@@ -1,0 +1,915 @@
+BMAI: the Button Men AI
+For information, contact Denis Papp, denis@accessdenied.net
+p0 s31.0 Dice (0)4:1 (0)10:1 
+p1 s40.0 Dice (0)20:20 (0)20:2 
+Setting max ply to 2
+Setting # simulations to 150
+Setting max branch to 1500
+l1 p0 Valid Moves 1 Sims 150
+l1 p0 m0: attack skill - (0)4:1 + (0)10:1 -> (0)20:2 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 43.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 66.0 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (66.0 points, 44.0% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 41.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 64.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 73.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (73.5 points, 49.0% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 37.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 60.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (60.5 points, 40.3% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 40.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 38.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 65.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (65.0 points, 43.3% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 64.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 61.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (64.5 points, 43.0% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 70.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: score 73.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 best move (73.0 points, 48.7% win) attack power - (0)20:20 -> (0)4:1 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 66.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 68.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (68.0 points, 45.3% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 42.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 70.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (70.5 points, 47.0% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 40.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 61.5 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (61.5 points, 41.0% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 40.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 50.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 55.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 61.0 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (61.0 points, 40.7% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 45.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 61.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (61.0 points, 40.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 37.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 69.0 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (69.0 points, 46.0% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 67.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)4:2 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 64.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 44.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 64.0 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (64.0 points, 42.7% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 53.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 44.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 64.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 69.5 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (69.5 points, 46.3% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 43.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 70.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (70.5 points, 47.0% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 65.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 63.5 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (65.0 points, 43.3% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 64.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: score 73.5 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 best move (73.5 points, 49.0% win) attack power - (0)20:20 -> (0)10:2 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 47.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 68.5 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (68.5 points, 45.7% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 58.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 63.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (63.0 points, 42.0% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 42.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 70.0 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (70.0 points, 46.7% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 57.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 65.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 65.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (65.0 points, 43.3% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 62.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 55.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 65.5 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 73.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (73.0 points, 48.7% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 62.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 45.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 48.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 62.5 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (62.5 points, 41.7% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 61.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 43.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 70.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (70.0 points, 46.7% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 57.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m0: score 57.0 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 36.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 37.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m0: score 59.5 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 66.5 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 70.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (70.5 points, 47.0% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 47.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 57.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (57.5 points, 38.3% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 40.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 65.0 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (65.0 points, 43.3% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 50.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 53.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 73.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (73.0 points, 48.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 63.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 70.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (70.0 points, 46.7% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 57.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 71.5 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: score 71.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 best move (71.5 points, 47.7% win) attack power - (0)20:20 -> (0)10:1 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 51.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 53.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 55.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 58.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (58.5 points, 39.0% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 41.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 68.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 63.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (68.5 points, 45.7% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 36.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 49.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 65.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (65.0 points, 43.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 50.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 72.5 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (72.5 points, 48.3% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 44.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 60.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (60.0 points, 40.0% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 64.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 69.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (69.0 points, 46.0% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 63.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 63.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (63.5 points, 42.3% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 64.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 60.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (64.0 points, 42.7% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 40.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 67.0 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (67.0 points, 44.7% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 53.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 62.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (62.0 points, 41.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 39.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 51.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 66.0 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (66.0 points, 44.0% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 52.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 64.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (64.5 points, 43.0% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 56.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 68.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (68.5 points, 45.7% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 36.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 39.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 60.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (60.0 points, 40.0% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 39.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 60.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (60.5 points, 40.3% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 55.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 68.0 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (68.0 points, 45.3% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 56.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 66.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (66.0 points, 44.0% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 63.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 63.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (63.5 points, 42.3% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 51.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 44.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 67.0 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (67.0 points, 44.7% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 46.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 68.0 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (68.0 points, 45.3% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 65.5 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)4:2 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 48.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 66.0 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (66.0 points, 44.0% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 63.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 67.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (67.0 points, 44.7% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 56.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 53.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 61.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (61.5 points, 41.0% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 37.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 66.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (66.0 points, 44.0% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 62.5 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 72.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (72.5 points, 48.3% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 59.5 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 64.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (64.0 points, 42.7% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 59.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 72.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (72.5 points, 48.3% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 51.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 52.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 41.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 69.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (69.5 points, 46.3% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 51.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 72.5 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (72.5 points, 48.3% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 47.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 59.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (59.0 points, 39.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 37.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 56.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 62.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (62.0 points, 41.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 62.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 63.5 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (63.5 points, 42.3% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 50.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 63.0 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (63.0 points, 42.0% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 67.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 74.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (74.0 points, 49.3% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 61.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 73.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (73.0 points, 48.7% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 69.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)4:1 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 63.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 73.0 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (73.0 points, 48.7% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 37.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 48.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 61.0 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (61.0 points, 40.7% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 50.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 63.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (63.5 points, 42.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 56.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 73.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: score 70.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 best move (73.0 points, 48.7% win) attack power - (0)20:20 -> (0)10:1 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 48.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 69.0 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (69.0 points, 46.0% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 43.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 70.5 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (70.5 points, 47.0% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 70.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: score 71.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 best move (71.5 points, 47.7% win) attack power - (0)20:20 -> (0)4:2 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 48.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 62.5 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (62.5 points, 41.7% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 56.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 69.5 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (69.5 points, 46.3% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 53.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 64.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (64.0 points, 42.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 47.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 64.0 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (64.0 points, 42.7% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 71.5 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: score 73.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 best move (73.0 points, 48.7% win) attack power - (0)20:20 -> (0)4:1 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 43.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 72.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (72.5 points, 48.3% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m0: score 61.0 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m0: score 60.5 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 59.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (60.5 points, 40.3% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 60.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 34.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 63.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (63.5 points, 42.3% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 54.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 65.5 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (65.5 points, 43.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 66.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 49.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 61.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (61.0 points, 40.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 60.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 62.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: score 72.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 40.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 59.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (59.5 points, 39.7% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 39.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 68.0 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (68.0 points, 45.3% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 53.5 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 67.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (67.5 points, 45.0% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 41.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:8 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)10:8 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)10:8 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 51.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 71.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (71.5 points, 47.7% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 42.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 71.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (71.5 points, 47.7% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m0: score 64.0 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: score 69.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 best move (69.0 points, 46.0% win) attack power - (0)20:20 -> (0)4:2 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 63.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 61.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (63.0 points, 42.0% win) attack power - (0)20:20 -> (0)10:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:4 
+l2 p1 m0: score 63.0 - attack power - (0)20:20 -> (0)10:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 55.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (63.0 points, 42.0% win) attack power - (0)20:20 -> (0)10:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 42.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 54.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 62.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (62.0 points, 41.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 72.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 best move (72.0 points, 48.0% win) attack power - (0)20:20 -> (0)10:1 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 50.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 59.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (59.0 points, 39.3% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 45.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:7 
+l2 p1 m1: score 58.5 - attack power - (0)20:20 -> (0)10:7 
+l2 p1 best move (58.5 points, 39.0% win) attack power - (0)20:20 -> (0)10:7 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:1 
+l2 p1 m0: score 61.0 - attack power - (0)20:20 -> (0)10:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 70.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (70.5 points, 47.0% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 56.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:6 
+l2 p1 m1: score 67.0 - attack power - (0)20:20 -> (0)10:6 
+l2 p1 best move (67.0 points, 44.7% win) attack power - (0)20:20 -> (0)10:6 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m0: score 51.0 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 62.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (62.5 points, 41.7% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 40.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 59.5 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (59.5 points, 39.7% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 43.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:9 
+l2 p1 m1: score 71.5 - attack power - (0)20:20 -> (0)10:9 
+l2 p1 best move (71.5 points, 47.7% win) attack power - (0)20:20 -> (0)10:9 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 68.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: score 70.5 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 best move (70.5 points, 47.0% win) attack power - (0)20:20 -> (0)10:2 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m0: score 57.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 67.0 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (67.0 points, 44.7% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m0: score 62.5 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:3 
+l2 p1 m1: score 71.5 - attack power - (0)20:20 -> (0)4:3 
+l2 p1 best move (71.5 points, 47.7% win) attack power - (0)20:20 -> (0)4:3 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 32.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 71.0 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (71.0 points, 47.3% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:3 
+l2 p1 m0: score 55.0 - attack power - (0)20:20 -> (0)10:3 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: score 66.5 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 best move (66.5 points, 44.3% win) attack power - (0)20:20 -> (0)4:4 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:4 
+l2 p1 m0: score 43.0 - attack power - (0)20:20 -> (0)4:4 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:10 
+l2 p1 m1: score 59.0 - attack power - (0)20:20 -> (0)10:10 
+l2 p1 best move (59.0 points, 39.3% win) attack power - (0)20:20 -> (0)10:10 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)4:1 
+l2 p1 m0: score 59.5 - attack power - (0)20:20 -> (0)4:1 
+l2 p1 m1: attack power - (0)20:20 -> (0)10:5 
+l2 p1 m1: score 72.5 - attack power - (0)20:20 -> (0)10:5 
+l2 p1 best move (72.5 points, 48.3% win) attack power - (0)20:20 -> (0)10:5 
+l2 p1 Valid Moves 2 Sims 150
+l2 p1 m0: attack power - (0)20:20 -> (0)10:2 
+l2 p1 m0: score 68.5 - attack power - (0)20:20 -> (0)10:2 
+l2 p1 m1: attack power - (0)20:20 -> (0)4:2 
+l2 p1 m1: score 66.0 - attack power - (0)20:20 -> (0)4:2 
+l2 p1 best move (68.5 points, 45.7% win) attack power - (0)20:20 -> (0)10:2 
+l1 p0 m0: score 83.0 - attack skill - (0)4:1 + (0)10:1 -> (0)20:2 
+l1 p0 best move (83.0 points, 55.3% win) attack skill - (0)4:1 + (0)10:1 -> (0)20:2 
+action
+skill
+0 1
+1

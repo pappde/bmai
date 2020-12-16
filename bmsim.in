@@ -1,0 +1,15 @@
+game
+preround
+player 0 5 0
+6
+8
+z20
+z20
+S
+player 1 5 0
+4
+20
+4/8
+6/12
+6/20
+playgame 20

@@ -1,0 +1,12 @@
+game
+fight
+player 0 2 31
+4:1
+10:1
+player 1 2 40
+20:20
+20:2
+ply 2
+sims 150
+maxbranch 1500
+getaction
