@@ -1,10 +1,11 @@
 #!/usr/bin/perl --
-##################################################################
+# TODO: new "game over" notification
+###################################################################################
 # bmai.pl
 #
-# Copyright (c) 2001 Denis Papp. All rights reserved.
+# Copyright (c) 2001-2020 Denis Papp. All rights reserved.
 # denis@accessdenied.net
-# http://www.accessdenied.net/bmai
+# https://github.com/hamstercrack/bmai
 #
 # DESCRIPTION: this is the front-end to BMAI.  It serves as the interface between the AI and
 # the BM web page by Dana Huyler.  It also is intended to do rating and evaluation of BMs,
@@ -32,7 +33,30 @@
 # drp070701 - support for CHANCE
 # drp072201 - add random "seed" call
 # drp090601 - support for 'pass' on a CHANCE
-##################################################################
+# drp102801	- release 1.0
+# drp110301 - fixed problem recognizing CHANCE action wanted
+# drp111001 - support for FOCUS
+# drp031302 - added ability to create games (3 games of random set vs the same set)
+# drp031502 - don't fail if player mail/news/challenges are there, but notify in $g_actions
+# drp031702 - added statistics reporting in taunt when game starts
+# drp062702	- fixed stats taunting - didn't display 'vs_bm' correctly
+#			- added '2000 Rare/Promo' to sets
+# drp063002	- dump 'stats' line, such as "Time Elapsed" in $g_actions
+#			- handle 'surrender'
+# drp071302	- deal with case where default "bmai_out.txt" file cannot be written to
+# drp072102 - deal with 'The Flying Squirrel' special rule (die modifier 'k')
+# drp090202 - parsing: added 'Stinger' and fixed problem parsing special option dice
+#	    - add 'Diceland' and '2002 Rare-Promo' sets
+# drp090702 - added game # to bets move taunt
+# drp101302 - deal with 'Guillermo' special rule (die modifier 'u' - used to be part of the definition)
+#	    - added 'Renaissance' set
+# drp102202 - handle new "Notification Center" for acknowledging/purging completed games
+# drp021403 - fixed mainmenu gamelist parsing (<tr class="ready"> from <tr>)
+# drp021503 - fixed complete_game notification parsing
+# drp030103 - complete_game notification link changed again, support both forms
+# drp071305 - added lamer support (people who join games but don't play their turns if they start losing)
+# drp080405 - fixed reserve preround parsing
+###################################################################################
 
 # TODO
 # drp060601 - because BMAI does not distinguish games by what section they are in, it tries to
@@ -65,33 +89,43 @@ use Net::SMTP;
 
 # MAIN SETTINGS
 
+# BEHAVIOR
+$::PURGE_STALE_GAMES = 0;
+#$::DEBUG_GAME = 446689;
 
 # SETTINGS
-$BMW_URL_BASE = "http://www.buttonmen.dhs.org/";
-$BMD_BMAI = "c:\\dev\\bmai\\release\\bmai";
+$BMW_URL_BASE = "http://www.buttonmen.dhs.org";
+$BMD_BMAI = "release\\bmai";
 $BMD_BMAI_INPUT = "bmai_in.txt";
-$BMD_BMAI_OUTPUT = "bmai_out.txt";
-$BMD_BMAI_PATH = "c:\\dev\\bmai\\";
+$BMD_BMAI_OUTPUT_PREFIX = "bmai_out";
+#$BMD_BMAI_PATH = "";
 $BMD_HISTORY = $BMD_BMAI_PATH . "history.txt";
+(-e $BMD_HISTORY) || die "Could not find: $BMD_HISTORY - is working dir set?";
 $DATE = "c:\\bin\\date";
 $TEMP_FILE = "out";
 $ADMIN_USER = "lunatic";
 $ADMIN_EMAIL = "denis\@accessdenied.net";
-$SMTP_SERVER = "mail.houston.rr.com";
-$VERBOSE_USERS = "(lunatic|zaph)";
+$SMTP_SERVER = "fnord.accessdenied.net"; ##mail.houston.rr.com";
+$VERBOSE_USERS = "(lunatic|zaph|ahowald|jl8e)";
+# drp071006 - removed BattleOmega from list
+#$LAMERS = "(BattleOmega)";
+$LAMERS = "()";
+$STATS_TOOL = "stats.pl";
+#$PERL_EXE = "d:\\bin\\perl\\bin\\perl";
+$PERL_EXE = "perl";
 
 $USERNAME = "bmai";
 $PASSWORD = "****";
 
 # WEBSITE URLs
-$BMW_MAIN = "menu.fcgi";
+$BMW_MAIN = "/menu.fcgi";
 $BMW_MENU = $BMW_URL_BASE . $BMW_MAIN;
 #$BMW_NEWUSER = $BMW_URL_BASE . "$BMW_MAIN?cmd=newuser";
 $BMW_LOGIN = $BMW_URL_BASE . "$BMW_MAIN?cmd=login";
 $BMW_JOIN = $BMW_URL_BASE . "$BMW_MAIN?cmd=list_open";
 $BMW_CREATE = $BMW_URL_BASE . "$BMW_MAIN?cmd=create";
 $BMW_PROFILE = $BMW_URL_BASE . "$BMW_MAIN?cmd=profile&view=";   # username
-$BMW_PLAY = $BMW_URL_BASE . "bm.cgi\?game="; # id
+$BMW_PLAY = $BMW_URL_BASE . "/bm.cgi\?game="; # id
 $BMW_PURGE = $BMW_URL_BASE . "$BMW_MAIN?cmd=purge&game=";       # id
 
 # SCORING
@@ -99,10 +133,52 @@ $SCORE_ADMIN_BONUS = 100;
 $SCORE_CHALLENGE_BONUS = 10;
 $SCORE_JOIN_THRESHOLD = 50;
 
+# CREATING NEW GAMES
+$BMD_IDLE_DAYS_THRESHOLD = 14;
+$BMD_DESIRED_ACTIVE_GAMES = 40; #35; #30; #50; #60;
+$BMD_CREATE_OUTOFGAMES = 3;
+@BMD_CREATE_GAME_SET = (
+	'1999 Rare-Promo',
+	'2000 Rare-Promo',
+	'2002 Rare-Promo',
+	# 'BladeMasters', # observed removal 1/4/03
+	'Brawl',
+	'Brom',
+	'Bruno!',
+	'Chicago Crew',
+	'Club Foglio',
+	'Diceland',
+	# 'Dr. Oche', # observed that it was removed 10/27/02
+	'Fairies',
+	'Fantasy',
+	'Four Horsemen',
+	'Freaks',
+	'Howling Wolf',
+	'Iron Chef',
+	'Legend of the Five Rings',
+	'Lunch Money', 'Majesty',
+	'Dork Victory', 'Presidential Button Men', 'Yoyodyne', 'Sluggy Freelance',
+	'Renaissance',
+	'Sailor Moon',
+	'Sailor Moon 2',
+	'Samurai',
+	'Sanctum',
+	'Save the Ogres',
+	'Soldiers',
+	'Tenchi Muyo',
+	'The Metamorphers',
+	'Vampyres',
+	'Wonderland',
+	'Geekz',	# added 091905
+	'2003 Rare-Promo',	# added 091905
+);
+
 # AI SETTINGS
-$PLY = 2;
-$SIMS = 150;
-$MAXBRANCH = 1500;
+$PLY = 3;
+$MIN_SIMS = 5;
+$MAX_SIMS = 100;
+$MAXBRANCH = 400;
+# s_ply_decay is in bmai_ai.cpp
 
 # TWEAKS
 
@@ -129,6 +205,7 @@ my $g_games = 0;
 my $g_stats_finished;
 my $g_stats_won;
 my $g_stats_lost;
+
 #@{game . $g}
 #@{g_dice . $id}
 
@@ -153,6 +230,7 @@ my $g_ref_var;
 # POST: page is in $TEMP_FILE
 sub bm_get_url
 {
+	$_[0] = $BMW_URL_BASE . $_[0] if ($_[0] =~ m|^/|);
 	&get_url(undef, GET, $TEMP_FILE, @_);
 }
 
@@ -160,6 +238,7 @@ sub bm_get_url
 # POST: page is in $TEMP_FILE
 sub bm_post_url
 {
+	$_[0] = $BMW_URL_BASE . $_[0] if ($_[0] =~ m|^/|);
 	&get_url(undef, POST, $TEMP_FILE, @_);
 }
 
@@ -220,7 +299,14 @@ sub bm_onexit
 	# if played no games, and no error - send no email
     return if ($games_played==0 && !defined($g_error));
 
-    $smtp = new Net::SMTP($SMTP_SERVER); ##, Debug=>1);
+	# clean up BMAI output file unless there was an error
+	if (!defined($g_error)) {
+		unlink $g_bmai_output_file;
+	}
+
+    print "Sending report to $ADMIN_EMAIL via $SMTP_SERVER\n";
+    $smtp = new Net::SMTP($SMTP_SERVER); #, Debug=>1);
+    print "Connected: $smtp\n";
     $smtp->mail($ADMIN_EMAIL);
     $smtp->to($ADMIN_EMAIL);
     $smtp->data();
@@ -233,9 +319,64 @@ sub bm_onexit
     $smtp->quit;
 }
 
-#######################################################################################3
+#######################################################################################
+# stats
+#######################################################################################
+
+# POST: fills %g_history_stats.  Index {stat type} gives ref to hash.  Index this hash
+#	with the name give sa ref to an array of stats.
+#
+#	e.g., @{${$g_history_stats{'vs_opp'}}{'lunatic'}} = array of stats
+sub bm_readstats
+{
+	my $state = undef;
+	open (STATS,"$PERL_EXE $STATS_TOOL |") || die "could not run $STATS_TOOL";
+	while (<STATS>)
+	{
+		chop;
+		if (/STATISTIC: (.+)/)
+		{
+			$state = $1;
+		}
+		elsif (/^(.+)\s+(\d+) games \(\s*(\d+)\s+(\d+)\s+([\d\.]+\%)\)\s+\d+ matches /)
+		{
+			my $name = $1;
+			my @stats = ($games,$win,$loss,$perc) = ($2,$3,$4,$5);
+			$name =~ s/\s+$//;
+
+			# fix percentage
+			$stats[3] =~ s/%/%%/;
+
+			$hash_ref = $g_history_stats{$state};
+			if (!defined $hash_ref)
+			{
+				my %hash = ();
+				$g_history_stats{$state} = \%hash;
+				$hash_ref = $g_history_stats{$state};
+			}
+			$$hash_ref{$name} = \@stats;
+		}
+	}
+	close STATS;
+}
+
+# PARAM: category, name
+# RETURNS: array of stats
+sub bm_gethistorystats
+{
+	my ($cat,$name) = @_;
+
+	&debug(STATS, "Getting stats for $cat/$name\n");
+
+	my $category_hash_ref = $g_history_stats{$cat};
+	my $arr_ref = $$category_hash_ref{$name};
+
+	return (defined $arr_ref) ? @$arr_ref : (0);
+}
+
+#######################################################################################
 # interface to BMAI
-#######################################################################################3
+#######################################################################################
 
 $SIG{CHLD} = sub { wait };
 
@@ -248,14 +389,34 @@ sub bmai_init
     #&dp_onexit('bmai_uninit');
 }
 
+# PARAM: game id
 sub bmai_process
 {
+	my $g = shift;
+
 	&error("bad bmai state") unless $g_bmai_state eq 'init';
 
 	&bmai_uninit;
 
-	system "$BMD_BMAI < $BMD_BMAI_INPUT > $BMD_BMAI_OUTPUT";
-	open ( BMAI_OUT, "<$BMD_BMAI_OUTPUT") || &error("error reading $BMD_BMAI_OUTPUT");
+	# try to find a valid output file
+	my $i = 1;
+	while (1)
+	{
+		$g_bmai_output_file = sprintf($BMD_BMAI_OUTPUT_PREFIX . "-%d.txt", $i++);
+		open ( BMAI_OUT, ">$g_bmai_output_file") && last;
+	}
+	close BMAI_OUT;
+
+	$cmd = "$BMD_BMAI < $BMD_BMAI_INPUT > $g_bmai_output_file";
+	system $cmd;
+	(-s $g_bmai_output_file) || &bm_error("output file is empty (running '$cmd'): " . `dir`);
+	open ( BMAI_OUT, "<$g_bmai_output_file") || &error("error reading $g_bmai_output_file");
+
+	$g_bmai_best_move = undef;
+	$g_bmai_stats = undef;
+
+	my @scores = split(m|/|, &bm_ingame_score($g));
+	my $best_move_games = $scores[0] + $scores[1] + $scores[2] + 1;
 
 	# drain input until past 'action' (to avoid comments during move processing)
 	while (<BMAI_OUT>)
@@ -263,9 +424,15 @@ sub bmai_process
 		last if /^action/;
 		if (/best move/)
 		{
-			$g_bmai_best_move = $_;
+			$g_bmai_best_move = "Game #" . $best_move_games . ": " . $_;
 			chop $g_bmai_best_move;
 			&debug(BMAI, $g_bmai_best_move . "\n");
+		}
+		elsif (/^stats/)
+		{
+			$g_bmai_stats = $_;
+			chop $g_bmai_stats;
+			&debug(BMAI, $g_bmai_stats . "\n");
 		}
 	}
 
@@ -311,7 +478,8 @@ sub bm_login_parse
 {
 	if (m,<META HTTP-EQUIV=\"Refresh\" CONTENT=\"0; URL=(\S+)\">,)
 	{
-		$t_result = $1;
+		# drp060503 - website now contains file part of URL only
+		$t_result = $1; ### $BMW_URL_BASE . $1;
 		return 0;
 	}
 	1;
@@ -536,20 +704,19 @@ sub bm_joingames
 
 # parameters for mainmenu games
 $i=0;
+$MM_CLASS = $i++;
 $MM_ID = $i++;
 $MM_TOURN = $i++;
 $MM_FUN = $i++;
 $MM_OPP = $i++;
 $MM_STATUS = $i++;
-# $MM_BLANK = $i++;
 $MM_MY_BM = $i++;
 $MM_VS = $i++;
 $MM_OPP_BM = $i++;
-# $MM_BLANKPOST = $i++;
 $MM_SCORE = $i++;
 $MM_IDLETIME = $i++;
 $MM_ACTION_NAME = $i++;
-# $MM_ACTION = $i++;
+#$MM_DELETE_GAME = $i++;
 $MM_MAX = $i++;
 
 # values
@@ -558,14 +725,23 @@ $MM_MAX = $i++;
 #MM_STATUS
 # Your Turn, [opponent]'s Turn, Preround
 
+# PARAM: the class
 sub bm_mainmenu_start_reading_game
 {
+	my $class = shift;
+
 	@{game . $g_games} = ();
 	$t_state++;
+
+	push(@{game . $g_games},$class);
+	$t_state++;
+
+        &debug(MAIN, "start reading game ($t_state - $class)\n");
 }
 
 sub bm_mainmenu_end_reading_game
 {
+        print "ENDREADINGGAME: $t_state\n";
 	# SPECIAL: completed games have an extra field
 	# For normal games look at $MM_MAX + 1 since $t_state starts at 1 when parsing a game
 	if ($t_state == $MM_MAX + 2 || $t_state == $MM_MAX + 1)
@@ -575,12 +751,13 @@ sub bm_mainmenu_end_reading_game
 		&debug(MAIN, "in game $g_games id $game[$MM_ID] status $game[$MM_STATUS] vs $game[$MM_OPP] playing $game[$MM_MY_BM] vs $game[$MM_OPP_BM]\n");
 		$t_state = 0;
 		$g_games++;
+		$g_idle_games++ if ( ($game[$MM_IDLETIME] =~ /(\d+) DAYS/) && ($1>$BMD_IDLE_DAYS_THRESHOLD));
 		($w, $l, $t) = split(m|/|, $game[$MM_SCORE]);
 		$g_temp_wlt[($w>$l) ? 0 : (($l>$w) ? 1 : 2) ]++;
 	}
 	else
 	{
-		&debug(MAIN, "unexpected <\/tr> in mainmenu ($t_state/$MM_MAX)\n");
+		#&debug(MAIN, "unexpected <\/tr> in mainmenu ($t_state/$MM_MAX)\n");
 		$t_state = 0;
 	}
 }
@@ -588,7 +765,7 @@ sub bm_mainmenu_end_reading_game
 # TODO: if the last item is "View Game" it adds an unnecessary entry
 sub parse_mainmenu
 {
-	#print "LINE: $_";
+        #print "LINE:$t_state: $_";
 	if (/You have tournaments/)	# this puts a <tr> which messes up game parsing
 	{
 		##&bm_error("There are tournaments awaiting BM selection [unhandled]\n");
@@ -597,12 +774,60 @@ sub parse_mainmenu
 	{
 		&debug(MAIN, "Ignoring tournament $1\n");
 	}
-	elsif (/Player Mail/)
+	elsif (/Mark news read/)
 	{
-		&bm_error("There is player mail to address [unhandled]\n");
+		$g_actions .= "There is news\n\n";
+		# TODO: log and clear news
 	}
-	elsif (/<tr>/)
+	elsif (/Read Mail/)
 	{
+		$g_actions .= "There is player mail\n\n";
+		# TODO: handle mail
+	}
+	elsif (/You have been challenged/)
+	{
+		$g_actions .= "There is a challenge\n\n";
+		# TODO: handle challenges
+	}
+	# drp102202 - notification center
+	elsif (m,<table.+Notification Center,)
+	{
+		$t_state = notification;
+	}
+	elsif ($t_state eq 'notification')
+	{
+		#print "LINE: $_";
+		if (m,</table>,)
+		{
+			$t_state = 0;
+		}
+		elsif (m,\"(.+id=)(\d+)(.+complete_game)\">Remove Notice,)
+		{
+			$g_gameover{$2} = $1 . $2 . $3;
+		}
+		elsif (m,\"(.+complete_game)(.+id=)(\d+)(.*)\">Remove Notice,)
+		{
+			#&debug(MAIN, "Game Over: $3\n");
+			$g_gameover{$3} = $1 . $2 . $3 . $4;
+		}
+                elsif (m,\"(.+id=)(\d+)(.+complete_game)(.*)\">Remove Notice,)
+                {
+                        $g_gameover{$2} = $1 . $2 . $3 . $4;
+                }
+		elsif (m,complete_game.*\">Remove all Notices,i)
+		{
+			# ignore
+		}
+		elsif (m,complete_game,)
+		{
+			&bm_error("unrecognized complete_game: $_");
+		}
+	}
+	elsif (/<tr class=\"(\S+) ?\">/ || /<tr>/)
+	{
+		#&debug(MAIN, "read " . $_);
+                print "READ END - STATE $t_state\n";
+		$t_class = $1;
 		if ($t_state==$MM_MAX)
 		{
 			&bm_mainmenu_end_reading_game;
@@ -612,26 +837,37 @@ sub parse_mainmenu
 			&debug(MAIN, "ignoring unexpected <tr> in mainmenu ($t_state)\n");
 			$t_state = 0;
 		}
-		&bm_mainmenu_start_reading_game;
+		&bm_mainmenu_start_reading_game($t_class);
 	}
 	# also check for <tr>, since on 031801 was missing </tr>
-	elsif (m,</tr>, || ($t_state>0 && m,<tr>,))
+	elsif (m,</tr>,) #### || ($t_state>0 && m,<tr>,))
 	{
+                &debug(MAIN, "spotted </tr>\n");
 		&bm_mainmenu_end_reading_game;
-		# if was ended by a <tr>, duplicate code in the first block
-		if (m,<tr>,)
-		{
-			&bm_mainmenu_start_reading_game;
-		}
+		#### if was ended by a <tr>, duplicate code in the first block
+		#### if (m,<tr>,)
+		#### {
+		####	    &bm_mainmenu_start_reading_game;
+		#### }
 	}
 	elsif ($t_state>0)
 	{
-		#&debug(MAIN, "watch $t_state: $_");
+		# drp081505 - this code used to support multiple <td>
+		#  tokens per line when website put multiple columsn on one
+		#  line.  But website now has max one column per line.  Plus 
+		#  they have a weird case where the Arena link is followed by
+		#  an "&nbsp;" and the old code was confusing that for two 
+		#  tokens == two columns which is wrong.
+		# FIX: changed it to support max one column/token per line
+		#debug(MAIN, "watch $t_state: $_");
 		$string = $_;
+		$l_tokens_this_line = 0;
 		while ($token = &get_token(\$string))
 		{
 			# ignore blank tokens
 			next if ($token =~ /^\s+$/);
+			next if ($l_tokens_this_line>0 && $token eq "&nbsp;");
+			$l_tokens_this_line++;
 			push(@{game . $g_games},$token);
 			#&debug(MAIN, "found index $t_state lastentry $#{game . $g_games} $token\n");
 			$t_state++;
@@ -649,21 +885,109 @@ sub parse_mainmenu
 }
 
 
-# POST: fills @{game...} and sets $g_games
+# POST: fills @{game...} and sets $g_games, $g_active_games
 sub bm_mainmenu
 {
-	&bm_get_url($BMW_MENU);
+	# drp021803 - need "menu=BM" to get full list
+	&bm_post_url($BMW_MENU, 'cmd', 'menu', 'menu', 'BM');
 	$g_games = 0;
 	$t_state = 0;
+	@g_temp_wlt = (0,0,0);
+	$g_idle_games = 0;
+	%g_gameover = ();
 	&bm_parse('parse_mainmenu');
 	#&bm_dump;
 
-	&bm_error("Could not parse games stats") unless defined $g_stats_finished;
+	# parse g_gameover (notification center)
+	&debug(MAIN, "processing completed games\n");
+	foreach $g (keys %g_gameover)
+	{
+		&bm_process_gameover($g);
+	}
 
-	$g_results .= "Games Won $g_stats_won Lost $g_stats_lost Finished $g_stats_finished\n";
-	$g_results .= "$g_games games found. Winning $g_temp_wlt[0] Losing $g_temp_wlt[1] Tied $g_temp_wlt[2]\n";
+	$g_active_games = $g_games - $g_idle_games;
+
+	# drp102202 - disappeared from site
+	# &bm_error("Could not parse games stats") unless defined $g_stats_finished;
+
+	# $g_results .= "Games Won $g_stats_won Lost $g_stats_lost Finished $g_stats_finished\n";
+	$g_results .= "$g_games games found ($g_active_games active). Winning $g_temp_wlt[0] Losing $g_temp_wlt[1] Tied $g_temp_wlt[2]\n";
 
 	&debug(MAIN, $g_results);
+
+}
+
+sub parse_gameover_view
+{
+	#print "PGOV: $_";
+	if (m,This game was completed: (.+)<,)
+	{
+	}
+	elsif ( (m,profile.+view=\S+>(\S+)</a>,)
+		|| (m,view.+profile.*\">(\S+)</a>,) )
+	{
+		#print "2 $_";
+		if ($1 eq $USERNAME) {
+			$t_state = 'my_bm'
+		} else {
+			$opp = $1;
+			$t_state = 'opp_bm';
+		}
+	}
+	elsif (0 && m,view, && m,profile,)
+	{
+		die "mismatched: $_";
+	}
+	elsif (m,Button Man.+displaybm.*\">(.+)</a>,)
+	{
+		#print "3:$t_state: $_";
+		($t_state eq 'my_bm') ? $my_bm = $1 : $opp_bm = $1;
+	}
+	elsif ($t_state eq 'my_bm')
+	{
+		#print "4 $_";
+		if (m,Rounds.+<B>(.+)</B>,) {
+			$score = $1;
+		}
+	}
+
+	1;
+}
+
+# PRE: $g_gameover{$id} = the remove URL
+#      bm.cgi?game=$id to view the results of the game
+# NOTE: copies bm_purgegame()
+sub bm_process_gameover
+{
+	my $id = shift;
+	my $view_url = $BMW_PLAY . $id;
+
+	my $date = localtime(time);
+	$date =~ s/(\S+ +\S+ +\d+).+ (\d+)/\1 \2/;
+
+	# determine opp, my_bm, opp_bm, score (w/l/t)
+	$opp = $my_bm = $opp_bm = $score = undef;
+	$t_state = undef;
+	&bm_get_url($view_url);
+	&bm_parse('parse_gameover_view');
+
+	die "processing gameover - opp: $opp bm: $my_bm vs $opp_bm score: $score" unless defined $opp && defined $my_bm && defined $opp_bm && defined $score;
+
+	$score =~ s/ //g;
+	local($w, $l, $t) = split(m:/:, $score);
+	my $result = ($w > $l) ? "win" : "loss";
+
+	my $log = "$date\t$id\t$opp\t$my_bm\t$opp_bm\t$w\t$l\t$t\t$result\n";
+
+	open(HISTORY,">>$BMD_HISTORY") || &bm_error("could not open $BMD_HISTORY: $!");
+	print HISTORY $log;
+	close HISTORY;
+
+	$g_actions .= "\nCompleted: Game $id BM $my_bm VS $opp_bm ($opp) Score $score\n";
+
+        $games_finished++;
+
+	&bm_post_url($g_gameover{$id});
 }
 
 sub bm_ingame_param
@@ -678,8 +1002,12 @@ sub bm_ingame_id { return &bm_ingame_param(shift, $MM_ID); }
 sub bm_ingame_status { return &bm_ingame_param(shift,$MM_STATUS); }
 sub bm_ingame_score { return &bm_ingame_param(shift,$MM_SCORE); }
 sub bm_ingame_action_name { return &bm_ingame_param(shift, $MM_ACTION_NAME); }
+sub bm_ingame_delete_game { return &bm_ingame_param(shift, $MM_DELETE_GAME); }
 sub bm_ingame_action { my $game = shift; return ${game . $game . action}; }
 sub bm_ingame_opp { return &bm_ingame_param(shift,$MM_OPP); }
+sub bm_ingame_my_bm { return &bm_ingame_param(shift,$MM_MY_BM); }
+sub bm_ingame_opp_bm { return &bm_ingame_param(shift,$MM_OPP_BM); }
+
 
 #######################################################################################
 # general BM functions
@@ -717,21 +1045,32 @@ sub bm_text_to_die
 	$die .= "r" if ($text =~ s/Reserve//);
 	$die .= "o" if ($text =~ s/Ornery//);
 	$die .= "D" if ($text =~ s/Doppleganger//);
+    $die .= "G" if ($text =~ s/Rage//);
 	$die .= "f" if ($text =~ s/Focus//);
 	$die .= "c" if ($text =~ s/Chance//);
 	$die .= "m" if ($text =~ s/Morphing//);
 	$die .= "%" if ($text =~ s/Radioactive//);
+	$die .= "`" if ($text =~ s/Warrior//);
+	$die .= "w" if ($text =~ s/Slow//);
+	$die .= "u" if ($text =~ s/Unique//);
+	$die .= "g" if ($text =~ s/Stinger//);
+	$die .= "k" if ($text =~ s/Konstant//);	
 
 	# option postfix (but before "defined sides")
 	$option .= "!" if ($text =~ /Turbo/);           $text =~ s/Turbo//;
 	$option .= "?" if ($text =~ /Mood/);            $text =~ s/Mood//;
 
 	# sides (one)
-	if ($text =~ m,Option (\d+)/(\d+),)
+	if ($text =~ s,Option +(\d+)/(\d+),,)
 	{
 		$die .= "$1/$2";
 		$sides_defined = 1;
-		$text =~ s,Option (\d+)/(\d+),,;
+	}
+	# BUG: drp063002 - weird bug with web site.  Option die without options defined.  Just treat it as a normal die
+	elsif ($text =~ s,Option (\d+)-sided die,,)
+	{
+		$die .= $1;
+		$sides_defined = 1;
 	}
 	elsif ($text =~ s/Twin +(\S) +Swing( Die)?//)
 	{
@@ -790,11 +1129,98 @@ sub bm_text_to_die
 	if ($text =~ s/showing (\d+)//)
 	{
 		$die .= ":$1";
+
+		# indicate dizzy die
+		$die .= "d" if ($text =~ s/\(Dizzy\)//);
 	}
 
     &bm_error("Unsuccessfully parsed die: $text -> $die\n") if $text !~ /^\s*$/;
 
 	return $die;
+}
+
+
+# PRE: parse_fight called
+# RETURNS: taunt string
+sub bm_process_taunting
+{
+	my $taunt;
+
+	# vs_bm, same_bm, opp, bm
+
+	# opp stats
+	my $opp = ${game . $g}[$MM_OPP];
+	@stats = &bm_gethistorystats('opp',$opp);
+	if ($stats[0]>0)
+	{
+		my $perc = $stats[3];
+		if ($opp =~ /^$LAMERS$/i) {
+			$perc = "92.7%"; 
+		}
+		$games_string = ($stats[0]>1) ? "games" : "game";
+		$taunt = "I am $perc in $stats[0] $games_string against you.";
+	}
+	else
+	{
+		$taunt = "I have never played you.";
+	}
+
+	# template: same bm
+	my $my_bm = ${game . $g}[$MM_MY_BM];
+	my $opp_bm = ${game . $g}[$MM_OPP_BM];
+	if ($my_bm eq $opp_bm)
+	{
+		@stats = &bm_gethistorystats('same_bm',$my_bm);
+
+		# template: same bm, played
+		if ($stats[0]>0)
+		{
+			$games_string = ($stats[0]>1) ? "games" : "game";
+			$taunt .= "   I am $stats[3] in $stats[0] $games_string when playing $my_bm against itself.";
+		}
+		# template: same bm, never played
+		else
+		{
+			$taunt .= "   I have never played $my_bm against itself.";
+		}
+	}
+
+	# my bm
+	@stats = &bm_gethistorystats('bm',$my_bm);
+
+	# template: played my bm
+	if ($stats[0]>0)
+	{
+		$games_string = ($stats[0]>1) ? "games" : "game";
+		$taunt .= "   I am $stats[3] in $stats[0] $games_string when playing $my_bm.";
+	}
+	# template: never played my bm
+	else
+	{
+		$taunt .= "   I have never played $my_bm.";
+	}
+
+	# opp bm
+	@stats = &bm_gethistorystats('vs_bm',$opp_bm);
+
+	# template: played against opp bm
+	if ($stats[0]>0)
+	{
+		$games_string = ($stats[0]>1) ? "games" : "game";
+		$taunt .= "   I am $stats[3] in $stats[0] $games_string when playing against $opp_bm.";
+	}
+	# template: never played against opp bm
+	else
+	{
+		$taunt .= "   I have never played against $opp_bm.";
+	}
+
+	&debug(FIGHT, "TAUNT: $taunt\n");
+
+	# remove extra "%%"
+	$taunt =~ s/%%/%/g;
+
+	return $taunt;
 }
 
 #######################################################################################
@@ -814,6 +1240,7 @@ $PT_TURN = 1;
 
 sub parse_preround
 {
+	# print "#$t_state: $_";
 	if (/You have set your Swing dice./)
 	{
 		$t_state = 'no_turn_needed';
@@ -843,14 +1270,41 @@ sub parse_preround
 	elsif ($t_state eq 'readdice')
 	{
 		if (/Opponent's Dice.+Your Dice/)
-		{
+			{
 			&error("Preround dice are listed in reverse order.");
 		}
 		elsif (/<li>(.+)/)
 		{
 			push(@{g_dice . $t_id} , &bm_text_to_die($1));
-			#my $l_size = $#{g_dice . $t_id};
-			#&debug(PLAYPREROUND, "DICE$t_id: #$l_size = ${g_dice . $t_id}[$l_size]\n");
+			my $l_size = $#{g_dice . $t_id};
+			&debug(PLAYPREROUND, "DICE$t_id: #$l_size = ${g_dice . $t_id}[$l_size]\n");
+		}
+		# drp072105 - new reserve syntax
+		# drp091905 - made regexp more general so catches twin dice
+		elsif (/td valign=top>(.+ die.*)<br>/i)
+		{
+			&debug(PLAYPREROUND, "RESERVE-TD PARSING: $1\n");
+			push(@{g_dice . $t_id} , &bm_text_to_die($1));
+			my $l_size = $#{g_dice . $t_id};
+			&debug(PLAYPREROUND, "RESERVE DICE$t_id: #$l_size = ${g_dice . $t_id}[$l_size]\n");
+		}
+		# drp072105 - new reserve syntax
+		# drp091905 - made regexp more general so catches twin dice
+		elsif (/(.+ die.*)<br>$/i)	     
+		{
+			&debug(PLAYPREROUND, "RESERVE-BR PARSING: $1\n");
+			push(@{g_dice . $t_id} , &bm_text_to_die($1));
+			my $l_size = $#{g_dice . $t_id};
+			&debug(PLAYPREROUND, "RESERVE DICE$t_id: #$l_size = ${g_dice . $t_id}[$l_size]\n");
+		}
+		# drp072105 - new reserve syntax
+		elsif (/^<\/td>/)
+		{
+			$t_id++;
+			#$t_state = 'readaction' if ($t_id>$ID_OPP);
+			# now we're looking for the reserve choices (<option value>)
+			$t_state = 'reserveaction' if ($t_id>$ID_OPP);
+			&debug(PLAYPREROUND, "NEXT PLAYER ($t_state)\n");
 		}
 		elsif (m,</ul>,)
 		{
@@ -865,9 +1319,10 @@ sub parse_preround
 			@DICE = split(/, ?/, $dice);
 			foreach $die (@DICE)
 			{
+				print "TITLE PARSE: $die\n";
 				push(@{g_dice . $t_id}, &bm_text_to_die($die));
-				#my $l_size = $#{g_dice . $t_id};
-				#&debug(PLAYPREROUND, "DICE$t_id: #$l_size = ${g_dice . $t_id}[$l_size]\n");
+				my $l_size = $#{g_dice . $t_id};
+				&debug(PLAYPREROUND, "GROUP - DICE$t_id: #$l_size = ${g_dice . $t_id}[$l_size]\n");
 			}
 		}
 		elsif (m,you may select a reserve die,)
@@ -875,6 +1330,15 @@ sub parse_preround
 			$t_state = 'reserveaction';
 			&debug(PLAYPREROUND, "looking for reserve action\n");
 		}
+	}
+	# drp072105 - new reserve syntax		
+	elsif (m,Choose Reserve Die,i)
+	{
+		$t_state = 'reserveaction';
+		&debug(PLAYPREROUND, "end of reserve action\n");
+		
+		# don't bother reading actions
+		return 0;
 	}
 	elsif (m,You have Chance Dice,)
 	{
@@ -884,15 +1348,41 @@ sub parse_preround
 		# don't bother reading actions
 		return 0;
 	}
-	# reserve action (will ignore the "-1" no reserve option
+	elsif (m,You have Focus Dice,)
+	{
+		#&bm_error("focus support not finished");
+		$t_state = 'focusaction';
+		&debug(PLAYPREROUND, "looking for focus action\n");
+
+		# don't bother reading actions
+		return 0;
+	}
+	# reserve action (will ignore the "-1" no reserve option)
+	# drp080405: reserve dice were populated above, so we don't add this die, we find it in the list
 	elsif ($t_state eq 'reserveaction' && m,<option value=(\d+)>(.+),)
 	{
 		$value = $1;
-		push(@{g_dice . 0}, &bm_text_to_die($2));
+		$die = &bm_text_to_die($2);
+		print "RESERVE OPTION:$value DIE:$die\n";
+		
+		return 1 if ($value<0);
+		
+		#push(@{g_dice . 0}, &bm_text_to_die($2));
 		my $l_size = $#{g_dice . 0};
-		&debug(PLAYPREROUND, "RESERVE: $value = ${g_dice . 0}[$l_size]\n");
-		${g_reservevalue . 0}[$l_size] = $value;
-		## &bm_error("value $value mismatches # dice $l_size") unless $l_size == $value;
+		my $slot;
+		my $i;
+		for ($i=0; $i<=$l_size; $i++) 
+		{
+			if ($die eq ${g_dice . 0}[$i])
+			{
+				$slot = $i;
+				last;
+			}
+		}
+		&bm_error("could not find reserve die ($die)") unless defined $slot;	
+		&debug(PLAYPREROUND, "RESERVE: $value = ${g_dice . 0}[$slot]\n");
+		${g_reservevalue . 0}[$slot] = $value;
+		# &bm_error("value $value mismatches # dice $l_size") unless $l_size == $value;
 	}
 	# reserveaction - end of actions
 	elsif ($t_state eq 'reserveaction' && m,input type=submit,)
@@ -900,7 +1390,8 @@ sub parse_preround
 		return 0;
 	}
 	# readaction - end of actions
-	elsif ($t_state eq 'readaction' && m,input type=submit,)
+	# - ignore the chance action "No Initiative Response"
+	elsif ($t_state eq 'readaction' && m,input type=submit, && $_ !~ /No Initi?ative Response/)
 	{
 		return 0;
 	}
@@ -973,6 +1464,18 @@ sub parse_preround_result
 		$t_result = "WARNING: must setswing!!";
 		return 0;
 	}
+	# FOCUS success unchallenged
+	elsif ($t_action =~ /^focus/ && $_ =~ /To attack, click on one of your dice/)
+	{
+		$t_result = "focus success unchallenged";
+		return 0;
+	}
+	# FOCUS success challenged
+	elsif ($t_action =~ /^focus/ && $_ =~ /can now respond with/)
+	{
+		$t_result = "focus success challenged";
+		return 0;
+	}
 
 	1;
 }
@@ -995,7 +1498,7 @@ sub bm_playturn_preround
 	$t_id = $ID_ME;
 	$g_setdice_actions = 0;
 	&bm_parse('parse_preround');
-
+	
 	if ($t_state eq 'no_turn_needed')
 	{
 		&debug(PLAYPREROUND, "swing dice already set\n");
@@ -1011,12 +1514,13 @@ sub bm_playturn_preround
 	# log dice
 	for ($p=0; $p<2; $p++)
 	{
-	my $log = "p$p: ";
+		&bm_playturn_fix_dice($g, $p);
+		my $log = "p$p: ";
 		for ($n=0; $n<=$#{g_dice . $p}; $n++)
 		{
 	    $log .= "${g_dice . $p}[$n] ";
 		}
-	&debug(PLAYPREROUND, "$log\n");
+		&debug(PLAYPREROUND, "$log\n");
 		$g_actions .= "$log\n";
 	}
 
@@ -1031,11 +1535,14 @@ sub bm_playturn_preround
 	&bmai_init();
 	# drp072201 - randomize the BMAI RNG
 	&bmai_write("seed 0\n");
+	my $action = $t_state;
 	&bmai_write("game\n");
 	if ($t_state eq "reserveaction") {
 		&bmai_write("reserve\n");
 	} elsif ($t_state eq "chanceaction") {
 		&bmai_write("chance\n");
+	} elsif ($t_state eq "focusaction") {
+		&bmai_write("focus\n");
 	} else {
 		&bmai_write("preround\n");
 	}
@@ -1048,12 +1555,14 @@ sub bm_playturn_preround
 			&bmai_write("${g_dice . $p}[$n]\n");
 		}
 	}
-    &bmai_write("ply $PLY\nsims $SIMS\nmaxbranch $MAXBRANCH\n");
+    &bmai_write("ply $PLY\nmax_sims $MAX_SIMS\nmin_sims $MIN_SIMS\nmaxbranch $MAXBRANCH\n");
 	&bmai_write("getaction\n");
-	&bmai_process();
+	&bmai_process($g);
+
+	$g_actions .= "$g_bmai_best_move\n";
+	$g_actions .= "$g_bmai_stats\n";
 
 	# send a 'taunt' of the best move score if opponent is admin
-	my @taunt = ();
 	if (&bm_ingame_opp($g) =~ /^$VERBOSE_USERS$/i)
 	{
 		@taunt = ('taunt', $g_bmai_best_move);
@@ -1062,6 +1571,7 @@ sub bm_playturn_preround
 	# get action
 	my @vars = ();
 	my $pushed_chance_dice = 0;
+	my $pushed_focus_dice = 0;
 	while ($_ = &bmai_read)
 	{
 		## &bm_error("passing on preround\n") if /^pass/;
@@ -1088,6 +1598,7 @@ sub bm_playturn_preround
 			my $value = ${g_reservevalue . 0}[$1];
 			push @vars, "reserve";
 			push @vars, $value;
+			&bm_error("g_reservevalue missing") unless defined $value;
 		}
 		elsif (/^chance (\d+)/)
 		{
@@ -1096,13 +1607,35 @@ sub bm_playturn_preround
 			push @vars, "1";
 			$pushed_chance_dice++;
 		}
-		elsif (/^pass/) # pass on chance
+		elsif (/^focus (\d+) (\d+)/)
 		{
-			push @vars, "bail", "1";
-			push @vars, "attack_type", "";
+			push @vars, "setme", "1" if (!$pushed_focus_dice);
+			$idx = $1 + 1;					# focus is 1-based
+			push @vars, "focus$idx";
+			push @vars, $2;
+			$pushed_focus_dice++;
 		}
+		elsif (/^pass/) # pass on chance or focus
+		{
+			# drp072105 - new reserve syntax
+			# drp080205 - "chance/focus" still use bail
+			if ($action eq "reserveaction") {
+				push @vars, "reserve", "-1";
+				push @vars, "attack_type", "";
+			} else {
+				push @vars, "bail", "1";
+			}
+		}
+
+		$t_action = $_;
 	}
 	&bmai_uninit();
+
+	if ($::DEBUG_GAME)
+	{
+		&debug(PLAY, "Debugging game - not sending action\n");
+		return 1;
+	}
 
 	push(@vars, @taunt);
 
@@ -1131,6 +1664,14 @@ sub parse_fight
 	{
 		$t_id = $g_id_name{$1};
 	}
+	elsif (m|(Your\s)?Button Man:.+>(.+)<\/a>|)
+	{
+		# redundant
+		# ($name,$bm) = ($1,$2);
+		# $name =~ s/\s+$//;
+		# $name = "Opponent" if ($name eq "");
+		# $g_game_bm[$g_id_name{$name}] = $bm;
+	}
 	elsif (/^$USERNAME passed this turn/)
 	{
 		$t_state = 'no_turn_needed';
@@ -1146,10 +1687,17 @@ sub parse_fight
 		$g_standing[1] = $2;
 		$g_standing[2] = $3;
 		$g_wins = $4;
+		$g_standing_games_played = $1 + $2 + $3;
 	}
-	elsif (m,(\S+) Captured Dice: <B>(.+)</,)
+	elsif (m,(Your\s)?Captured Dice: <B>(.+)</,)
 	{
-		$t_id = $g_id_name{$1};
+		($name,$dice) = ($1,$2);
+		$name =~ s/\s+$//;
+		$name = "Opponent" if ($name eq "");
+		$dice = "" if ($dice eq "None");
+		# print "READ CAPTURED DICE: $name DICE: $dice\n";
+		$t_id = $g_id_name{$name};
+		$g_captured_dice[$t_id] = $dice;
 		# TODO: parse captured dice
 	}
 	elsif (m,(Your|Opponent) Dice,)
@@ -1181,12 +1729,36 @@ sub parse_fight
 		$die =~ s/.+(pick_attack|font_size=-1)>//;
 		$die =~ s/<a href.+>//;
 		$die =~ s/<br>/ /g;
+		#print "READ $die\n";
 		push(@{g_dice . $t_id}, &bm_text_to_die($die));
 	}
 	elsif ($t_state eq 'readvalue')
 	{
 		&error("error reading value $_") unless m,>(\d+)<,;
-		push(@{g_value . $t_id}, $1);
+		$val = $1;
+
+		# if reading MY dice and dont see "pick_attack" then the die is dizzy
+		$dizzy = ($_ !~ /pick_attack>/ && $t_id == $ID_ME);
+		$val .= "d" if $dizzy;
+		push(@{g_value . $t_id}, $val);
+
+	}
+	elsif (/Player Communication/)
+	{
+		$t_state = 'readcomments';
+	}
+	elsif ($t_state eq 'readcomments' && /<tr>/)
+	{
+		$t_state = 'readcomments_name';
+	}
+	elsif ($t_state eq 'readcomments_name')
+	{
+		# <Td ...>name<...
+		# then <td...><font...>text<...
+		$g_comments = $_;
+		$t_state = 'finished';
+
+		# TODO: parse comments.  Complex since </table> and all comments on the same line.
 	}
 
 	1;
@@ -1203,6 +1775,10 @@ sub parse_fight_result
 		$t_state = turbo;
 		return 0;
 	}
+	elsif (/SURRENDERED this round/)
+	{
+		$t_state = "surrendered";
+	}
 	1;
 }
 
@@ -1212,6 +1788,8 @@ sub bm_playturn_main
 	my $g = shift;
 	my $id = &bm_ingame_id($g);
 
+
+
 	# parse
 	for ($i=0; $i<2; $i++)
 	{
@@ -1220,7 +1798,10 @@ sub bm_playturn_main
 	}
 	$t_id = $ID_ME;
 	$t_state = undef;
+	$g_comments = undef;
 	&bm_parse('parse_fight');
+
+	#die $g_comments if (&bm_ingame_opp($g) eq "lunatic");
 
 	if ($t_state eq 'no_turn_needed')
 	{
@@ -1232,6 +1813,7 @@ sub bm_playturn_main
 	# $g_score[id]
 	# $g_standing[]
 	# $g_wins
+	# $g_comments: if there were any
 
 	# send state to bmai
 	&bmai_init();
@@ -1240,19 +1822,20 @@ sub bm_playturn_main
 	for ($p=0; $p<2; $p++)
 	{
 		my $num_dice = $#{g_dice . $p} + 1;
-	my $log = "p$p/$g_score[$p]: ";
+		my $log = "p$p/$g_score[$p]: ";
 		&bmai_write("player $p $num_dice $g_score[$p]\n");
+		&bm_playturn_fix_dice($g, $p);
 		for ($n=0; $n<$num_dice; $n++)
 		{
-	    $log .= "${g_dice . $p}[$n]:${g_value . $p}[$n] ";
+			$log .= "${g_dice . $p}[$n]:${g_value . $p}[$n] ";
 			&bmai_write("${g_dice . $p}[$n]:${g_value . $p}[$n]\n");
 		}
-	&debug(FIGHT, "$log\n");
+		&debug(FIGHT, "$log\n");
 		$g_actions .= "$log\n";
 	}
-    &bmai_write("ply $PLY\nsims $SIMS\nmaxbranch $MAXBRANCH\n");
+    &bmai_write("ply $PLY\nmax_sims $MAX_SIMS\nmin_sims $MIN_SIMS\nmaxbranch $MAXBRANCH\n");
 	&bmai_write("getaction\n");
-	&bmai_process();
+	&bmai_process($g);
 
 	# get action
 	my $att_type;
@@ -1267,22 +1850,40 @@ sub bm_playturn_main
 	# read any possible turbo actions (probably undef)
 	my $turbo = &bmai_read;
 	chop $turbo;
-
+	
 	$att =~ y/ /,/;
 	$def =~ y/ /,/;
 
 	&bmai_uninit();
 
 	$g_actions .= "$g_bmai_best_move\n";
+	$g_actions .= "$g_bmai_stats\n";
 	$g_actions .= defined $att ? "$att $att_type $def\n" : "pass\n";
 
 	# submit request
+
+	# taunting
+
+	my @taunt = ();
+	my $taunt = "";
+
+	# for first game, send a taunt with stats on this matchup.
+	# TODO: doesn't work if opponent moves first and sends a taunt
+	if ($g_standing_games_played == 0 && (!defined $g_comments))
+	{
+		$taunt = &bm_process_taunting;
+	}
+
 	# send a 'taunt' of the best move score if opponent is admin
 	my @taunt = ();
 	if (&bm_ingame_opp($g) =~ /^$VERBOSE_USERS$/i)
 	{
-		@taunt = ('taunt', $g_bmai_best_move);
+		$taunt .= "   " if ($taunt ne "");
+		$taunt .= "$g_bmai_best_move";
 	}
+
+	@taunt = ('taunt', $taunt) if defined $taunt;
+
 	my @vars = ();
 	push @vars, 'userid', $USERNAME;
 	push @vars, 'attack_type', $att_type;
@@ -1304,6 +1905,15 @@ sub bm_playturn_main
 	{
 		&bm_error("Did not recognize turbo: $turbo\n");
 	}
+	elsif ($att_type eq "surrender")
+	{
+		@vars = ();
+		push @vars, 'next_game', "";
+		push @vars, "attack_type", "Surrender Round";
+		push @vars, "attack_die", "-1";
+		push @vars, "game", "$id";
+		push @vars, "action", "Beat People UP!";        # this is the confirmation
+	}
 
 	push @vars, @taunt;
 
@@ -1312,13 +1922,40 @@ sub bm_playturn_main
 
 	&bm_parse('parse_fight_result');
 
+	&debug(PLAY, "Attack Result: $t_state\n");
+
 	&bm_error("attack failed game $id\n") unless defined $t_state;
 
 	&bm_error("did not recognize turbo ($turbo)\n") unless $t_state ne 'turbo';
 
-	&debug(PLAY, "Attack Result: $t_state\n");
-
 	return 1;
+}
+
+# DESC: handles special rules, such as "The Flying Squirrel"
+# PARAM: playturn game #, player #
+# PRE: %{game . $g} hash setup
+sub bm_playturn_fix_dice
+{
+	my $g = shift;
+	my $p = shift;
+	my $bm = ($p==0) ? &bm_ingame_my_bm($g) : &bm_ingame_opp_bm($g);
+	my $num_dice = $#{g_dice . $p} + 1;
+	my $dice_key = 'g_dice' . $p;
+
+	if ($bm eq 'The Flying Squirrel')
+	{
+		for ($n=0; $n<$num_dice; $n++)
+		{
+			${$dice_key}[$n] = "k" . ${$dice_key}[$n];
+		}
+	}
+	elsif ($bm eq 'Guillermo')
+	{
+		for ($n=0; $n<$num_dice; $n++)
+		{
+			${$dice_key}[$n] = "u" . ${$dice_key}[$n] if (${$dice_key}[$n] =~ /[A-Z]/);
+		}
+	}
 }
 
 sub bm_playturn
@@ -1328,6 +1965,7 @@ sub bm_playturn
 	my $id = &bm_ingame_id($g);
 	my $date = `$DATE`;
 	chop $date;
+	($date ne "") || &bm_error("Missing: $date");
 
 	my $desc = "$date Phase $phase Game $id BM ${game . $g}[$MM_MY_BM] VS ${game . $g}[$MM_OPP_BM] (${game . $g}[$MM_OPP]) Score ${game . $g}[$MM_SCORE]\n";
 	&debug(PLAY, $desc);
@@ -1350,25 +1988,39 @@ sub bm_playturn
 sub bm_purgegame
 {
 	my $g = shift;
+	my $stale = shift;
 	my $id = &bm_ingame_id($g);
 
+
 	my $date = localtime(time);
-	$date =~ s/(\S+ +\S+ +\d+).+/\1/;
+	$date =~ s/(\S+ +\S+ +\d+).+ (\d+)/\1 \2/;
 	my $opp = &bm_ingame_opp($g);
 	my $my_bm = &bm_ingame_param($g, $MM_MY_BM);
 	my $opp_bm = &bm_ingame_param($g, $MM_OPP_BM);
 	my $score = &bm_ingame_param($g, $MM_SCORE);
 	local($w, $l, $t) = split(m:/:, $score);
+
 	my $result = ($w > $l) ? "win" : "loss";
 
 	my $log = "$date\t$id\t$opp\t$my_bm\t$opp_bm\t$w\t$l\t$t\t$result\n";
 
-	open(HISTORY,">>$BMD_HISTORY") || &bm_error("could not open $BMD_HISTORY: $!");
-	print HISTORY $log;
-	close HISTORY;
+	# only write to history if not stale
+	if (!$stale)
+	{
+		open(HISTORY,">>$BMD_HISTORY") || &bm_error("could not open $BMD_HISTORY: $!");
+		print HISTORY $log;
+		close HISTORY;
+
+                $games_finished++;
+
+                $g_actions .= "\nCompleted: Game $id BM $my_bm VS $opp_bm ($opp) Score $score\n";
+	}
+        else
+        {
+                $g_actions .= "\nPurging: Game $id BM $my_bm VS $opp_bm ($opp) Score $score\n";
+        }
 
 	&debug(PURGE, "purging game $id: $log");
-	$g_actions .= "\nCompleted: Game $id BM $my_bm VS $opp_bm ($opp) Score $score\n";
 
 	&bm_post_url("$BMW_PURGE$id");
 }
@@ -1376,15 +2028,63 @@ sub bm_purgegame
 sub bm_playturns
 {
 	$games_played = 0;
-	$games_finished = 0;
+	$games_ignored = 0;
 	for ($g=0; $g<$g_games; $g++)
 	{
-	&debug(PLAY, "Playing game $g score " . &bm_ingame_score($g) . " status " . &bm_ingame_status($g) . " action " . &bm_ingame_action_name($g) . "\n");
 
-		if (&bm_ingame_status($g) eq 'Your Turn')
+		&debug(PLAY, "Playing game $g score " . &bm_ingame_score($g) . " status " . &bm_ingame_status($g)
+			. " action " . &bm_ingame_action_name($g)
+			. " " . &bm_ingame_delete_game($g)
+			. "\n");
+
+		my $opp = &bm_ingame_opp($g);
+		my $delete_option =
+			&bm_ingame_delete_game($g)
+			&& ( (&bm_ingame_status($g) eq 'Waiting')
+			   ||(&bm_ingame_status($g) eq 'Preround') );
+		my $id = &bm_ingame_id($g);
+		
+		# ignore annoying players - don't even purge stale games. But play if winning or 1-1
+		if ($opp =~ /^$LAMERS$/i)
+		{
+			my @scores = split(m|[\/\(\)]|, &bm_ingame_score($g));
+			my $left = $scores[3] - max($scores[0],$scores[1]);
+			my $played = $scores[0] + $scores[1];
+			my $delta = $scores[0] - $scores[1];
+			print "SCORE: $scores[0] - $scores[1] - $scores[2] - $scores[3]\n";
+			print "LEFT: $left PLAYED: $played DELTA: $delta\n";
+			#if ($delta<0 || ($delta==0 && $left==1))
+			if (($delta<=0 && $left==1))
+			{
+				my $id = &bm_ingame_id($g);
+				$games_ignored++;
+				&debug(PLAY, "Ignoring game $id with lamer $opp\n");
+				next;
+			}
+		}
+
+		# HACK: purge stale games
+		if ($::PURGE_STALE_GAMES && $delete_option)
+		{
+			&debug(PLAY, "Purging stale game $id\n");
+			&bm_purgegame($g,1);
+			next;
+		}
+		
+		# DEBUG_GAME - skip if doesn't match
+		if ($::DEBUG_GAME && $id != $::DEBUG_GAME)
+		{
+			&debug(PLAY, "Skipping non-debug game $id\n");
+			next;
+		}
+
+		if (&bm_ingame_param($g,$MM_CLASS) ne "ready") {
+			next;
+		}
+		elsif (&bm_ingame_status($g) eq 'Your Turn')
 		{
 			$games_played++;
-			&bm_playturn($g, $PT_TURN);
+                        &bm_playturn($g, $PT_TURN);
 		}
 		elsif ( &bm_ingame_status($g) eq 'Focus/Chance' && &bm_ingame_action_name($g) eq 'Enter Game' )
 		{
@@ -1397,6 +2097,7 @@ sub bm_playturns
 			if (&bm_playturn($g, $PT_PREROUND))
 			{	$games_played++;	}
 		}
+                # TODO: is this code even called anymore?
 		elsif ( (&bm_ingame_status($g) eq 'Game Over') )
 		{
 			$games_finished++;
@@ -1405,7 +2106,144 @@ sub bm_playturns
 	}
 
 	$g_results .= "$games_finished games completed\n" if ($games_finished>0);
+	$g_results .= "$games_ignored games ignored\n" if ($games_ignored>0);
 	$g_results .= "$games_played games played\n";
+}
+
+#######################################################################################
+# create games
+#######################################################################################
+
+sub parse_creategame
+{
+	if (/Your game has been created/)
+	{
+		$t_result = 'success';
+		return 0;
+	}
+	1;
+}
+
+# PARAM: the set, its val
+sub bm_creategame
+{
+	my $set = shift;
+	my $val = shift;
+
+	&debug(CREATE, "Creating game in set $set ($val)\n");
+
+	&bm_post_url($BMW_CREATE,
+					'posted',1,
+					'outof',$BMD_CREATE_OUTOFGAMES,
+					'comment',"Play the AI! You will be assimilated and stuff.",
+					'player','select',              # select my BM/sets
+					'player_choice',$val."g", # comma delimited option list
+					#'player_list',undef,   # the possible BM/sets in list form - not needed
+					'opp','select',                 # select opp BM/sets
+					'opp_choice',$val."g",  # comma delimited option list
+					#'opp_list',undef,              # the possible BM/sets in list form - not needed
+					'opp_random',1,                 # opp select randomly from choices
+					);
+
+	$t_result = undef;
+	&bm_parse('parse_creategame');
+
+	&bm_error("Failure to create game: $t_result") unless $t_result eq 'success';
+
+	$g_actions .= "Created game in set $set.\n\n";
+}
+
+# DESC: find the IDs for sets
+# POST: updates %t_setid
+sub parse_creategames
+{
+	if ($t_state eq 'seeking') {
+		if (/select.+player_sets/) {
+			$t_state = 'reading';
+		}
+	} elsif ($t_state eq 'reading') {
+		if (/option value=\"(\S+)\"\>(.+) \(/)
+		{
+			($id,$name) = ($1,$2);
+			$name =~ s/ \(unlicensed\)$//i;
+			$t_setid{$name} = $id;
+		}
+		elsif (m|/select|)
+		{
+			$t_state = 'finished';
+			return 0;
+		}
+	}
+	1;
+}
+
+# POST: update $t_open_games
+# drp090103 - changed parsing rules (wasn't recognizing my open games)
+sub parse_joingames
+{
+	if ($t_state eq 'seeking')
+	{
+		if (/my open games/i) {
+			$t_state = 'reading';
+		}
+	}
+	elsif ($t_state eq 'reading')
+	{
+		if (/Delete Game/) {
+			$t_open_games++;
+		}
+		elsif (m|/table|)
+		{
+			$t_state = 'finished';
+			return 0;
+		}
+	}
+	1;
+}
+
+# PRE: $g_active_games
+sub bm_creategames
+{
+	my $create_games = $BMD_DESIRED_ACTIVE_GAMES - $g_active_games;
+
+	return unless $create_games>0;
+
+	# check out JOIN GAMES and see how many I have open for opponents
+
+	$t_state = 'seeking';
+	$t_open_games = 0;
+	&bm_get_url($BMW_JOIN);
+	&bm_parse('parse_joingames');
+	$create_games -= $t_open_games;
+
+	if ($t_open_games > 0 )
+	{
+		&debug(CREATE, "Have $t_open_games open games.\n");
+		$g_results .= "$t_open_games open games\n";
+	}
+
+	return unless $create_games>0;
+
+	$t_state = 'seeking';
+	&bm_get_url($BMW_CREATE);
+	&bm_parse('parse_creategames');
+
+	&debug(CREATE, "Creating $create_games games.\n");
+
+	my $created = $create_games;
+
+	while ($create_games-->0)
+	{
+		# pick a set
+		my $set = $BMD_CREATE_GAME_SET[&dp_rand($#BMD_CREATE_GAME_SET+1)];
+
+		&bm_error("bm_creategames: Could not find set ID for set $set") unless defined $t_setid{$set};
+
+		# make the game
+		&bm_creategame($set,$t_setid{$set});
+	}
+
+	$g_results .= "$created games created\n";
 }
 
 #######################################################################################
@@ -1419,6 +2257,9 @@ chop $g_date;
 # SET DEBUGGING LEVELS
 &set_debug(undef,1);
 
+# READ STATS
+&bm_readstats;
+
 # LOG IN
 &dp_onexit('bm_onexit');
 &bm_login();
@@ -1427,7 +2268,8 @@ chop $g_date;
 # &bm_scoregames();
 # &bm_joingames();
 &bm_mainmenu();
-&bm_error("No games\n") unless $g_games>0;
+&bm_creategames();
+## &bm_error("No games\n") unless $g_games>0;
 
 &bm_playturns();
 

@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai_player.cpp
-// Copyright (c) 2001 Denis Papp. All rights reserved.
+// Copyright (c) 2001-2020 Denis Papp. All rights reserved.
 // denis@accessdenied.net
-// http://www.accessdenied.net/bmai
+// https://github.com/hamstercrack/bmai
 // 
 // DESC: BMAI code for managing the BMC_Player class
 //
@@ -42,7 +42,7 @@ void BMC_Player::Reset()
 		m_die[i].Reset();
 	}
 
-	m_swing_set = FALSE;
+	m_swing_set = SWING_SET_NOT;
 	m_score = 0;
 	m_available_dice = 0;
 }
@@ -86,7 +86,7 @@ void BMC_Player::OnDiceParsed()
 		if (m_die[i].HasProperty(BME_PROPERTY_TURBO))
 		{
 			BM_ERROR(m_die[i].HasProperty(BME_PROPERTY_OPTION) || m_die[i].GetSwingType(0)!=BME_SWING_NOT);
-			BM_ERROR(!have_turbo);
+			// TODO: reenable this error check BM_ERROR(!have_turbo);
 			have_turbo = TRUE;
 		}
 	}
@@ -222,6 +222,12 @@ void BMC_Player::OptimizeDice()
 
 void BMC_Player::OnDieSidesChanging(BMC_Die *_die)
 {
+	// KONSTANT: if die was set to not reroll, but we're about to change the number of sides, then force a reroll
+	if (_die->GetState()!=BME_STATE_NOTSET)
+	{
+		BM_ERROR(_die->HasProperty(BME_PROPERTY_KONSTANT));
+		_die->SetState(BME_STATE_NOTSET);
+	}
 	m_score -= _die->GetScore(TRUE);
 }
 
@@ -285,7 +291,7 @@ void BMC_Player::OnRoundLost()
 	for (i=0; i<BME_SWING_MAX; i++)
 		m_swing_value[i] = 0;
 
-	m_swing_set = FALSE;
+	m_swing_set = SWING_SET_NOT;
 }
 
 // RETURNS: die index +1 (i.e. >0) if there is one present
@@ -309,3 +315,25 @@ void BMC_Player::OnSurrendered()
 	m_score = BMD_SURRENDERED_SCORE;
 }
 
+// NOTE: copies logic from BMC_Game::GenerateValidSetSwing()
+BOOL BMC_Player::NeedsSetSwing()
+{
+	INT i;
+
+	for (i=0; i<BME_SWING_MAX; i++)
+	{
+		if (GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+			return TRUE;
+	}
+
+	for (i=0; i<BMD_MAX_DICE; i++)
+	{
+		if (!GetDie(i)->IsUsed())
+			continue;
+
+		if (GetDie(i)->HasProperty(BME_PROPERTY_OPTION))
+			return TRUE;
+	}
+
+	return FALSE;
+}

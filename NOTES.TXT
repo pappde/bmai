@@ -1,0 +1,387 @@
+TODO:
+- Q: is perf decrease simply degradation over time? (e.g. better opponents)
+- validate 011703 result, validate 090202 result
+- run some ply2 tests
+- CURRENT: 3/5-100/400 (validating 011703 result)
+- NEXT: try higher branch (maybe smaller max)
+
+COMBINATIONS TRIED (also on www.accessdenied.net/bmai/index.htm)
+date	games	ply     sims    branch  rating
+090202	220	4       5-150   200     60.5
+101302	399	2       25-250  2000    60.2
+011703	878	3       5-100   400     64.8
+050703	690	4       5-100   125     58.1
+083003	378	4       5-100   250     60.8    (very slow)
+071305	2304	3	10-250	250	58.2
+020208	2611	3	10-250	500	63.6
+
+---------------------------------------------------------------------
+BM SITE RANKINGS: place: win-lost-total score win%
+Jan 2002:
+        1st     Grivan          162-161-383     92275   50.15%
+        9th     bmai            47-42-102       29884   52.80%
+
+Mar 2002:
+        1st     Grivain         83-66-211       44782   55.70%
+        12th    bmai            35-21-62        26437   62.50%
+
+Apr 2002:
+        1st     kusinohki       78-40-130       56548   66.10%
+        22nd    bmai            36-51-98        15637   41.37%
+
+May 2002:
+        1st     Sabathia        79-45-137       50832   63.70%
+        2nd     bmai            75-58-147       50779   56.39%
+        3rd     randomlife      88-90-287       49281   49.43%
+
+June 2002:      ******
+        1st     bmai            70-36-115       57115   66.03%
+        2nd     Boot2daHead     70-33-168       51921   67.96%
+
+July 2002:
+        1st     Boot2daHead     59-29-168       43073   67.04%
+        2nd     bmai            45-36-91        29385   55.55%
+        3rd     Zomulgustar     40-23-111       25903   63.49%
+
+Aug 2002:       ******
+        1st     bmai            77-43-123       59604   64.16%
+        2nd     Boot2daHead     83-42-218       59394   66.4%
+        3rd     zaph            72-34-126       49581   67.92%
+
+Sep 2002:       ******
+        1st     bmai            171-103-302     126765  62.4%
+        2nd     zaph            191-127-344     125855  60.06%
+        3rd     Anders          94-44-160       69199   68.11%
+
+Oct 2002:
+        1st     Boot2daHead     195-101-434     132925  65.87%
+        2nd     Anders          147-59-249      121580 *71.35%
+        3rd     zaph            147-81-251      103506  64.47%
+        6th     bmai            108-73-196      74425   59.66%
+
+Nov 2002:       ******
+        1st     bmai            153-82-256      120565  65.1%
+        2nd     Anders          157-83-286      115317  65.41%
+        3rd     Boot2daHead     113-61-273      73706   64.94%
+
+Dec 2002:       ******
+        1st     bmai            188-96-299      151641  66.19%
+        2nd     Jota            237-193-501     143726  55.11%
+        3rd     icarus          239-196-449     143420  54.94%
+
+Jan 2003:
+        1st     Weylan         *370-309-727     209514  54.49%
+        2nd     icarus          284-229-542     174550  55.36%
+        3rd     bmai            145-78-229      115605  65.02%
+
+Feb 2003:
+        1st     icarus          222-166-421     141766  57.21%
+        2nd     ep              260-263-586     139287  49.71%
+        3rd     Anders          118-65-209      86467   64.48%
+        15th    bmai            76-52-133       54798   59.37%
+
+Mar 2003:
+        1st     ep              331-310-720     179827  51.63%
+        2nd     bmai            154-107-270     109386  59%
+        3rd     Boot2daHead     191-136-416     105412  58.4%
+
+Apr 2003:
+        1st     triskaideka     287-236-614     162415  54.87%
+        2nd     ep              217-259-607     143956  51.13%
+        3rd     Boot2daHead     203-118-404     127155  63.23%
+        7th     bmai            141-100-252     100503  58.5%
+
+May 2003:
+        1st     ep              300-274-679     161849  52.26%
+        2nd     triskaideka     260-203-523     145961  56.15%
+        3rd     Desdinova       271-264-609     142377  50.65%
+        25th    bmai            65-52-121       43495   55.55%
+
+Jun 2003:
+        1st     triskaideka     262-197-555     153316  57.08%
+        2nd     Desdinova       245-230-591     126578  51.57%
+        3rd     ep              250-255-583     125309  49.5%
+        23rd    bmai            64-40-109       47993   61.53%
+
+Jul 2003:
+        1st     hellcat223      350-325-885     186867  51.85%
+        2nd     Fingall         219-187-555     121176  53.94%
+        3rd     kaufman         194-149-463     111714  56.55%
+        25th    bmai            60-30-92        49128   66.66%
+
+Aug 2003:
+        1st     Wandu           184-74-296      150820  71.31%
+        2nd     hellcat223      258-264-684     127528  49.42%
+        3rd     kaufman         210-170-573     117040  55.26%
+        33rd    bmai            52-33-89        38781   61.17%
+
+- on 9/21/03 bmai took over the #1 player overall (all time)
+        1st     bmai            2506-1613-4376  2078020 60.84%
+        2nd     Anders          2399-1335-4357  2075706 64.24%
+        3rd     zaph            2615-1647-5000  2058744 61.35%
+        4th     Boot2daHead     2500-1514-5862  2029646 62.28%
+
+Sep 2003:       *****
+        1st     bmai            360-186-566    *292926  65.93%
+        2nd     Finngall        225-173-503     136774  56.53%
+        3rd     kev             209-185-449     113373  53.04%
+
+Oct 2003:
+        1st     Finngall        355-283-791     205144  55.64%
+        2nd     TwistedRich     303-337-802     136410  47.34%
+        3rd     bmai            151-95-256      113307  61.38%
+
+Nov 2003:
+        1st     Finngall        249-168-538     150887  59.71%
+        2nd     bmai            121-77-204      90503   61.11%
+        3rd     TwistedRich     173-190-557     76621   47.65%
+
+Dec 2003:
+        1st     Finngall        217-151-534     134753  58.96%
+        2nd     TwistedRich     173-162-527     90860   51.64%
+        3rd     kaufman         146-122-395     81459   54.47%
+        16th    bmai            65-55-123       42190   54.16%
+
+Jan 2004:
+	1st	Finngall	237-192-656	134454	55.24%
+	38th	bmai		59-47-110	39351	55.66%
+
+Feb 2004:
+	1st	Kuni		230-206-495	124648	52.75%
+	51st	bmai		38-33-73	24619	53.52%
+
+Mar 2004:
+	1st	Finngall	257-208-703	148069	55.26%
+	23rd	bmai		66-40-109	50928	62.26%
+
+Apr 2004:
+	1st 	Finngall	239-181-701	141339	56.9%
+	20th	bmai		63-49-113	42525	56.25%
+
+May 2004:
+	1st	KaijuGamer	302-303-726	159162	49.91%
+	27th	bmai		60-59-123	36352	50.42%
+
+Jun 2004:
+	1st	Heather		273-192-536	170582	58.7%
+	172nd	bmai		8-11-19		4125	42.1%
+
+Jul 2004:
+	1st	GoldenOtter	346-252-636	231226	57.85%
+	76th	bmai		26-43-73	11379	37.68%
+
+Aug 2004:
+	1st	PolarBear	324-299-666	189956	52%
+	67th	bmai		14-7-21		11732	66.66%
+
+Sep 2004:
+	1st	KaijuGamer	239-239-661	124725	50%
+	44th	bmai		31-30-63	18799	50.81%
+
+Oct 2004:
+        1st     KaijuGamer      190-172-491     106691  52.48%
+        20th    bmai            44-28-76        32877   61.11%
+
+Nov 2004:       1st     nelde           102-37-182      76865   73.38%
+Dec 2004:       1st     Kuni            143-113-299     86539   55.85%
+Jan 2005:       1st     Kuni            180-142-388     110933  55.9%
+
+Feb 2005: (monthly rankings stopped after this)
+        1st     Kuni            139-104-309     88202   57.2%
+        2nd     theAlmighty     140-116-393     84425   54.68%
+        3rd     bmai            133-119-265     84220   52.77%
+
+Overall 8/11/05: bmai has fallen to 3rd overall for all time
+	1st	Boot2daHead	4054-2409-9167	3335407	62.72%
+	2nd	Finngall	4334-3495-13246	3264754	55.35%
+	3rd	bmai		3549-2429-6305	2884408	59.36%
+
+Overall 2/2/08: bmai has fallen to 4th overall
+	1st	theAlmighty	9999-9267-26543	7197037	51.89%
+	2nd	Finngall	8252-6915-23253	6120582	54.5%
+	3rd	TwistedRich	6198-6264-20535	4286005	49.73%
+	4th	bmai		5122-3295-8855	4261264	60.85%
+
+-------------------------------------------------------------------------
+
+HISTORY.TXT PERFORMANCE:
+
+3/31/02:
+- added BMAI2 which is ply 3 plus early culling (cull score threshold 0.25 - 0.9)
+- testing 12/d4/s6.
+	Against QAI: 14-6 (as first player) 12-8 (as second player)
+	Against BMAI1: 13-7 (as first player) 9-11 (as second player)
+	Against self ply 2: 14-6 (as first player) 10-10 (as second player)
+	QAI vs QAI: 9-11
+	BMAI vs BMAI: 7-13
+	BMAI2 vs BMAI2 (both ply 2): 14-6
+
+
+1/23/02: o13
+initial 		800 games (471 329  58.9%) 3388 matches (1819 1530  39)
+
+[ignore] 3/30/02: o14 (ply2, sims 150, branch 1500)
+recent			 92 games (48 44  52.2%) 428 matches ( 213  203  12)
+total			892 games (519 373  58.2%) 3816 matches (2032 1733  51)
+SAME: Avis 5-6 (45.5), Hope 2-6 (25), Cthulhu 4-4 (50)
+
+[ignore] 5/1/02: o15 (ply4, sims 250, branch 1500) - actually sims was 150 for first few
+recent			105 games (45 60  42.9%) 466 matches ( 209  243  14)
+total			997 games (564 433  56.6%) 4282 matches (2241 1976  65)
+
+[ignore] 6/2/02: o16 (ply4/sims 150/branch 1000)
+recent			144 games (82 62  56.9%) 576 matches ( 309  257  10)
+total			1141 games (646 495  56.6%) 4858 matches (2550 2233  75)
+
+[ignore] 6/30/02: o17 (4/250/1000).
+recent			110 games (73 37  66.4%) 458 matches ( 263  185  10)
+total			1251 games (719 532  57.5%) 5316 matches (2813 2418  85)
+SAME: Avis 7-6 (53.8), Hope 3-7 (30)
+
+9/2/02: o18 (4/5-150/200/0.5)
+  - also previously had not really been working at ply4, first 20 were 9/11 at misc settings
+  - Change to use P(win) of next ply for more accurate move scoring.
+  - for some preround settings had to set PLY 2 since was running too long (Max vs Max)
+recent                  220 games (133 87  60.5%) 900 matches ( 497  389  14)
+SAME: Hope 8-20 (28.6%), Avis 13-7 (65%), Cthulhu 7-5 (58.3%), Max 2-8 (20%), Werner 7-3 (70%)
+
+10/13/02: o19 (2/25-250/2000/0.5).  avg time 30
+recent                  399 games (240 159  60.2%) 1618 matches ( 904  689  25)
+SAME: Avis 14-8 (63.6%-), Max 4-8 (33.3%+), Yseulte 7-4 (63.6%), Ogi 5-5 (50%), Bunnies 7-3 (70%)
+
+1/17/03: o20 (3/5-100/400/0.5), avg time 100
+recent                  878 games (569 309  64.8%) 3547 matches (2037 1470  40)
+SAME: MAX(p) 14-5 (73.7%+), Yseulte 13-4 (76.5%+), Werner 10-3 (76.9%+), Bunnies 7-5 (58.3%-)
+
+2/17/03: tried 4/5-100/250/0.5. Didn't really work. Time was average 3000+
+2/22/03: fixed problem where SetSwing() got out of hand, so should cut down
+  average time and should also allow increasing maxbranch. Also optimized move size
+
+5/7/03: o21 (4/5-100/125/0.5), avg time 50-150
+recent                  690 games (401 289  58.1%) 2813 matches (1536 1237  40)
+SAME: MAX(p) 30-11 (73.2%-), Hope 8-20 (28.6%)
+
+8/30/03: o22 (4/5-100/250/0.5), avg time 150-3000 (too slow)
+recent                  378 games (230 148  60.8%) 1550 matches ( 874  655  21)
+SAME: MAX(p) 37-13 (74%+), Hope...
+
+7/13/05: o23 (3/10-250/250/0.5)
+recent                  2304 games (1341 963  58.2%) 9342 matches (5067 4185  90)
+initial                 3816 games (2292 1524  60.1%) 15744 matches (8661 6858 225)
+
+
+
+-------------------------------------------------------------------------
+old notes
+
+7/15/02 Hope note: from 2/10-250/500/0.5 (50s)
+opp     use     P(win)
+1       19      75
+2       20      70
+3       19      80
+4       1       91.7
+5       2       75
+6       2       75
+7       4       90
+8       1       83.3
+9       2       83.3
+10      3       100
+11      9       100
+12      1       100
+13      5       75
+14      5       83.3
+15      8       83.3
+16      12      83.3
+17      1       83.3
+18      11      91.7
+19      4       66.7
+20      2       66.7
+then culls 5-20
+1       1       66.7
+2       15      58.3
+3       17      58.3
+4       2       75
+
+TODO:
+- Hope vs Hope
+- tweak sims/decay
+- fix timing
+- cap ply for preround
+- VTune
+
+NOTE:
+- can estimate total time as goes on. May know out of hand after 1 sim at ply 1
+
+TIMING STATS @ 4/5-150/200/.5
+MAX = 200^4 * .5^6 = 25M
+BM			time	sims	sims/s
+8v5 Reserve (no score)  24412   66      2.7
+8v5 Reserve (no score)  2337    15.8    6.7
+5v8                     5895    29      5
+5v5 Swing Swing         2122    13.5    6.4
+5v5 Hope                1885    13      7
+5v5 Swing Avis          1226    14.3    11.7
+5v5 Swing Swing         1254    15.3    12.2
+5v5                     1319    16      12.3
+4v4 Hope                1079    19      17.8
+6v5                     1064    16      15
+5v5                     907     15.8    17.4
+4v4                     597     18      30.7
+5v4                     431     20.5    47.5
+4v4                     382     13.3    34.8
+
+TIMING STATS @ 4/5-150/200/.75
+MAX = 200^4 * .71^6 = 200M
+BM			time	sims	sims/s
+5v5 Hope Swing		25360	141	5.5
+4v4			944	41	44
+
+
+TIMING STATS @ 3/100/400:
+BM			time	sims	sims/s
+5v5 Hope Swing          8282    30.7    3
+5v5 Hope Swing          7701    29M     3.8
+9v6 Reserve		4831	22	4.5
+5v5 Hope		3773	18.7	5
+8v5 Reserve		3054	23.4	7.6
+5v5 Focus		2366	10.5	4.4
+4v5 Hope		1919	15.5M	8k
+5v5 Avis swing		1091	8.5	7.7
+5v5 Avis Swing		1016	8.4M	8.2k
+4v4 Hope		983	9.1	9.3
+5v5 Focus		979	5.5	5.6
+5v5 Swing		916	8.5	9.3
+5v5 Swing		812	7.1	8.8
+5v5 Focus 2		781	4.8	6.2
+5v5			518	3.7	7.1
+5v5 Avis		426	5.4	12.7
+5v5 Focus 3		372	2.6	7.1
+5v5			263	3.4	13
+3v4 Hope		234	5.5M	23k
+4v5			213	3.6M	17k
+4v5			222	3.8	17
+4v4			106	2.9	27
+4v4			102	3.8M	37k
+... with less than 8 dice, it is 10 - 90
+
+4/1/02:
+- testing 12/s8/4
+			ply 2
+	BMAI	QAI	1k/100	1k/150	1k/250	1.5/100 1.5/150 1.5/250 2.5/100 2.5/150 2.5/250
+BMAI	58-42	69-31	52-48	51-49	50-50	52-48	66-34	54-46	52-48	62-38	53-47
+
+	ply 3
+	1k/100	1k/150	1k/250	1.5/100 1.5/150 1.5/250 2.5/100 2.5/150 2.5/250
+BMAI	55-45	46-54	57-43	55-45	44-56	42-58	55-45	44-56	51-49
+
+	ply 4
+	1k/100	1k/150	1k/250	1.5/100 1.5/150 1.5/250 2.5/100 2.5/150 2.5/250
+BMAI	47-53	62-38	54-46	47-53	57-43	58-42	47-53	57-43	52-48
+
+			ply 2
+	BMAI	QAI	1k/100	1k/150	1k/250	1.5/100 1.5/150 1.5/250 2.5/100 2.5/150 2.5/250
+QAI	42-58	47-53	46-54	40-60	33-67	45-54	44-56	28-72	46-54	44-56	38-62
+
+	ply 3
+	1k/100	1k/150	1k/250	1.5/100 1.5/150 1.5/250 2.5/100 2.5/150 2.5/250
+QAI	43-57	46-54	43-57

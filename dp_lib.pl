@@ -1,14 +1,17 @@
 ##################################################################
 # dp_lib.pl
 #
-# Copyright (c) 2001 Denis Papp. All rights reserved.
+# Copyright (c) 2001-2020 Denis Papp. All rights reserved.
 # denis@accessdenied.net
-# http://www.accessdenied.net/bmai
+# https://github.com/hamstercrack/bmai
 #
 # DESCRIPTION: useful functions library
 #
+# VERSION: 1.0.1
+#
 # REVISION HISTORY:
 # drp011901 - created
+# drp031302 - added &dp_rand()
 ##################################################################
 
 # DEPENDENCIES
@@ -82,6 +85,16 @@ sub set_debug
 	{
 		$g_debug_component{$component} = $on;
 	}
+}
+
+##############################################################################################
+# utilities
+##############################################################################################
+
+# RETURNS: random int from 0..param-1
+sub dp_rand
+{
+	return int(rand()*shift); 
 }
 
 ##############################################################################################
@@ -271,6 +284,12 @@ sub get_token
 	return $token;
 }
 
+sub max
+{
+	my $l = shift;
+	my $r = shift;
+	return $r > $l ? $r : $l;
+}	 
 
 1;
 

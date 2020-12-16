@@ -1,0 +1,16 @@
+game
+fight
+player 0 3 50
+30:16
+30:16
+6/30-6:5
+player 1 4 46
+5/7-5:4
+7/9-7:3
+9/11-9:3
+11/17-11:3
+ply 3
+max_sims 100
+min_sims 5
+maxbranch 400
+getaction

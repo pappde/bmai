@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai.h
-// Copyright (c) 2001 Denis Papp. All rights reserved.
+// Copyright (c) 2001-2020 Denis Papp. All rights reserved.
 // denis@accessdenied.net
-// http://www.accessdenied.net/bmai
+// https://github.com/hamstercrack/bmai
 // 
 // DESC: main header for BMAI
 //
@@ -17,6 +17,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <vector>
+#include <time.h>
 
 // forward declarations
 class BMC_Player;
@@ -32,9 +33,15 @@ typedef int				INT;
 typedef unsigned int	UINT;
 typedef float			F32;
 
+// special types
+typedef std::vector<float>	BMC_FloatVector;
+
 // assert
 #define BM_ASSERT	assert
 #define BM_ERROR(check)	{ if (!(check)) { BMF_Error(#check); } }
+
+// C prototypes
+void BMF_Error( char *_fmt, ... );
 
 // template classes
 template <int SIZE>
@@ -50,9 +57,11 @@ public:
 	void Clear() { ClearAll(); }
 	void Set(int _bit)		{ INT byte = _bit/8; bits[byte] |= (1<<(_bit-byte*8)); }
 	void Clear(int _bit)	{ INT byte = _bit/8; bits[byte] &= ~(1<<(_bit-byte*8)); }
+	void Set(int _bit, BOOL _on)	{ if (_on) Set(_bit); else Clear(_bit); }
 
 	// accessors
-	U8	IsSet(INT _bit)	{ INT byte = _bit/8; return bits[byte] & (1<<(_bit-byte*8)); }
+	BOOL	IsSet(INT _bit)	{ INT byte = _bit/8; return bits[byte] & (1<<(_bit-byte*8)); }
+	BOOL	operator[](int _bit) { return IsSet(_bit) ? 1 : 0; }
 
 private:
 	U8	bits[(SIZE+7)>>3];	
@@ -82,9 +91,15 @@ void BMC_BitArray<SIZE>::ClearAll()
 class BMC_RNG
 {
 public:
-	UINT	GetRand(UINT _i)	{ return rand() % _i; }
-	F32		GetFRand()			{ return (float)rand() / (float)0x8000; }
+	BMC_RNG();
+
+	UINT	GetRand(UINT _i)	{ return GetRand() % _i; }
+	F32		GetFRand()			{ return (float)GetRand() / (float)0x80000000; }
+	UINT	GetRand();		
 	void	SRand(UINT _seed);
+
+private:
+	UINT	m_seed;
 };
 
 // settings
@@ -96,6 +111,7 @@ public:
 #define BMD_SURRENDERED_SCORE	-1000
 #define BMD_MAX_STRING	256
 #define BMD_DEFAULT_WINS	3
+#define BMD_MAX_PLY		10
 
 // debug categories
 enum BME_DEBUG
@@ -107,6 +123,7 @@ enum BME_DEBUG
 	BME_DEBUG_ROUND,
 	BME_DEBUG_GAME,
 	BME_DEBUG_QAI,
+	BME_DEBUG_BMAI,
 	BME_DEBUG_MAX
 };
 
@@ -130,30 +147,37 @@ enum BME_ACTION
 // N = apply nature attack stage
 enum BME_PROPERTY
 {
-	BME_PROPERTY_TIME_AND_SPACE	=	0x0001, // (N) post-attack effect
-	BME_PROPERTY_AUXILIARY		=	0x0002, // pre-game action
-	BME_PROPERTY_QUEER			=	0x0004, // attacks
-	BME_PROPERTY_TRIP			=	0x0008, // (N) attacks, special attack
-	BME_PROPERTY_SPEED			=	0x0010, // attacks
-	BME_PROPERTY_SHADOW			=	0x0020, // attacks
-	BME_PROPERTY_BERSERK		=	0x0040, // attacks
-	BME_PROPERTY_STEALTH		=	0x0080, // attacks
-	BME_PROPERTY_POISON			=	0x0100, // score modifier
-	BME_PROPERTY_NULL			=	0x0200,	// (N) capture modifier
-	BME_PROPERTY_MOOD			=	0x0400,	// (N) post-attack effect
-	BME_PROPERTY_TURBO			=	0x0800,	// (DP) post-attack action
-	BME_PROPERTY_OPTION			=	0x1000,	// swing, uses two dice
-	BME_PROPERTY_TWIN			=	0x2000,	// uses two dice
-	BME_PROPERTY_FOCUS			=	0x4000,	// initiative action
-	BME_PROPERTY_VALID			=	0x8000,	// without this, it isn't a valid die!
-	BME_PROPERTY_MIGHTY			=  0x10000,	// (P) pre-roll effect
-	BME_PROPERTY_WEAK			=  0x20000,	// (P) pre-roll effect
-	BME_PROPERTY_RESERVE		=  0x40000,	// preround (after a loss)
-	BME_PROPERTY_ORNERY			=  0x80000,	// (N) post-attack effect on all dice
-	BME_PROPERTY_DOPPLEGANGER	= 0x100000,	// (P) post-attack effect
-	BME_PROPERTY_CHANCE			= 0x200000, // initiative action
-	BME_PROPERTY_MORPHING		= 0x400000, // (P) post-attack effect
-	BME_PROPERTY_RADIOACTIVE	= 0x800000, // (P) post-attack effect
+	BME_PROPERTY_TIME_AND_SPACE	=	 0x0001, // (N) post-attack effect
+	BME_PROPERTY_AUXILIARY		=	 0x0002, // pre-game action
+	BME_PROPERTY_QUEER			=	 0x0004, // attacks
+	BME_PROPERTY_TRIP			=	 0x0008, // (N) attacks, special attack, initiative effect
+	BME_PROPERTY_SPEED			=	 0x0010, // attacks
+	BME_PROPERTY_SHADOW			=	 0x0020, // attacks
+	BME_PROPERTY_BERSERK		=	 0x0040, // attacks
+	BME_PROPERTY_STEALTH		=	 0x0080, // attacks
+	BME_PROPERTY_POISON			=	 0x0100, // score modifier
+	BME_PROPERTY_NULL			=	 0x0200,	// (N) capture modifier
+	BME_PROPERTY_MOOD			=	 0x0400,	// (N) post-attack effect
+	BME_PROPERTY_TURBO			=	 0x0800,	// (DP) post-attack action
+	BME_PROPERTY_OPTION			=	 0x1000,	// swing, uses two dice
+	BME_PROPERTY_TWIN			=	 0x2000,	// uses two dice
+	BME_PROPERTY_FOCUS			=	 0x4000,	// initiative action
+	BME_PROPERTY_VALID			=	 0x8000,	// without this, it isn't a valid die!
+	BME_PROPERTY_MIGHTY			=   0x10000,	// (P) pre-roll effect
+	BME_PROPERTY_WEAK			=   0x20000,	// (P) pre-roll effect
+	BME_PROPERTY_RESERVE		=   0x40000,	// preround (after a loss)
+	BME_PROPERTY_ORNERY			=   0x80000,	// (N) post-attack effect on all dice
+	BME_PROPERTY_DOPPLEGANGER	=  0x100000,	// (P) post-attack effect
+	BME_PROPERTY_CHANCE			=  0x200000, // initiative action
+	BME_PROPERTY_MORPHING		=  0x400000, // (P) post-attack effect
+	BME_PROPERTY_RADIOACTIVE	=  0x800000, // (P) post-attack effect
+	BME_PROPERTY_WARRIOR		= 0x1000000, // attacks
+	BME_PROPERTY_SLOW			= 0x2000000,	// initiative effect
+	BME_PROPERTY_UNIQUE			= 0x4000000,	// (D) swing rule
+	BME_PROPERTY_UNSKILLED		= 0x8000000,	// attacks [The Flying Squirrel]	// TODO: implement as BM property?
+	BME_PROPERTY_STINGER		=0x10000000,	// initiative effect, (D) skill attacks
+	BME_PROPERTY_RAGE			=0x20000000,	// TODO
+	BME_PROPERTY_KONSTANT			=0x40000000,	
 	BME_PROPERTY_MAX
 };
 
@@ -180,7 +204,7 @@ enum BME_STATE
 	BME_STATE_READY,
 	BME_STATE_NOTSET,
 	BME_STATE_CAPTURED,
-	BME_STATE_PARALYZED,	// focus dice - one turn paralysis
+	BME_STATE_DIZZY,		// focus dice - one turn paralysis 
 	BME_STATE_NULLIFIED,
 	BME_STATE_NOTUSED,		// this die (slot) isn't being used at all this game
 	BME_STATE_RESERVE,		
@@ -216,6 +240,7 @@ enum BME_ATTACK
 	BME_ATTACK_SPEED,						// 1 -> N
 	BME_ATTACK_TRIP,						// 1 -> 1
 	BME_ATTACK_SHADOW,						// 1 -> 1
+	BME_ATTACK_INVALID,						// 0 -> 0 (like pass)
 	BME_ATTACK_MAX
 };
 
@@ -224,6 +249,7 @@ enum BME_ATTACK_TYPE
 	BME_ATTACK_TYPE_1_1,
 	BME_ATTACK_TYPE_N_1,
 	BME_ATTACK_TYPE_1_N,
+	BME_ATTACK_TYPE_0_0,
 	BME_ATTACK_TYPE_MAX
 };
 
@@ -235,8 +261,8 @@ extern INT g_swing_sides_range[BME_SWING_MAX][2];
 // globals
 
 extern class BMC_Logger	g_logger;
-extern class BMC_BMAI	g_ai;
 extern class BMC_QAI	g_qai;
+extern class BMC_Stats	g_stats;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // classes
@@ -245,8 +271,7 @@ extern class BMC_QAI	g_qai;
 class BMC_Move
 {
 public:
-	//BMC_MoveAttack() : BMC_Move(BME_ACTION_ATTACK) {}
-	BMC_Move() : m_pool_index(-1)	{}
+	BMC_Move() {} //: m_pool_index(-1)	{}
 
 	// methods
 	void	Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS, const char *_postfix = "\n");
@@ -261,7 +286,7 @@ public:
 
 	// data
 	BME_ACTION					m_action;
-	INT							m_pool_index;
+	//INT							m_pool_index;
 	BMC_Game					*m_game;
 	union
 	{
@@ -277,10 +302,14 @@ public:
 			S8							m_turbo_option;	// only supports one die, 0/1 for which sides to go with. -1 means none
 		};
 
+		// BME_ACTION_SET_SWING_AND_OPTION: work data for BMAI::RandomlySelectMoves
+
 		// BME_ACTION_SET_SWING_AND_OPTION,
 		struct {
 			U8			m_swing_value[BME_SWING_MAX];	
-			U8			m_option_die[BMD_MAX_DICE];	// use die 0 or 1
+			//U8			m_option_die[BMD_MAX_DICE];	// use die 0 or 1
+			BMC_BitArray<BMD_MAX_DICE>	m_option_die;	// use die 0 or 1
+			U8			m_extreme_settings;			// work data for "BMAI::RandomlySelectMoves"
 		};
 
 		// BME_ACTION_USE_CHANCE
@@ -302,12 +331,7 @@ public:
 
 #define	BMC_MoveAttack	BMC_Move
 
-class BMC_MoveSetSwingAndOption
-{
-public:
-};
-
-typedef std::vector<BMC_Move *>	BMC_MoveVector;
+typedef std::vector<BMC_Move>	BMC_MoveVector;
 
 class BMC_MoveList
 {
@@ -317,8 +341,10 @@ public:
 	void	Clear();
 	void	Add(BMC_Move  & _move );
 	INT		Size() { return list.size(); }
-	BMC_Move *	Get(INT _i) { return list[_i]; }
+	BMC_Move *	Get(INT _i) { return &list[_i]; }
 	BOOL	Empty() { return Size()<1; }
+	void	Remove(int _index);
+	BMC_Move &	operator[](int _index) { return list[_index]; }
 
 protected:
 private:
@@ -334,6 +360,7 @@ private:
 	U8	m_target;
 };
 
+/*
 class TGC_MoveSkill
 {
 public:
@@ -351,6 +378,7 @@ private:
 	U8	m_attacker;
 	BMC_BitArray<BMD_MAX_DICE>	m_targets;
 };
+*/
 
 // NOTES:
 // - second die only used for Option and Twin
@@ -394,20 +422,23 @@ public:
 	// methods
 	void		Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS);
 	void		SetOption(INT _d);
+	void		SetFocus(INT _v);
 
 	// accessors
 	BOOL		CanDoAttack(BMC_MoveAttack &_move)	{ return m_attacks.IsSet(_move.m_attack); }
 	BOOL		CanBeAttacked(BMC_MoveAttack &_move)	{ return m_vulnerabilities.IsSet(_move.m_attack); }
 	INT			GetValueTotal()					{ return m_value_total; }
 	INT			GetSidesMax()					{ return m_sides_max; }
-	BOOL		IsAvailable()					{ return m_state == BME_STATE_READY; }
-	BOOL		IsInReserve()						{ return m_state == BME_STATE_RESERVE; }
+	BOOL		IsAvailable()					{ return m_state == BME_STATE_READY || m_state == BME_STATE_DIZZY; }
+	BOOL		IsInReserve()					{ return m_state == BME_STATE_RESERVE; }
 	BOOL		IsUsed()						{ return m_state != BME_STATE_NOTUSED && m_state!=BME_STATE_RESERVE; }
 	float		GetScore(BOOL _own);
 	INT			GetOriginalIndex()				{ return m_original_index; }
+	BME_STATE	GetState()						{ return (BME_STATE)m_state; }
 
 	// mutators
 	void		SetState(BME_STATE _state)		{ m_state = _state; }
+	void		CheatSetValueTotal(INT _v)		{ m_value_total = _v; }	// used for some functions
 
 	// events
 	void		OnDieChanged();
@@ -417,6 +448,7 @@ public:
 	void		OnApplyAttackNatureRollTripped();
 	void		OnBeforeRollInGame(BMC_Player *_owner);
 	void		OnUseReserve();
+	void		OnDizzyRecovered();
 
 protected:
 
@@ -449,6 +481,12 @@ class BMC_Player	// 204b
 	friend class BMC_Parser;
 
 public:
+	typedef enum {
+		SWING_SET_NOT,
+		SWING_SET_READY,	// set this round, esults should not be "known" to opponent - to simulate simultaneous swing set
+		SWING_SET_LOCKED,	// set from previous round
+	} SWING_SET;
+
 				BMC_Player();
 	void		SetID(INT _id) { m_id = _id; }			
 	void		Reset();				
@@ -463,6 +501,8 @@ public:
 	// methods
 	void		Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS);
 	void		DebugAllDice(BME_DEBUG _cat = BME_DEBUG_ALWAYS);
+	void		SetSwingDiceStatus(SWING_SET _swing)	{ m_swing_set = _swing; }
+	BOOL		NeedsSetSwing();
 
 	// events
 	void		OnDieSidesChanging(BMC_Die *_die);
@@ -471,19 +511,23 @@ public:
 	void		OnDieCaptured(BMC_Die *_die);
 	void		OnRoundLost();
 	void		OnSurrendered();
-	void		OnSwingDiceSet() { m_swing_set = TRUE; }
+	//void		OnSwingDiceSet() { m_swing_set = TRUE; }
+	void		OnSwingDiceReady()	{ m_swing_set = SWING_SET_READY; }
 	void		OnAttackFinished() { OptimizeDice(); }
 	void		OnDieTripped() { OptimizeDice(); }
 	void		OnChanceDieRolled() { OptimizeDice(); }
+	void		OnFocusDieUsed()	{ OptimizeDice(); }
 
 	// accessors
 	BMC_Die *	GetDie(INT _d) { return &m_die[_d]; }
 	INT			GetAvailableDice() { return m_available_dice; }
 	INT			GetMaxValue() { return m_max_value; }
 	float		GetScore() { return m_score; }
-	BOOL		SwingDiceSet() { return m_swing_set; }
+	//BOOL		SwingDiceSet() { return m_swing_set; }
+	SWING_SET	GetSwingDiceSet()	{ return m_swing_set; }
 	INT			HasDieWithProperty(INT _p, BOOL _check_all_dice=FALSE);
 	INT			GetTotalSwingDice(INT _s) { return m_swing_dice[_s]; }
+	INT			GetID() { return m_id; }
 
 
 protected:
@@ -493,7 +537,7 @@ protected:
 private:
 	BMC_Man	*	m_man;
 	INT			m_id;
-	BOOL		m_swing_set;
+	SWING_SET	m_swing_set;
 	BMC_Die		m_die[BMD_MAX_DICE];			// as long as Optimize was called, these are sorted largest to smallest that are READY
 	U8			m_swing_value[BME_SWING_MAX];	
 	U8			m_swing_dice[BME_SWING_MAX];	// number of dice of each swing type
@@ -522,8 +566,8 @@ public:
 	void		GenerateValidAttacks(BMC_MoveList &_movelist);
 
 	BOOL		ValidSetSwing(BMC_Move &_move);
-	void		GenerateValidPreround(BMC_MoveList & _movelist);
-	void		ApplySetSwing(BMC_Move &_move);
+	void		GenerateValidSetSwing(BMC_MoveList & _movelist);
+	void		ApplySetSwing(BMC_Move &_move, BOOL _lock = TRUE);
 
 	BOOL		ValidUseFocus(BMC_Move &_move);
 	void		GenerateValidFocus(BMC_MoveList & _movelist);
@@ -532,6 +576,7 @@ public:
 	void		ApplyUseReserve(BMC_Move &_move);
 
 	BOOL		ValidUseChance(BMC_Move &_move);
+	void		GenerateValidChance(BMC_MoveList & _movelist);
 	void		ApplyUseChance(BMC_Move &_move);
 
 	// initiative
@@ -543,6 +588,7 @@ public:
 	void		ApplyAttackNatureRoll(BMC_Move &_move);
 	void		ApplyAttackNaturePost(BMC_Move &_move, BOOL &_extra_turn);
 	void		SimulateAttack(BMC_MoveAttack &_move, BOOL & _extra_turn);
+	void		RecoverDizzyDice(INT _player);
 
 	// accessors
 	BMC_Player *GetPlayer(INT _i) { return &m_player[_i]; }
@@ -554,9 +600,15 @@ public:
 	INT			GetStanding(INT _wlt) { return m_standing[_wlt]; }
 	INT			GetInitiativeWinner() { return m_initiative_winner; }
 	BOOL		IsSimulation() { return m_simulation; }
+	BMC_AI *	GetAI(INT _p) { return m_ai[_p]; }
 
 	// mutators
 	void		SetAI(INT _p, BMC_AI *_ai) { m_ai[_p] = _ai; }
+
+	// methods wrt. "percent chance to win"
+	float		ConvertWLTToWinProbability();
+	float		PlayFight_EvaluateMove(INT _pov_player, BMC_Move &_move);
+	float		PlayRound_EvaluateMove(INT _pov_player);
 
 protected:
 	// game simulation - level 1
@@ -571,6 +623,7 @@ protected:
 	void		FinishPreround();
 	void		FinishInitiative();
 	void		FinishInitiativeChance(BOOL _swap_phase_player);
+	void		FinishInitiativeFocus(BOOL _swap_phase_player);
 	BME_WLT		FinishRound(BME_WLT _wlt_0);
 
 	// game simulation - level 3
@@ -583,6 +636,7 @@ private:
 	BME_PHASE	m_phase;
 	U8			m_phase_player;
 	U8			m_target_player;
+	BME_ACTION	m_last_action;
 
 	// AI players
 	BMC_AI *	m_ai[BMD_MAX_PLAYERS];
@@ -592,105 +646,6 @@ private:
 
 	// is this a simulation run by the AI?
 	BOOL		m_simulation;
-};
-
-// basic AI class
-class BMC_AI
-{
-public:
-
-	virtual void	GetSetSwingAction(BMC_Game *_game, BMC_Move &_move);
-	virtual void	GetAttackAction(BMC_Game *_game, BMC_Move &_move);
-	virtual void	GetReserveAction(BMC_Game *_game, BMC_Move &_move);		
-	virtual void	GetUseChanceAction(BMC_Game *_game, BMC_Move &_move);
-	void		GetUseFocusAction(BMC_Game *_game, BMC_Move &_move);
-
-	void		GetUseAuxiliaryAction(BMC_Game *_game, BMC_Move &_move);
-	void		GetSetTurboAction(BMC_Game *_game, BMC_Move &_move);
-
-	F32			ScoreAttack(BMC_Game *_game, BMC_Move &_move);
-
-protected:
-private:
-	BMC_AI *	m_qai;
-};
-
-// The real BMAI
-class BMC_BMAI : public BMC_AI
-{
-public:
-				BMC_BMAI();
-
-	virtual void	GetAttackAction(BMC_Game *_game, BMC_Move &_move);
-	virtual	void	GetSetSwingAction(BMC_Game *_game, BMC_Move &_move);
-	virtual void	GetReserveAction(BMC_Game *_game, BMC_Move &_move);		
-	virtual void	GetUseChanceAction(BMC_Game *_game, BMC_Move &_move);
-
-	//////////////////////////////////////////
-	// mutators
-	//////////////////////////////////////////
-
-	void		SetQAI(BMC_AI *_ai) { m_qai = _ai; }		// use this to change the QAI used in simulations
-	void		SetMaxPly(INT _m)	{ m_max_ply = _m; }
-	void		SetMaxBranch(INT _m) { m_max_branch = _m; }
-
-	//////////////////////////////////////////
-	// accessors
-	//////////////////////////////////////////
-
-	INT			GetMaxPly() { return m_max_ply; }
-
-protected:
-private:
-
-	// determining number of sims to use
-	INT			ComputeNumberSims(INT _moves);
-
-	// for dealing with 'level'
-	void		OnStartEvaluation(INT &_enter_level);
-	void		OnPreSimulation(BMC_Game &_sim);
-	void		OnPostSimulation(BMC_Game *_game, INT _enter_level);
-	void		OnEndEvaluation(BMC_Game *_game, INT _enter_level);
-
-	BMC_AI *	m_qai;
-	INT			m_max_ply;
-	INT			m_max_branch;
-};
-
-// Heuristic Quick AI that BMAI uses by default
-class BMC_QAI : public BMC_AI
-{
-public:
-	virtual void		GetAttackAction(BMC_Game *_game, BMC_Move &_move);
-
-
-protected:
-private:
-};
-
-// Selects the maximizing move
-class BMC_AI_Maximize : public BMC_AI
-{
-public:
-	virtual void		GetAttackAction(BMC_Game *_game, BMC_Move &_move);
-};
-
-// Randomly selects between a basic AI and a maximizing AI
-// P(p) use Maximize (mode 1), else Basic (mode 0)
-class BMC_AI_MaximizeOrRandom : public BMC_AI
-{
-public:
-	virtual void		GetAttackAction(BMC_Game *_game, BMC_Move &_move);
-
-	void	SetP(F32 _p) { p = _p; }
-
-private:
-	F32	p;
-};
-
-
-class BMC_AI_Mode2 : public BMC_AI
-{
 };
 
 
@@ -717,6 +672,8 @@ public:
 	BMC_Die *		GetTopDie()		{ return owner->GetDie(GetTopDieIndex()); }
 	BOOL			Empty()			{ return die_stack_size == 0; }
 	INT				GetStackSize()	{ return die_stack_size; }
+	BMC_Die *		GetDie(int _index) { return owner->GetDie(die_stack[_index]); }
+	INT				CountDiceWithProperty(BME_PROPERTY _property);
 
 protected:
 private:
@@ -729,13 +686,16 @@ private:
 class BMC_Parser
 {
 public:
+	BMC_Parser();
 	void	SetupTestGame();
 	void	ParseGame();
 	void	Parse();
+	void	Parse(FILE *_fp)	{ file = _fp; Parse(); }
 
 protected:
 	void			GetAction();
 	void			PlayGame(INT _games);
+	void			CompareAI(INT _games);
 	void			PlayFairGames(INT _games, INT _mode, F32 _p);
 	void			ParseDie(INT _p, INT _dice);
 	void			ParsePlayer(INT _p, INT _dice);
@@ -743,10 +703,12 @@ protected:
 
 	// output
 	void			Send(char *_fmt, ...);
+	void			SendStats();
 	void			SendSetSwing(BMC_Move &_move);
 	void			SendUseReserve(BMC_Move &_move);
 	void			SendAttack(BMC_Move &_move);
 	void			SendUseChance(BMC_Move &_move);
+	void			SendUseFocus(BMC_Move &_move);
 
 	// parsing dice
 	BOOL			DieIsSwing(char _c) { return _c>=BMD_FIRST_SWING_CHAR && _c<=BMD_LAST_SWING_CHAR; }
@@ -765,6 +727,7 @@ private:
 	BMC_Player *p;
 	BMC_Die *d;
 	char			line[BMD_MAX_STRING];
+	FILE *file;
 };
 
 class BMC_Logger
@@ -784,6 +747,30 @@ public:
 	
 private:
 	BOOL			m_logging[BME_DEBUG_MAX];
+};
+
+class BMC_Stats
+{
+public:
+	BMC_Stats();
+
+	// methods
+	void			DisplayStats();
+
+	// events
+	void			OnAppStarted()	{ m_start = time(NULL); }
+	void			OnFullSimulation() { m_sims++; }
+
+	// bmai-specific
+	void			OnPlyAction(int _ply, int _moves, int _sims) { m_total_sims[_ply]+=_sims; m_total_moves[_ply]+=_moves; m_total_samples[_ply]++; }
+
+private:
+	time_t			m_start, m_end;
+	int				m_sims;
+	int				m_total_sims[BMD_MAX_PLY];
+	int				m_total_moves[BMD_MAX_PLY];
+	int				m_total_samples[BMD_MAX_PLY];
+
 };
 
 // Utility functions
