@@ -18,8 +18,8 @@ public:
 	F32			ScoreAttack(BMC_Game *_game, BMC_Move &_move);
 
 	// class testing
-	virtual		BOOL	IsBMAI() { return FALSE; }
-	virtual		BOOL	IsBMAI3() { return TRUE; }
+	virtual		bool	IsBMAI() { return false; }
+	virtual		bool	IsBMAI3() { return true; }
 
 protected:
 
@@ -40,7 +40,7 @@ public:
 	virtual void	GetUseChanceAction(BMC_Game *_game, BMC_Move &_move);
 	virtual void	GetUseFocusAction(BMC_Game *_game, BMC_Move &_move);
 
-	virtual		BOOL	IsBMAI() { return TRUE; }
+	virtual		bool	IsBMAI() { return true; }
 
 	//////////////////////////////////////////
 	// mutators
@@ -102,7 +102,7 @@ public:
 	float	GetLastProbabilityWin() { return m_last_probability_win; }
 
 	// class testing
-	virtual BOOL	IsBMAI3() { return TRUE; }
+	virtual bool	IsBMAI3() { return true; }
 
 protected:
 	// getaction state
@@ -122,7 +122,7 @@ protected:
 	};
 	friend class BMC_ThinkState;
 
-	BOOL			CullMoves(BMC_ThinkState &_t);
+	bool			CullMoves(BMC_ThinkState &_t);
 	void			RandomlySelectMoves(BMC_MoveList &_movelist, int _max);
 
 	int				m_sims_per_check;

@@ -11,8 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // includes
-#include <windows.h>
-#include <assert.h>
+#include <cassert>
 #include "bmai.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +70,7 @@ void BMC_Player::OnDiceParsed()
 	INT i, j;
 
 	// update m_swing_dice
-	BOOL have_turbo = FALSE;
+	bool have_turbo = false;
 	m_score = 0;
 	for (i=0; i<BMD_MAX_DICE; i++)
 	{
@@ -81,13 +80,13 @@ void BMC_Player::OnDiceParsed()
 		for (j=0; j<m_die[i].Dice(); j++)
 			m_swing_dice[m_die[i].GetSwingType(j)]++;
 
-		m_score += m_die[i].GetScore(TRUE);
+		m_score += m_die[i].GetScore(true);
 
 		if (m_die[i].HasProperty(BME_PROPERTY_TURBO))
 		{
 			BM_ERROR(m_die[i].HasProperty(BME_PROPERTY_OPTION) || m_die[i].GetSwingType(0)!=BME_SWING_NOT);
 			// TODO: reenable this error check BM_ERROR(!have_turbo);
-			have_turbo = TRUE;
+			have_turbo = true;
 		}
 	}
 
@@ -95,7 +94,7 @@ void BMC_Player::OnDiceParsed()
 	OptimizeDice();
 }	
 
-void BMC_Player::SetSwingDice(INT _swing, U8 _value, BOOL _from_turbo)
+void BMC_Player::SetSwingDice(INT _swing, U8 _value, bool _from_turbo)
 {
 	BM_ASSERT(!m_swing_set || _from_turbo);	
 
@@ -129,7 +128,7 @@ void BMC_Player::RollDice()
 		m_die[i].Roll();
 		BM_ASSERT(m_die[i].GetValueTotal()>0);
 
-		m_score += m_die[i].GetScore(TRUE);
+		m_score += m_die[i].GetScore(true);
 	}
 
 	OptimizeDice();
@@ -179,7 +178,7 @@ void BMC_Player::OptimizeDice()
 	// TODO: do better
 	INT i,j;
 	BMC_Die	* die_i, *die_j;
-	BOOL swap;
+	bool swap;
 	BMC_Die temp_die;
 	for (i=0; i<BMD_MAX_DICE; i++)
 	{
@@ -191,13 +190,13 @@ void BMC_Player::OptimizeDice()
 			//    NOTUSED vs not NOTUSED
 			// OR not READY vs READY
 			// OR value less than value
-			swap = FALSE;
+			swap = false;
 			if (!die_i->IsUsed() && die_j->IsUsed())
-				swap = TRUE;
+				swap = true;
 			else if (die_j->IsAvailable())
 			{
 				if (!die_i->IsAvailable() || die_i->GetValueTotal()<die_j->GetValueTotal())
-					swap = TRUE;
+					swap = true;
 			}
 
 			if (swap)
@@ -228,12 +227,12 @@ void BMC_Player::OnDieSidesChanging(BMC_Die *_die)
 		BM_ERROR(_die->HasProperty(BME_PROPERTY_KONSTANT));
 		_die->SetState(BME_STATE_NOTSET);
 	}
-	m_score -= _die->GetScore(TRUE);
+	m_score -= _die->GetScore(true);
 }
 
 void BMC_Player::OnDieSidesChanged(BMC_Die *_die)
 {
-	m_score += _die->GetScore(TRUE);
+	m_score += _die->GetScore(true);
 
 	//OptimizeDice();
 }
@@ -248,7 +247,7 @@ BMC_Die * BMC_Player::OnDieLost(INT _d)
 {
 	BM_ASSERT(m_die[_d].IsAvailable());
 
-	m_score -= m_die[_d].GetScore(TRUE);
+	m_score -= m_die[_d].GetScore(true);
 
 	// shuffle over dice instead of calling optimize
 	INT i;
@@ -280,7 +279,7 @@ BMC_Die * BMC_Player::OnDieLost(INT _d)
 
 void BMC_Player::OnDieCaptured(BMC_Die *_die)
 {
-	m_score += _die->GetScore(FALSE);
+	m_score += _die->GetScore(false);
 }
 
 // POST: swing dice have been reset
@@ -295,7 +294,7 @@ void BMC_Player::OnRoundLost()
 }
 
 // RETURNS: die index +1 (i.e. >0) if there is one present
-INT BMC_Player::HasDieWithProperty(INT _p, BOOL _check_all_dice)
+INT BMC_Player::HasDieWithProperty(INT _p, bool _check_all_dice)
 {
 	INT i;
 	INT max = _check_all_dice ? BMD_MAX_DICE : GetAvailableDice();
@@ -316,14 +315,14 @@ void BMC_Player::OnSurrendered()
 }
 
 // NOTE: copies logic from BMC_Game::GenerateValidSetSwing()
-BOOL BMC_Player::NeedsSetSwing()
+bool BMC_Player::NeedsSetSwing()
 {
 	INT i;
 
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
 		if (GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
-			return TRUE;
+			return true;
 	}
 
 	for (i=0; i<BMD_MAX_DICE; i++)
@@ -332,8 +331,8 @@ BOOL BMC_Player::NeedsSetSwing()
 			continue;
 
 		if (GetDie(i)->HasProperty(BME_PROPERTY_OPTION))
-			return TRUE;
+			return true;
 	}
 
-	return FALSE;
+	return false;
 }
