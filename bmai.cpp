@@ -249,8 +249,17 @@
 // includes
 #include "bmai.h"
 #include "bmai_ai.h"
-#include <time.h>	// for time()
-#include <math.h>	// for fabs()
+#include <ctime>	// for time()
+#include <cmath>	// for fabs()
+#include <cstdarg>  // for va_start() va_end()
+
+// to help make a cross-platform case insensitive compare
+// we need transform and string
+#include <algorithm>
+#include <string>
+
+// some compilers want to be very explicit
+#include <cstring>  // string functions on std namespace
 
 // definitions
 BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX] =
@@ -294,7 +303,7 @@ INT g_swing_sides_range[BME_SWING_MAX][2] =
 	{ 4, 30 },	// Z
 };
 
-char * g_swing_name[BME_SWING_MAX] =
+const char * g_swing_name[BME_SWING_MAX] =
 {
 	"None",
 	"R",
@@ -309,7 +318,7 @@ char * g_swing_name[BME_SWING_MAX] =
 };
 
 // PHASE names
-char *g_phase_name[BME_PHASE_MAX] = 
+const char *g_phase_name[BME_PHASE_MAX] =
 {
 	"preround",
 	"reserve",
@@ -321,7 +330,7 @@ char *g_phase_name[BME_PHASE_MAX] =
 };
 
 // ATTACK names
-char *g_attack_name[BME_ATTACK_MAX] =
+const char *g_attack_name[BME_ATTACK_MAX] =
 {
 	"power",
 	"skill",
@@ -333,7 +342,7 @@ char *g_attack_name[BME_ATTACK_MAX] =
 };
 
 // ACTION names
-char *g_action_name[BME_ACTION_MAX] =
+const char *g_action_name[BME_ACTION_MAX] =
 {
 	"aux",
 	"chance",
@@ -346,7 +355,7 @@ char *g_action_name[BME_ACTION_MAX] =
 };
 
 // BME_DEBUG setting names
-char *g_debug_name[BME_DEBUG_MAX] = 
+const char *g_debug_name[BME_DEBUG_MAX] =
 {
 	"ALWAYS",
 	"WARNING",
@@ -362,10 +371,10 @@ char *g_debug_name[BME_DEBUG_MAX] =
 BMC_RNG		g_rng;
 BMC_Man		g_testman1, g_testman2;
 BMC_BMAI3	g_ai;	// the main AI used
-BMC_Game	g_game(FALSE);
+BMC_Game	g_game(false);
 BMC_Parser	g_parser;
 BMC_Logger	g_logger;
-FLOAT		g_turbo_accuracy = 1;	// 0 is worst, 1 is best
+float		g_turbo_accuracy = 1;	// 0 is worst, 1 is best
 BMC_Stats	g_stats;
 
 // AI types - for setting up compare games
@@ -408,7 +417,7 @@ BMC_Logger::BMC_Logger()
 {
 	INT i;
 	for (i=0; i<BME_DEBUG_MAX; i++)
-		m_logging[i] = TRUE;
+		m_logging[i] = true;
 }
 
 void BMC_Logger::Log(BME_DEBUG _cat, char *_fmt, ... )
@@ -422,21 +431,26 @@ void BMC_Logger::Log(BME_DEBUG _cat, char *_fmt, ... )
 	va_end(ap);	
 }
 
-BOOL BMC_Logger::SetLogging(const char *_catname, BOOL _log)
+bool BMC_Logger::SetLogging(const char *_catname, bool _log)
 {
+	// case insensitive compares are not easy to come by in a cross-platform way
+	// so lets uppercase the input and do a normal std::strcmp below
+	std::string _cn(_catname);
+	std::transform(_cn.begin(), _cn.end(), _cn.begin(), ::toupper);
+
 	INT i;
 	for (i=0; i<BME_DEBUG_MAX; i++)
 	{
-		if (!stricmp(_catname, g_debug_name[i]))
+		if (!std::strcmp(_catname, g_debug_name[i]))
 		{
 			SetLogging((BME_DEBUG)i, _log);
 			Log(BME_DEBUG_ALWAYS, "Debug %s set to %d\n", _catname, _log);
-			return TRUE;
+			return true;
 		}
 	}
 
 	BMF_Error("Could not find debug category: %s\n", _catname);
-	return FALSE;
+	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -513,7 +527,7 @@ void BMC_DieIndexStack::SetBits(BMC_BitArray<BMD_MAX_DICE> & _bits)
 //       and replace it with the next available die 
 // PARAM: _add_die: if specificed, then force cycling the top die 
 // RETURNS: if finished (couldn't cycle)
-BOOL BMC_DieIndexStack::Cycle(BOOL _add_die)
+bool BMC_DieIndexStack::Cycle(bool _add_die)
 {
 	// if at end... (stack top == last die)
 	if (ContainsLastDie())
@@ -522,9 +536,9 @@ BOOL BMC_DieIndexStack::Cycle(BOOL _add_die)
 
 		// if empty - give up
 		if (Empty())
-			return TRUE;
+			return true;
 
-		_add_die = FALSE;	// cycle the previous die
+		_add_die = false;	// cycle the previous die
 	}
 
 	if (_add_die)
@@ -539,7 +553,7 @@ BOOL BMC_DieIndexStack::Cycle(BOOL _add_die)
 		value_total += GetTopDie()->GetValueTotal();
 	}
 
-	return FALSE;	// not finished
+	return false;	// not finished
 }
 
 void BMC_DieIndexStack::Push(INT _index)
@@ -802,7 +816,7 @@ void BMC_Die::Roll()
 	RecomputeAttacks();
 }
 
-float BMC_Die::GetScore(BOOL _own)
+float BMC_Die::GetScore(bool _own)
 {
 	// WARRIOR and NULL: worth 0
 	if (HasProperty(BME_PROPERTY_NULL|BME_PROPERTY_WARRIOR))
@@ -828,8 +842,8 @@ float BMC_Die::GetScore(BOOL _own)
 }
 
 // DESC: deal with all deterministic effects of attacking, including TURBO
-// PARAM: _actually_attacking is normally TRUE, but may be FALSE for forced attack rerolls like ORNERY
-void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, BOOL _actually_attacking)
+// PARAM: _actually_attacking is normally true, but may be false for forced attack rerolls like ORNERY
+void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _actually_attacking)
 {
 	// clear value
 	// KONSTANT: don't reroll
@@ -880,7 +894,7 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, BOOL _act
 		{
 			BM_ASSERT(GetSwingType(0)!=BME_SWING_NOT);
 			_owner->OnDieSidesChanging(this);
-			_owner->SetSwingDice(GetSwingType(0), _move.m_turbo_option, TRUE);
+			_owner->SetSwingDice(GetSwingType(0), _move.m_turbo_option, true);
 			_owner->OnDieSidesChanged(this);
 		}
 	}
@@ -998,7 +1012,7 @@ public:
 	BMC_MovePool() 
 	{
 		m_pool.resize(128);
-		m_available.resize(128, TRUE);
+		m_available.resize(128, true);
 		m_next_available = 0;
 	}
 
@@ -1011,7 +1025,7 @@ public:
 			CheckSize();
 		}
 
-		m_available[m_next_available] = FALSE;
+		m_available[m_next_available] = false;
 		m_pool[m_next_available].m_pool_index = m_next_available;
 		return &(m_pool[m_next_available++]);
 	}
@@ -1020,7 +1034,7 @@ public:
 	{
 		if (_move->m_pool_index<0)
 			return;
-		m_available[_move->m_pool_index] = TRUE;
+		m_available[_move->m_pool_index] = true;
 		_move->m_pool_index = -1;
 	}
 
@@ -1040,7 +1054,7 @@ private:
 	}
 
 	std::vector<BMC_Move>		m_pool;
-	std::vector<BOOL>	m_available;
+	std::vector<bool>	m_available;
 	INT					m_next_available;
 };
 
@@ -1062,7 +1076,7 @@ void BMC_MoveList::Add(BMC_Move & _move)
 	BMC_Move * move;
 
 	move = new BMC_Move;
-	memcpy(move, &_move, sizeof(BMC_Move));
+	std::memcpy(move, &_move, sizeof(BMC_Move));
 	*/
 
 	list.push_back(_move);
@@ -1239,7 +1253,7 @@ BMC_Player *BMC_Move::GetTarget()
 // BMC_Game methods
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-BMC_Game::BMC_Game(BOOL _simulation) 
+BMC_Game::BMC_Game(bool _simulation)
 {
 	INT i;
 
@@ -1257,15 +1271,15 @@ BMC_Game::BMC_Game(BOOL _simulation)
 
 BMC_Game::BMC_Game(const BMC_Game & _game)
 {
-	BOOL save_simulation = m_simulation;
+	bool save_simulation = m_simulation;
 	*this = _game;
 	m_simulation = save_simulation;
 }
 
 const BMC_Game & BMC_Game::operator=(const BMC_Game & _game)
 {
-	BOOL save_simulation = m_simulation;
-	memcpy(this, &_game, sizeof(BMC_Game));
+	bool save_simulation = m_simulation;
+	std::memcpy(this, &_game, sizeof(BMC_Game));
 	m_simulation = save_simulation;	
 	return *this;
 }
@@ -1409,20 +1423,20 @@ BME_WLT BMC_Game::FinishRound(BME_WLT _wlt_0)
 
 // DESC: a chance move is valid (for the non-initiative player) as long as the selected die is a CHANCE die
 // PRE: the acting player is m_phase_player
-BOOL BMC_Game::ValidUseChance(BMC_Move &_move)
+bool BMC_Game::ValidUseChance(BMC_Move &_move)
 {
 	INT i;
 	for (i=0; i<m_player[m_phase_player].GetAvailableDice(); i++)
 	{
 		if (_move.m_chance_reroll.IsSet(i) && !m_player[m_phase_player].GetDie(i)->HasProperty(BME_PROPERTY_CHANCE))
-			return FALSE;
+			return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // DESC: a focus move is valid so long as the selected dice are FOCUS, are being reduced in value, and gains the initiative
-BOOL BMC_Game::ValidUseFocus(BMC_Move &_move)
+bool BMC_Game::ValidUseFocus(BMC_Move &_move)
 {
 	INT i;
 
@@ -1453,7 +1467,7 @@ BOOL BMC_Game::ValidUseFocus(BMC_Move &_move)
 	return (init == m_phase_player);
 }
 
-BOOL BMC_Game::ValidSetSwing(BMC_Move &_move)
+bool BMC_Game::ValidSetSwing(BMC_Move &_move)
 {
 	INT i;
 
@@ -1464,7 +1478,7 @@ BOOL BMC_Game::ValidSetSwing(BMC_Move &_move)
 		{
 			// check range
 			if (_move.m_swing_value[i]<g_swing_sides_range[i][0] || _move.m_swing_value[i]>g_swing_sides_range[i][1])
-				return FALSE;
+				return false;
 		}
 	}
 
@@ -1481,7 +1495,7 @@ BOOL BMC_Game::ValidSetSwing(BMC_Move &_move)
 		if (d->HasProperty(BME_PROPERTY_OPTION))
 		{
 			if (_move.m_option_die[i]>1)
-				return FALSE;
+				return false;
 		}
 
 		// check UNIQUE:  we check if current swing value>0 because some AIs use this function before having set all swing dice
@@ -1498,16 +1512,16 @@ BOOL BMC_Game::ValidSetSwing(BMC_Move &_move)
 					&&  _move.m_swing_value[s]>0
 					&&	_move.m_swing_value[s]==_move.m_swing_value[swing_type])
 				{
-					return FALSE;
+					return false;
 				}
 			}
 		}
 	}
 
-	return TRUE;	
+	return true;
 }
 
-BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
+bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 {
 	BMC_Die *att_die, *tgt_die;
 	BMC_Player *attacker = &(m_player[_move.m_attacker_player]);
@@ -1521,11 +1535,11 @@ BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			// is the attack type legal based on the given dice
 			att_die = attacker->GetDie(_move.m_attacker);
 			if (!att_die->CanDoAttack(_move))
-				return FALSE;
+				return false;
 
 			tgt_die = target->GetDie(_move.m_target);
 			if (!tgt_die->CanBeAttacked(_move))
-				return FALSE;
+				return false;
 
 			// for POWER - check value >=
 			if (_move.m_attack == BME_ATTACK_POWER)
@@ -1540,8 +1554,8 @@ BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			else
 			{
 				if (att_die->Dice()==1 && tgt_die->Dice()>1)
-					return FALSE;
-				return TRUE;
+					return false;
+				return true;
 			}
 		}
 
@@ -1551,7 +1565,7 @@ BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			// is the attack type legal based on the given dice
 			att_die = attacker->GetDie(_move.m_attacker);
 			if (!att_die->CanDoAttack(_move))
-				return FALSE;
+				return false;
 
 			// iterate over target dice
 			INT	tgt_value_total = 0;
@@ -1565,25 +1579,25 @@ BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					// can the target die be attacked?
 					tgt_die = target->GetDie(i);		
 					if (!tgt_die->CanBeAttacked(_move))
-						return FALSE;
+						return false;
 					// count value of target die, and check if gone past limit
 					tgt_value_total += tgt_die->GetValueTotal();
 					if (tgt_value_total > att_die->GetValueTotal())		
-						return FALSE;
+						return false;
 				}
 			}
 
 			// must be capturing more than one
 			/* removed - this is legal
 			if (dice<2)
-				return FALSE;
+				return false;
 			*/
 
 			// if match - success
 			if (tgt_value_total == att_die->GetValueTotal())
-				return TRUE;
+				return true;
 			
-			return FALSE;
+			return false;
 		}
 
 	case BME_ATTACK_SKILL:	// N -> 1
@@ -1601,13 +1615,13 @@ BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			// can the target die be attacked?
 			tgt_die = target->GetDie(_move.m_target);		
 			if (!tgt_die->CanBeAttacked(_move))
-				return FALSE;
+				return false;
 
 			// iterate over attack dice
 			INT	att_value_total = 0;
 			INT i;
 			INT dice = 0;
-			BOOL has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
+			bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
 			INT stinger_att_value_minimum = 0;
 			INT konstants = 0;
 			for (i=0; i<BMD_MAX_DICE; i++)
@@ -1618,17 +1632,17 @@ BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					// is the attack type legal based on the given dice
 					att_die = attacker->GetDie(i);
 					if (!att_die->CanDoAttack(_move))
-						return FALSE;
+						return false;
 
 					// count value of att die, and check if gone past limit
 					att_value_total += att_die->GetValueTotal();
 					if (!has_stinger && att_value_total > tgt_die->GetValueTotal())		
-						return FALSE;
+						return false;
 
 					if (att_die->HasProperty(BME_PROPERTY_WARRIOR))
 					{
 						if (warriors>=1)
-							return FALSE;
+							return false;
 						warriors++;
 					}
 
@@ -1645,26 +1659,26 @@ BOOL BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			// must be using more than one
 			// TODO: should allow this (important for FIRE)
 			if (dice<2)
-				return FALSE;
+				return false;
 
 			// KONSTANT: cannot do with just one die
 			if (dice<2 && konstants>0)
-				return FALSE;
+				return false;
 
 			// if match - success
 			if (att_value_total == tgt_die->GetValueTotal())
-				return TRUE;
+				return true;
 
 			// stinger - if within range - success
 			if (has_stinger && tgt_die->GetValueTotal() >= stinger_att_value_minimum && tgt_die->GetValueTotal() <= att_value_total)
-				return TRUE;
+				return true;
 			
-			return FALSE;
+			return false;
 		}
 
 	default:
 		BM_ASSERT(0);
-		return FALSE;
+		return false;
 	}
 }
 
@@ -1681,11 +1695,11 @@ void BMC_Game::PlayPreround()
 			// to accurately model simultaneous swing actions (where you aren't supposed to know your opponent's
 			// swing action), if the opponent is SWING_SET_READY then temporarily mark him SWING_SET_NOT
 			int opp = !i;
-			BOOL opp_was_ready = FALSE;
+			bool opp_was_ready = false;
 			if (m_player[opp].GetSwingDiceSet()==BMC_Player::SWING_SET_READY)
 			{
 				m_player[opp].SetSwingDiceStatus(BMC_Player::SWING_SET_NOT);
-				opp_was_ready = TRUE;
+				opp_was_ready = true;
 			}
 
 			m_phase_player = i;	// setup phase player for the AI
@@ -1737,11 +1751,11 @@ void BMC_Game::PlayInitiativeChance()
 			return;
 	}
 
-	FinishInitiativeChance(FALSE);
+	FinishInitiativeChance(false);
 }
 
 // PARAM: if ApplyUseChance() was used, then m_phase_player will be the player without initiative
-void BMC_Game::FinishInitiativeChance(BOOL _swap_phase_player)
+void BMC_Game::FinishInitiativeChance(bool _swap_phase_player)
 {
 	BM_ASSERT(m_phase == BME_PHASE_INITIATIVE_CHANCE);
 	
@@ -1781,11 +1795,11 @@ void BMC_Game::PlayInitiativeFocus()
 			return;
 	}
 
-	FinishInitiativeFocus(FALSE);
+	FinishInitiativeFocus(false);
 }
 
 // DESC: if ApplyUseFocus() was used, then m_phase_player will be the player without initiative
-void BMC_Game::FinishInitiativeFocus(BOOL _swap_phase_player)
+void BMC_Game::FinishInitiativeFocus(bool _swap_phase_player)
 {
 	BM_ASSERT(m_phase == BME_PHASE_INITIATIVE_FOCUS);
 	
@@ -1817,19 +1831,19 @@ void BMC_Game::PlayInitiative()
 	}
 }
 
-BOOL BMC_Game::FightOver()
+bool BMC_Game::FightOver()
 {
 	if (m_player[m_phase_player].GetAvailableDice()<1)
-		return TRUE;
+		return true;
 	if (m_player[m_target_player].GetAvailableDice()<1)
-		return TRUE;
-	return FALSE;
+		return true;
+	return false;
 }
 
-// PARAM: extra_turn is TRUE if the phasing player should go again
+// PARAM: extra_turn is true if the phasing player should go again
 // POST: updates m_phase_player and m_target_player
 // ASSUME: only two players
-void BMC_Game::FinishTurn(BOOL extra_turn)
+void BMC_Game::FinishTurn(bool extra_turn)
 {
 	if (extra_turn)
 		return;
@@ -1898,7 +1912,7 @@ void BMC_Game::PlayGame(BMC_Man *_man1, BMC_Man *_man2)
 				loser = 0;
 
 			// only do reserve if was not a tie, and loser has reserve dice
-			if (loser>=0 && m_player[loser].HasDieWithProperty(BME_PROPERTY_RESERVE,TRUE))
+			if (loser>=0 && m_player[loser].HasDieWithProperty(BME_PROPERTY_RESERVE,true))
 			{
 				m_phase = BME_PHASE_RESERVE;
 				m_ai[loser]->GetReserveAction(this, move);		
@@ -2042,7 +2056,7 @@ void BMC_Game::GenerateValidSetSwing(BMC_MoveList & _movelist)
 
 	// array of valid values
 	struct SWING_ACTION {
-		BOOL		swing;	// or option
+		bool		swing;	// or option
 		INT			index;	// swing type or die
 		INT			value;	// from [min..max] (or [0..1] for option)
 	};
@@ -2060,7 +2074,7 @@ void BMC_Game::GenerateValidSetSwing(BMC_MoveList & _movelist)
 	{
 		if (pl->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
 		{
-			swing_action[actions].swing = TRUE;
+			swing_action[actions].swing = true;
 			swing_action[actions].index = i;
 			swing_action[actions].value = g_swing_sides_range[i][0];	// initialize to min
 			actions++;
@@ -2076,7 +2090,7 @@ void BMC_Game::GenerateValidSetSwing(BMC_MoveList & _movelist)
 
 		if (pl->GetDie(i)->HasProperty(BME_PROPERTY_OPTION))
 		{
-			swing_action[actions].swing = FALSE;
+			swing_action[actions].swing = false;
 			swing_action[actions].index = i;
 			swing_action[actions].value = 0;	// initialize to first die
 			actions++;
@@ -2217,9 +2231,9 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 					//  of the stack.
 			
 					BMC_DieIndexStack	die_stack(attacker);
-					BOOL finished = FALSE;
-					BOOL has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
-					BOOL has_konstant = attacker->HasDieWithProperty(BME_PROPERTY_KONSTANT);
+					bool finished = false;
+					bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
+					bool has_konstant = attacker->HasDieWithProperty(BME_PROPERTY_KONSTANT);
 
 					// add the first die (this one)
 					die_stack.Push(move.m_attacker);
@@ -2292,7 +2306,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 						// if att_total matches or exceeds tgt_total, don't add a die
 						if (die_stack.GetValueTotal() >= target->GetMaxValue())
-							finished = die_stack.Cycle(FALSE);
+							finished = die_stack.Cycle(false);
 						else // otherwise standard cycle
 							finished = die_stack.Cycle();
 
@@ -2310,7 +2324,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 				{
 					BMC_DieIndexStack	die_stack(target);
 					INT att_total = att_die->GetValueTotal();
-					BOOL finished = FALSE;
+					bool finished = false;
 
 					// add the first die
 					die_stack.Push(0);
@@ -2335,7 +2349,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// if tgt_total matches or exceeds att_total, don't add a die (no sense continuing on this line)
 						// Otherwise do a standard cycle
 						if (att_total <= die_stack.GetValueTotal())
-							finished = die_stack.Cycle(FALSE);
+							finished = die_stack.Cycle(false);
 						else
 							finished = die_stack.Cycle();
 
@@ -2427,8 +2441,8 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 				// now use g_turbo_accuracy
 				// step_size = 1 / g_turbo_accuracy
-				FLOAT step_size = (g_turbo_accuracy<=0) ? 1000 : 1 / g_turbo_accuracy;
-				FLOAT sides_f;
+				float step_size = (g_turbo_accuracy<=0) ? 1000 : 1 / g_turbo_accuracy;
+				float sides_f;
 				for (sides_f = (float)(min + 1); sides_f<max; sides_f += step_size)
 				{
 					sides = (INT)sides_f;
@@ -2465,7 +2479,7 @@ void BMC_Game::ApplyUseChance(BMC_Move &_move)
 
 	if (_move.m_action == BME_ACTION_PASS)
 	{
-		FinishInitiativeChance(TRUE);
+		FinishInitiativeChance(true);
 		return;
 	}
 
@@ -2498,7 +2512,7 @@ void BMC_Game::ApplyUseChance(BMC_Move &_move)
 	{
 		BMF_Log(BME_DEBUG_ROUND, "CHANCE %d fail\n", m_phase_player);
 
-		FinishInitiativeChance(TRUE);
+		FinishInitiativeChance(true);
 		return;
 	}
 
@@ -2519,7 +2533,7 @@ void BMC_Game::ApplyUseFocus(BMC_Move &_move)
 
 	if (_move.m_action == BME_ACTION_PASS)
 	{
-		FinishInitiativeFocus(TRUE);
+		FinishInitiativeFocus(true);
 		return;
 	}
 
@@ -2576,9 +2590,9 @@ void BMC_Game::ApplyUseReserve(BMC_Move &_move)
 	die->OnUseReserve();
 }
 
-// PARAM: _lock TRUE means set to "SWING_SET_LOCKED", otherwise "SWING_SET_READY."  If used inappropriately, the latter
+// PARAM: _lock true means set to "SWING_SET_LOCKED", otherwise "SWING_SET_READY."  If used inappropriately, the latter
 // can result with the AI repeatedly stuck in PlayPreround().
-void BMC_Game::ApplySetSwing(BMC_Move &_move, BOOL _lock)
+void BMC_Game::ApplySetSwing(BMC_Move &_move, bool _lock)
 {
 	BMC_Player::SWING_SET	swing_status = _lock ? BMC_Player::SWING_SET_LOCKED : BMC_Player::SWING_SET_READY;
 
@@ -2671,7 +2685,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 	{
 		att_die = attacker->GetDie(i);
 		if (att_die->HasProperty(BME_PROPERTY_ORNERY))
-			att_die->OnApplyAttackPlayer(_move,attacker,FALSE);	// FALSE means not _actually_attacking
+			att_die->OnApplyAttackPlayer(_move,attacker,false);	// false means not _actually_attacking
 	}
 }
 
@@ -2679,11 +2693,11 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 // PRE: all dice that need to be rerolled have been marked BME_STATE_NOTSET
 void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 {
-	BOOL		capture = TRUE;
+	bool		capture = true;
 	BMC_Player *attacker = &(m_player[m_phase_player]);
 	BMC_Player *target = &(m_player[m_target_player]);
 	BMC_Die		*att_die, *tgt_die;
-	BOOL		null_attacker = FALSE;
+	bool		null_attacker = false;
 	INT i;
 
 	// reroll attackers
@@ -2723,19 +2737,19 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 // DESC: handle non-deterministic and capture-specific effects.  This includes
 // TIME_AND_SPACE, TRIP, NULL 
 // PRE: all dice that needed to be rerolled have been rerolled
-void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, BOOL &_extra_turn)
+void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 {
 	// update game pointer in move to ensure it is correct
 	_move.m_game = this;
 
 	// for TIME_AND_SPACE
-	_extra_turn = FALSE;	
+	_extra_turn = false;
 
-	BOOL		capture = TRUE;
+	bool		capture = true;
 	BMC_Player *attacker = &(m_player[m_phase_player]);
 	BMC_Player *target = &(m_player[m_target_player]);
 	BMC_Die		*att_die, *tgt_die;
-	BOOL		null_attacker = FALSE;
+	bool		null_attacker = false;
 	INT i;
 
 	// capture - attacker effects
@@ -2749,7 +2763,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, BOOL &_extra_turn)
 
 			// TIME AND SPACE
 			if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
-				_extra_turn = TRUE;
+				_extra_turn = true;
 			break;
 		}
 	case BME_ATTACK_TYPE_N_1:
@@ -2763,7 +2777,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, BOOL &_extra_turn)
 
 				// TIME AND SPACE
 				if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
-					_extra_turn = TRUE;
+					_extra_turn = true;
 			}
 			break;
 		}
@@ -2779,7 +2793,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, BOOL &_extra_turn)
 		// proceed with capture?
 		if (att_die->GetValueTotal() < tgt_die->GetValueTotal())
 		{
-			capture = FALSE;
+			capture = false;
 			target->OnDieTripped();	// target needs to reoptimize
 		}
 	}
@@ -2859,11 +2873,11 @@ float BMC_Game::PlayRound_EvaluateMove(INT _pov_player)
 			ai = m_ai[id];
 
 			// to accurately model simultaneous swing actions, temporarily mark SWING_SET_READY as SWING_SET_NOT
-			BOOL original_id_was_ready = FALSE;
+			bool original_id_was_ready = false;
 			if (m_player[original_id].GetSwingDiceSet()==BMC_Player::SWING_SET_READY)
 			{
 				m_player[original_id].SetSwingDiceStatus(BMC_Player::SWING_SET_NOT);
-				original_id_was_ready = TRUE;
+				original_id_was_ready = true;
 			}
 
 			// setup GetSetSwing
@@ -2909,7 +2923,7 @@ float BMC_Game::PlayRound_EvaluateMove(INT _pov_player)
 		}
 
 		// FinishInitiativeChance
-		FinishInitiativeChance(FALSE);
+		FinishInitiativeChance(false);
 	}
 
 	if (m_phase == BME_PHASE_INITIATIVE_FOCUS)
@@ -2935,7 +2949,7 @@ float BMC_Game::PlayRound_EvaluateMove(INT _pov_player)
 
 
 		// FinishInitiaitveFocus
-		FinishInitiativeFocus(FALSE);
+		FinishInitiativeFocus(false);
 	}
 
 	FinishInitiative();
@@ -2968,7 +2982,7 @@ float BMC_Game::PlayFight_EvaluateMove(INT _pov_player, BMC_Move &_move)
 	BM_ASSERT(!FightOver());
 	int original_phase_player = m_phase_player;
 	int original_target_player = m_target_player;
-	BOOL extra_turn = FALSE;
+	bool extra_turn = false;
 
 	if (_move.m_action == BME_ACTION_SURRENDER)
 		return 0;
@@ -3021,7 +3035,7 @@ void BMC_Game::PlayFight(BMC_Move *_start_action)
 
 	while (m_phase != BME_PHASE_PREROUND)
 	{
-		BOOL extra_turn = FALSE;
+		bool extra_turn = false;
 
 		if (FightOver())
 			return;
@@ -3079,7 +3093,7 @@ void BMC_Game::RecoverDizzyDice(INT _player)
 	}
 }
 
-void BMC_Game::SimulateAttack(BMC_Move &_move, BOOL &_extra_turn)
+void BMC_Game::SimulateAttack(BMC_Move &_move, bool &_extra_turn)
 {
 	ApplyAttackPlayer(_move);
 
@@ -3103,7 +3117,7 @@ INT BMC_Parser::ParseDieNumber(INT & _pos)
 
 INT BMC_Parser::ParseDieDefinedSides(INT _pos)
 {
-	while (_pos < (INT)strlen(line) && line[_pos] != '-')
+	while (_pos < (INT)std::strlen(line) && line[_pos] != '-')
 		_pos++;
 
 	if (line[_pos]=='-')
@@ -3243,7 +3257,7 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 	}
 
 	// postfix properties
-	while (pos < (INT)strlen(line) && line[pos] != ':')
+	while (pos < (INT)std::strlen(line) && line[pos] != ':')
 	{
 		U8 ch = line[pos++];
 		#define	DEFINE_POST_PROPERTY(_s, _v)	case _s: d->m_properties |= _v; break;
@@ -3291,7 +3305,7 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 	}
 
 	// did we successfully determine what this die is?
-	if (pos != strlen(line))
+	if (pos != std::strlen(line))
 		BMF_Error( "Could not successfully parse die: %s (broken at '%c')", line, line[pos]);
 
 	// set up attacks/vulnerabilities
@@ -3339,7 +3353,7 @@ void BMC_Parser::ParseGame()
 	g_game.m_phase = BME_PHASE_MAX;
 	for (i=0; i<BME_PHASE_MAX; i++)
 	{
-		if (!strcmp(g_phase_name[i], line))
+		if (!std::strcmp(g_phase_name[i], line))
 			g_game.m_phase = (BME_PHASE)i;
 	}
 	if (g_game.m_phase == BME_PHASE_MAX)
@@ -3374,21 +3388,21 @@ BMC_Parser::BMC_Parser()
 	file = stdin;
 }
 
-BOOL BMC_Parser::Read(BOOL _fatal)
+bool BMC_Parser::Read(bool _fatal)
 {
 	if (!fgets(line, BMD_MAX_STRING, file))
 	{
 		if (_fatal)
 			BMF_Error( "missing input" );
-		return FALSE;
+		return false;
 	}
 
 	// remove EOL
-	INT len = strlen(line);
+	INT len = std::strlen(line);
 	if (len>0 && line[len-1]=='\n')
 		line[len-1] = 0;
 
-	return TRUE;
+	return true;
 }
 
 void BMC_Parser::Send( char *_fmt, ... )
@@ -3680,7 +3694,7 @@ void BMC_Parser::PlayGame(INT _games)
 
 	INT wins[2] = {0,0};
 
-	BMC_Game	g_sim(FALSE);
+	BMC_Game	g_sim(false);
 	while (_games-->0)
 	{
 		g_sim = g_game;
@@ -3701,7 +3715,7 @@ void BMC_Parser::CompareAI(INT _games)
 
 	INT wins[2] = {0,0};
 
-	BMC_Game	g_sim(FALSE);
+	BMC_Game	g_sim(false);
 	while (_games-->0)
 	{
 		g_sim = g_game;
@@ -3774,7 +3788,7 @@ void BMC_Parser::PlayFairGames(INT _games, INT _mode, F32 _p)
 
 	// play games
 	INT g = 0;
-	BMC_Game	g_sim(FALSE);
+	BMC_Game	g_sim(false);
 	for (g=0; g<_games; g++)
 	{
 		g_sim = g_game;
@@ -3844,10 +3858,10 @@ void BMC_Parser::Parse()
 	INT	param, param2;
 	F32	fparam;
 	char sparam[BMD_MAX_STRING+1];
-	while (Read(FALSE))	// non-fatal Read()
+	while (Read(false))	// non-fatal Read()
 	{
 		// game [wins]
-		if (!strncmp(line, "game", 4))
+		if (!std::strncmp(line, "game", 4))
 		{
 			ParseGame();
 		}
@@ -3940,7 +3954,7 @@ void BMC_Parser::Parse()
 			g_ai.SetMaxBranch(param);
 			printf("Setting max branch to %d\n", param);
 		}
-		else if (!strcmp(line, "getaction"))
+		else if (!std::strcmp(line, "getaction"))
 		{
 			GetAction();
 		}
@@ -3954,7 +3968,7 @@ void BMC_Parser::Parse()
 			g_rng.SRand(param);
 			printf("Seeding with %d\n", param);
 		}
-		else if (!strcmp(line, "quit"))
+		else if (!std::strcmp(line, "quit"))
 		{
 			return;
 		}
@@ -4076,7 +4090,7 @@ void TestRNG()
 		double error = fabs(dist - range_size);
 		total += error;
 		total2 += error*error;
-		max_error = max(max_error,error);
+		max_error = std::max(max_error,error);
 		printf ("range %d dist %lf error %lf\n", i, dist, error);
 	}
 	double avg = total / ranges;
@@ -4085,7 +4099,7 @@ void TestRNG()
 }
 
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	//TestRNG();
 	g_stats.OnAppStarted();
@@ -4094,17 +4108,17 @@ void main(int argc, char *argv[])
 	// - disable in release build (for ZOM)
 	// drp051401 - reenabled in RELEASE since using for BMAI
 #ifndef _DEBUG	
-	//g_logger.SetLogging(BME_DEBUG_SIMULATION, FALSE);
-	g_logger.SetLogging(BME_DEBUG_BMAI, FALSE);
+	//g_logger.SetLogging(BME_DEBUG_SIMULATION, false);
+	g_logger.SetLogging(BME_DEBUG_BMAI, false);
 #endif
-	g_logger.SetLogging(BME_DEBUG_ROUND, FALSE);
-	g_logger.SetLogging(BME_DEBUG_QAI, FALSE);
+	g_logger.SetLogging(BME_DEBUG_ROUND, false);
+	g_logger.SetLogging(BME_DEBUG_QAI, false);
 
 	//g_ai_mode1b.SetP(0.5);
 	//g_ai.SetQAI(&g_ai_mode0);
 
 	// banner
-	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2002, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\n");
+	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2020, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\n");
 
 	//g_parser.SetupTestGame();
 	if (argc>1)
@@ -4113,7 +4127,7 @@ void main(int argc, char *argv[])
 		if (!fp)
 		{
 			printf("could not open %s", argv[1]);
-			return;
+			return 1;
 		}
 		printf("Reading from %s\n", argv[1]); 
 		g_parser.Parse(fp);
@@ -4123,6 +4137,8 @@ void main(int argc, char *argv[])
 		g_parser.Parse();
 
 	//g_stats.DisplayStats();
+
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -40,7 +40,7 @@
 
 #include "bmai.h"
 #include "bmai_ai.h"
-#include <math.h>
+#include <cmath>
 
 #define BMD_DEFAULT_SIMS	500
 #define BMD_MIN_SIMS		10
@@ -75,7 +75,7 @@ void BMC_QAI::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 	//printf("QAI p%d Valid Moves %d: \n", _game->GetPhasePlayerID(), movelist.Size());
 
 	INT i,j;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	BMC_Move *	best_move = NULL;
 	float		best_score, score, delta;
 	BMC_Player *attacker = _game->GetPhasePlayer();
@@ -93,7 +93,7 @@ void BMC_QAI::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 		g_logger.Log(BME_DEBUG_QAI, "QAI p%d m%d: ", _game->GetPhasePlayerID(), i);	attack->Debug(BME_DEBUG_QAI, NULL);
 
 		sim = *_game;
-		BOOL extra_turn = FALSE;
+		bool extra_turn = false;
 		sim.SimulateAttack(*attack, extra_turn);
 		score = sim.GetPhasePlayer()->GetScore() - sim.GetTargetPlayer()->GetScore();
 
@@ -274,9 +274,9 @@ F32 BMC_AI::ScoreAttack(BMC_Game *_game, BMC_Move &_move)
 	if (_move.m_action!=BME_ACTION_ATTACK)
 		return 0;
 
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	sim = *_game;
-	BOOL extra_turn = FALSE;
+	bool extra_turn = false;
 	sim.SimulateAttack(_move, extra_turn);
 	return sim.GetPhasePlayer()->GetScore() - sim.GetTargetPlayer()->GetScore();
 
@@ -321,7 +321,7 @@ F32 BMC_AI::ScoreAttack(BMC_Game *_game, BMC_Move &_move)
 	case BME_ATTACK_TYPE_1_1:
 		{
 			tgt_die = target->GetDie(_move.m_target);
-			score += (tgt_die->GetScore(TRUE) + tgt_die->GetScore(FALSE)) * prob_capture;
+			score += (tgt_die->GetScore(true) + tgt_die->GetScore(false)) * prob_capture;
 			break;
 		}
 	case BME_ATTACK_TYPE_1_N:
@@ -332,7 +332,7 @@ F32 BMC_AI::ScoreAttack(BMC_Game *_game, BMC_Move &_move)
 				if (!_move.m_targets.IsSet(i))
 					continue;
 				tgt_die = target->GetDie(i);
-				score += (tgt_die->GetScore(TRUE) + tgt_die->GetScore(FALSE)) * prob_capture;
+				score += (tgt_die->GetScore(true) + tgt_die->GetScore(false)) * prob_capture;
 			}
 			break;
 		}
@@ -367,7 +367,7 @@ void BMC_AI_Maximize::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 
 		//sim = *_game;
 
-		//BOOL extra_turn = FALSE;
+		//bool extra_turn = false;
 		//sim.ApplyAttack(*attack, extra_turn);
 		//score = sim.GetPhasePlayer()->GetScore() - sim.GetTargetPlayer()->GetScore();
 		score = ScoreAttack(_game, *attack);
@@ -499,7 +499,7 @@ void BMC_BMAI::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 	g_logger.Log(BME_DEBUG_SIMULATION, "l%d p%d Valid Moves %d Sims %d\n", sm_level, _game->GetPhasePlayerID(), movelist.Size(), sims);
 
 	INT i, s;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	BMC_Move *	best_move = NULL;
 	float		best_score, score;
 	for (i=0; i<movelist.Size(); i++)
@@ -592,12 +592,12 @@ void BMC_BMAI3::GetUseChanceAction(BMC_Game *_game, BMC_Move &_move)
 	OnStartEvaluation(_game, enter_level);
 
 	INT i, s;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	BMC_ThinkState	t(this,_game,movelist);
 
 	while (t.sims_run < t.sims)
 	{
-		int check_sims = min(m_sims_per_check, (t.sims-t.sims_run));
+		int check_sims = std::min(m_sims_per_check, (t.sims-t.sims_run));
 
 		for (i=0; i<movelist.Size(); i++)
 		{
@@ -695,12 +695,12 @@ void BMC_BMAI3::GetUseFocusAction(BMC_Game *_game, BMC_Move &_move)
 
 	INT i, s;
 	INT pass = 0;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	BMC_ThinkState	t(this,_game,movelist);
 
 	while (t.sims_run < t.sims)
 	{
-		int check_sims = min(m_sims_per_check, (t.sims-t.sims_run));
+		int check_sims = std::min(m_sims_per_check, (t.sims-t.sims_run));
 
 		for (i=0; i<movelist.Size(); i++)
 		{
@@ -867,7 +867,7 @@ void BMC_BMAI3::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 	OnStartEvaluation(_game, enter_level);
 
 	INT i,s;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 
 	// drp022203 - if there are simply far too many moves then randomly cut out moves
 	//  (not the extreme values). [Gordo has over 570k setswing moves, 160 days on ply 4]
@@ -890,7 +890,7 @@ void BMC_BMAI3::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 
 	while (t.sims_run < t.sims)
 	{
-		int check_sims = min(m_sims_per_check, (t.sims-t.sims_run));
+		int check_sims = std::min(m_sims_per_check, (t.sims-t.sims_run));
 
 		for (i=0; i<movelist.Size(); i++)
 		{
@@ -1015,7 +1015,7 @@ void BMC_BMAI3::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 	OnStartEvaluation(_game, enter_level);
 
 	INT i, s;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	BMC_ThinkState	t(this,_game,movelist);
 
 	if (enter_level < sm_debug_level)
@@ -1025,7 +1025,7 @@ void BMC_BMAI3::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 
 	while (t.sims_run < t.sims)
 	{
-		int check_sims = min(m_sims_per_check, (t.sims-t.sims_run));
+		int check_sims = std::min(m_sims_per_check, (t.sims-t.sims_run));
 
 		for (i=0; i<movelist.Size(); i++)
 		{
@@ -1109,11 +1109,11 @@ void BMC_BMAI3::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 	m_last_probability_win = t.best_score / t.sims_run;
 }
 
-// RETURN: TRUE to continue running simulations, FALSE if there is no point in continuing simulations (one move left)
-BOOL BMC_BMAI3::CullMoves(BMC_ThinkState &t)
+// RETURN: true to continue running simulations, false if there is no point in continuing simulations (one move left)
+bool BMC_BMAI3::CullMoves(BMC_ThinkState &t)
 {
 	if (t.movelist.Size()==1)
-		return FALSE;
+		return false;
 
 	//// compare and cull any moves that are not doing well
 
@@ -1188,9 +1188,9 @@ BOOL BMC_BMAI3::CullMoves(BMC_ThinkState &t)
 	}
 
 	if (t.movelist.Size()==1)
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 
@@ -1198,7 +1198,7 @@ void BMC_BMAI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 {
 	// array of valid values
 	struct SWING_ACTION {
-		BOOL		swing;	// or option
+		bool		swing;	// or option
 		INT			index;	// swing type or die
 		INT			value;	// from [min..max] (or [0..1] for option)
 	};
@@ -1218,7 +1218,7 @@ void BMC_BMAI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 	{
 		if (pl->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
 		{
-			swing_action[actions].swing = TRUE;
+			swing_action[actions].swing = true;
 			swing_action[actions].index = i;
 			swing_action[actions].value = g_swing_sides_range[i][0];	// initialize to min
 			actions++;
@@ -1234,7 +1234,7 @@ void BMC_BMAI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 
 		if (pl->GetDie(i)->HasProperty(BME_PROPERTY_OPTION))
 		{
-			swing_action[actions].swing = FALSE;
+			swing_action[actions].swing = false;
 			swing_action[actions].index = i;
 			swing_action[actions].value = 0;	// initialize to first die
 			actions++;
@@ -1260,7 +1260,7 @@ void BMC_BMAI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 	// now iterate over all combinations of actions
 	// TODO: stratify, at least in situations with a lot of moves
 	INT max;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	BMC_Move 	best_move;
 	float		best_score = -1, score;
 	do
@@ -1368,7 +1368,7 @@ void BMC_BMAI::GetReserveAction(BMC_Game *_game, BMC_Move &_move)
 	INT			i,s;
 	BMC_Move 	best_move;
 	float		best_score = -1, score;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 
 	INT enter_level;
 	OnStartEvaluation(_game, enter_level);
@@ -1496,7 +1496,7 @@ void BMC_BMAI::GetUseFocusAction(BMC_Game *_game, BMC_Move &_move)
 	INT			sims = ComputeNumberSims(movelist.Size());
 
 	INT i, s;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 	BMC_Move *	best_move = NULL;
 	float		best_score = -1, score;
 
@@ -1566,7 +1566,7 @@ void BMC_BMAI::GetUseChanceAction(BMC_Game *_game, BMC_Move &_move)
 	INT			i,s,j;
 	BMC_Move 	best_move;
 	float		best_score = -1, score;
-	BMC_Game	sim(TRUE);
+	BMC_Game	sim(true);
 
 	INT enter_level;
 	OnStartEvaluation(_game, enter_level);

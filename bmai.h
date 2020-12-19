@@ -14,10 +14,12 @@
 #define __BMAI_H__
 
 // dependent includes (and high-level)
-#include <windows.h>
-#include <assert.h>
+#include <cassert>
 #include <vector>
-#include <time.h>
+#include <ctime>
+
+// some compilers want to be very explicit
+#include <cstdio>   // FILE
 
 // forward declarations
 class BMC_Player;
@@ -57,11 +59,11 @@ public:
 	void Clear() { ClearAll(); }
 	void Set(int _bit)		{ INT byte = _bit/8; bits[byte] |= (1<<(_bit-byte*8)); }
 	void Clear(int _bit)	{ INT byte = _bit/8; bits[byte] &= ~(1<<(_bit-byte*8)); }
-	void Set(int _bit, BOOL _on)	{ if (_on) Set(_bit); else Clear(_bit); }
+	void Set(int _bit, bool _on)	{ if (_on) Set(_bit); else Clear(_bit); }
 
 	// accessors
-	BOOL	IsSet(INT _bit)	{ INT byte = _bit/8; return bits[byte] & (1<<(_bit-byte*8)); }
-	BOOL	operator[](int _bit) { return IsSet(_bit) ? 1 : 0; }
+	bool	IsSet(INT _bit)	{ INT byte = _bit/8; return bits[byte] & (1<<(_bit-byte*8)); }
+	bool	operator[](int _bit) { return IsSet(_bit) ? 1 : 0; }
 
 private:
 	U8	bits[(SIZE+7)>>3];	
@@ -275,12 +277,12 @@ public:
 
 	// methods
 	void	Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS, const char *_postfix = "\n");
-	BOOL	operator<  (const BMC_Move &_m) const  { return this < &_m; }
-	BOOL	operator==	(const BMC_Move &_m) const { return this == &_m; }
+	bool	operator<  (const BMC_Move &_m) const  { return this < &_m; }
+	bool	operator==	(const BMC_Move &_m) const { return this == &_m; }
 
 	// accessors
-	BOOL	MultipleAttackers() { return g_attack_type[m_attack]==BME_ATTACK_TYPE_N_1; }
-	BOOL	MultipleTargets()	{ return g_attack_type[m_attack]==BME_ATTACK_TYPE_1_N; }
+	bool	MultipleAttackers() { return g_attack_type[m_attack]==BME_ATTACK_TYPE_N_1; }
+	bool	MultipleTargets()	{ return g_attack_type[m_attack]==BME_ATTACK_TYPE_1_N; }
 	BMC_Player *	GetAttacker(); 
 	BMC_Player *	GetTarget(); 
 
@@ -342,7 +344,7 @@ public:
 	void	Add(BMC_Move  & _move );
 	INT		Size() { return list.size(); }
 	BMC_Move *	Get(INT _i) { return &list[_i]; }
-	BOOL	Empty() { return Size()<1; }
+	bool	Empty() { return Size()<1; }
 	void	Remove(int _index);
 	BMC_Move &	operator[](int _index) { return list[_index]; }
 
@@ -394,10 +396,10 @@ public:
 	void		Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS);
 
 	// accessors
-	BOOL		HasProperty(INT _p)  { return m_properties & _p; }
+	bool		HasProperty(INT _p)  { return m_properties & _p; }
 	BME_SWING	GetSwingType(INT _d) { return (BME_SWING)m_swing_type[_d]; }
-	BOOL		Valid()				 { return (m_properties & BME_PROPERTY_VALID); }
-	BOOL		Dice()				 { return (m_properties & BME_PROPERTY_TWIN) ? 2 : 1; }
+	bool		Valid()				 { return (m_properties & BME_PROPERTY_VALID); }
+	bool		Dice()				 { return (m_properties & BME_PROPERTY_TWIN) ? 2 : 1; }
 	INT			GetSides(INT _t)	{ return m_sides[_t]; }
 
 protected:
@@ -425,14 +427,14 @@ public:
 	void		SetFocus(INT _v);
 
 	// accessors
-	BOOL		CanDoAttack(BMC_MoveAttack &_move)	{ return m_attacks.IsSet(_move.m_attack); }
-	BOOL		CanBeAttacked(BMC_MoveAttack &_move)	{ return m_vulnerabilities.IsSet(_move.m_attack); }
+	bool		CanDoAttack(BMC_MoveAttack &_move)	{ return m_attacks.IsSet(_move.m_attack); }
+	bool		CanBeAttacked(BMC_MoveAttack &_move)	{ return m_vulnerabilities.IsSet(_move.m_attack); }
 	INT			GetValueTotal()					{ return m_value_total; }
 	INT			GetSidesMax()					{ return m_sides_max; }
-	BOOL		IsAvailable()					{ return m_state == BME_STATE_READY || m_state == BME_STATE_DIZZY; }
-	BOOL		IsInReserve()					{ return m_state == BME_STATE_RESERVE; }
-	BOOL		IsUsed()						{ return m_state != BME_STATE_NOTUSED && m_state!=BME_STATE_RESERVE; }
-	float		GetScore(BOOL _own);
+	bool		IsAvailable()					{ return m_state == BME_STATE_READY || m_state == BME_STATE_DIZZY; }
+	bool		IsInReserve()					{ return m_state == BME_STATE_RESERVE; }
+	bool		IsUsed()						{ return m_state != BME_STATE_NOTUSED && m_state!=BME_STATE_RESERVE; }
+	float		GetScore(bool _own);
 	INT			GetOriginalIndex()				{ return m_original_index; }
 	BME_STATE	GetState()						{ return (BME_STATE)m_state; }
 
@@ -443,7 +445,7 @@ public:
 	// events
 	void		OnDieChanged();
 	void		OnSwingSet(INT _swing, U8 _value);
-	void		OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, BOOL _actually_attacking=TRUE);
+	void		OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _actually_attacking=true);
 	void		OnApplyAttackNatureRollAttacker(BMC_Move &_move, BMC_Player *_owner);
 	void		OnApplyAttackNatureRollTripped();
 	void		OnBeforeRollInGame(BMC_Player *_owner);
@@ -494,7 +496,7 @@ public:
 
 	// playing with normal rules
 	void		SetButtonMan(BMC_Man *_man);
-	void		SetSwingDice(INT _swing, U8 _value, BOOL _from_turbo=FALSE);
+	void		SetSwingDice(INT _swing, U8 _value, bool _from_turbo=false);
 	void		SetOptionDie(INT _i, INT _d);
 	void		RollDice();
 
@@ -502,7 +504,7 @@ public:
 	void		Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS);
 	void		DebugAllDice(BME_DEBUG _cat = BME_DEBUG_ALWAYS);
 	void		SetSwingDiceStatus(SWING_SET _swing)	{ m_swing_set = _swing; }
-	BOOL		NeedsSetSwing();
+	bool		NeedsSetSwing();
 
 	// events
 	void		OnDieSidesChanging(BMC_Die *_die);
@@ -511,7 +513,7 @@ public:
 	void		OnDieCaptured(BMC_Die *_die);
 	void		OnRoundLost();
 	void		OnSurrendered();
-	//void		OnSwingDiceSet() { m_swing_set = TRUE; }
+	//void		OnSwingDiceSet() { m_swing_set = true; }
 	void		OnSwingDiceReady()	{ m_swing_set = SWING_SET_READY; }
 	void		OnAttackFinished() { OptimizeDice(); }
 	void		OnDieTripped() { OptimizeDice(); }
@@ -523,9 +525,9 @@ public:
 	INT			GetAvailableDice() { return m_available_dice; }
 	INT			GetMaxValue() { return m_max_value; }
 	float		GetScore() { return m_score; }
-	//BOOL		SwingDiceSet() { return m_swing_set; }
+	//bool		SwingDiceSet() { return m_swing_set; }
 	SWING_SET	GetSwingDiceSet()	{ return m_swing_set; }
-	INT			HasDieWithProperty(INT _p, BOOL _check_all_dice=FALSE);
+	INT			HasDieWithProperty(INT _p, bool _check_all_dice=false);
 	INT			GetTotalSwingDice(INT _s) { return m_swing_dice[_s]; }
 	INT			GetID() { return m_id; }
 
@@ -551,7 +553,7 @@ class BMC_Game		// 420b
 	friend class BMC_Parser;
 
 public:
-				BMC_Game(BOOL _simulation);
+				BMC_Game(bool _simulation);
 				BMC_Game(const BMC_Game & _game);
 	const BMC_Game & operator=(const BMC_Game &_game);
 
@@ -562,20 +564,20 @@ public:
 	BME_WLT		PlayRound(BMC_Move *_start_action=NULL);
 
 	// game methods
-	BOOL		ValidAttack(BMC_MoveAttack &_move);
+	bool		ValidAttack(BMC_MoveAttack &_move);
 	void		GenerateValidAttacks(BMC_MoveList &_movelist);
 
-	BOOL		ValidSetSwing(BMC_Move &_move);
+	bool		ValidSetSwing(BMC_Move &_move);
 	void		GenerateValidSetSwing(BMC_MoveList & _movelist);
-	void		ApplySetSwing(BMC_Move &_move, BOOL _lock = TRUE);
+	void		ApplySetSwing(BMC_Move &_move, bool _lock = true);
 
-	BOOL		ValidUseFocus(BMC_Move &_move);
+	bool		ValidUseFocus(BMC_Move &_move);
 	void		GenerateValidFocus(BMC_MoveList & _movelist);
 	void		ApplyUseFocus(BMC_Move &_move);
 
 	void		ApplyUseReserve(BMC_Move &_move);
 
-	BOOL		ValidUseChance(BMC_Move &_move);
+	bool		ValidUseChance(BMC_Move &_move);
 	void		GenerateValidChance(BMC_MoveList & _movelist);
 	void		ApplyUseChance(BMC_Move &_move);
 
@@ -583,11 +585,11 @@ public:
 	INT			CheckInitiative();
 
 	// managing fights
-	BOOL		FightOver();
+	bool		FightOver();
 	void		ApplyAttackPlayer(BMC_Move &_move);
 	void		ApplyAttackNatureRoll(BMC_Move &_move);
-	void		ApplyAttackNaturePost(BMC_Move &_move, BOOL &_extra_turn);
-	void		SimulateAttack(BMC_MoveAttack &_move, BOOL & _extra_turn);
+	void		ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn);
+	void		SimulateAttack(BMC_MoveAttack &_move, bool & _extra_turn);
 	void		RecoverDizzyDice(INT _player);
 
 	// accessors
@@ -595,11 +597,11 @@ public:
 	BMC_Player *GetPhasePlayer() { return GetPlayer(m_phase_player); }
 	BMC_Player *GetTargetPlayer() { return GetPlayer(m_target_player); }
 	INT			GetPhasePlayerID() { return m_phase_player; }
-	BOOL		IsPreround() { return m_phase == BME_PHASE_PREROUND || m_phase==BME_PHASE_RESERVE; }
+	bool		IsPreround() { return m_phase == BME_PHASE_PREROUND || m_phase==BME_PHASE_RESERVE; }
 	BME_PHASE	GetPhase() { return m_phase; }
 	INT			GetStanding(INT _wlt) { return m_standing[_wlt]; }
 	INT			GetInitiativeWinner() { return m_initiative_winner; }
-	BOOL		IsSimulation() { return m_simulation; }
+	bool		IsSimulation() { return m_simulation; }
 	BMC_AI *	GetAI(INT _p) { return m_ai[_p]; }
 
 	// mutators
@@ -622,12 +624,12 @@ protected:
 	void		PlayFight(BMC_Move *_start_action=NULL);
 	void		FinishPreround();
 	void		FinishInitiative();
-	void		FinishInitiativeChance(BOOL _swap_phase_player);
-	void		FinishInitiativeFocus(BOOL _swap_phase_player);
+	void		FinishInitiativeChance(bool _swap_phase_player);
+	void		FinishInitiativeFocus(bool _swap_phase_player);
 	BME_WLT		FinishRound(BME_WLT _wlt_0);
 
 	// game simulation - level 3
-	void		FinishTurn(BOOL extra_turn=FALSE);
+	void		FinishTurn(bool extra_turn=false);
 
 private:
 	BMC_Player	m_player[BMD_MAX_PLAYERS];
@@ -645,7 +647,7 @@ private:
 	U8			m_initiative_winner;	// the player who originally won initiative (ignoring CHANCE and FOCUS)
 
 	// is this a simulation run by the AI?
-	BOOL		m_simulation;
+	bool		m_simulation;
 };
 
 
@@ -658,7 +660,7 @@ public:
 	// mutators
 	void			Pop()	{ die_stack_size--; }
 	void			Push(INT _index);
-	BOOL			Cycle(BOOL _add_die=TRUE);
+	bool			Cycle(bool _add_die=true);
 
 	// methods 
 	void			SetBits(BMC_BitArray<BMD_MAX_DICE> & _bits);
@@ -666,11 +668,11 @@ public:
 
 	// accessors
 	INT				GetValueTotal() { return value_total; }
-	BOOL			ContainsAllDice() { return die_stack_size == owner->GetAvailableDice(); }
-	BOOL			ContainsLastDie() { return GetTopDieIndex() == owner->GetAvailableDice()-1; }
+	bool			ContainsAllDice() { return die_stack_size == owner->GetAvailableDice(); }
+	bool			ContainsLastDie() { return GetTopDieIndex() == owner->GetAvailableDice()-1; }
 	INT				GetTopDieIndex() { BM_ASSERT(die_stack_size>0); return die_stack[die_stack_size-1]; }
 	BMC_Die *		GetTopDie()		{ return owner->GetDie(GetTopDieIndex()); }
-	BOOL			Empty()			{ return die_stack_size == 0; }
+	bool			Empty()			{ return die_stack_size == 0; }
 	INT				GetStackSize()	{ return die_stack_size; }
 	BMC_Die *		GetDie(int _index) { return owner->GetDie(die_stack[_index]); }
 	INT				CountDiceWithProperty(BME_PROPERTY _property);
@@ -699,7 +701,7 @@ protected:
 	void			PlayFairGames(INT _games, INT _mode, F32 _p);
 	void			ParseDie(INT _p, INT _dice);
 	void			ParsePlayer(INT _p, INT _dice);
-	BOOL			Read(BOOL _fatal=TRUE);
+	bool			Read(bool _fatal=true);
 
 	// output
 	void			Send(char *_fmt, ...);
@@ -711,11 +713,11 @@ protected:
 	void			SendUseFocus(BMC_Move &_move);
 
 	// parsing dice
-	BOOL			DieIsSwing(char _c) { return _c>=BMD_FIRST_SWING_CHAR && _c<=BMD_LAST_SWING_CHAR; }
-	BOOL			DieIsNumeric(char _c) { return (_c>='0' && _c<='9'); }
-	BOOL			DieIsValue(char _c) { return DieIsSwing(_c) || DieIsNumeric(_c); }
-	BOOL			DieIsTwin(char _c) { return _c=='('; }
-	BOOL			DieIsOption(char _c) { return _c=='/'; }
+	bool			DieIsSwing(char _c) { return _c>=BMD_FIRST_SWING_CHAR && _c<=BMD_LAST_SWING_CHAR; }
+	bool			DieIsNumeric(char _c) { return (_c>='0' && _c<='9'); }
+	bool			DieIsValue(char _c) { return DieIsSwing(_c) || DieIsNumeric(_c); }
+	bool			DieIsTwin(char _c) { return _c=='('; }
+	bool			DieIsOption(char _c) { return _c=='/'; }
 
 private:
 	// parsing dice methods (uses 'line')
@@ -739,14 +741,14 @@ public:
 	void			Log(BME_DEBUG _cat, char *_fmt, ... );
 
 	// mutators
-	void			SetLogging(BME_DEBUG _cat, BOOL _log) { m_logging[_cat] = _log; }
-	BOOL			SetLogging(const char *_catname, BOOL _log);
+	void			SetLogging(BME_DEBUG _cat, bool _log) { m_logging[_cat] = _log; }
+	bool			SetLogging(const char *_catname, bool _log);
 
 	// accessors
-	BOOL			IsLogging(BME_DEBUG _cat) { return m_logging[_cat]; }
+	bool			IsLogging(BME_DEBUG _cat) { return m_logging[_cat]; }
 	
 private:
-	BOOL			m_logging[BME_DEBUG_MAX];
+	bool			m_logging[BME_DEBUG_MAX];
 };
 
 class BMC_Stats
