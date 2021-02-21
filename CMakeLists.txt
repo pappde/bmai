@@ -5,9 +5,9 @@ project(bmai)
 set(CMAKE_CXX_STANDARD 14)
 
 # to be able to reference header files
-include_directories(.)
+include_directories(./src)
 
 # to collect only needed source files
-set(SOURCE bmai.cpp bmai_ai.cpp bmai_player.cpp)
+set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/bmai_player.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE})
