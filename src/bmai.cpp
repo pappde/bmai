@@ -840,6 +840,9 @@ float BMC_Die::GetScore(bool _own)
 // PARAM: _actually_attacking is normally true, but may be false for forced attack rerolls like ORNERY
 void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _actually_attacking)
 {
+    // TODO determine how this may conflict with the design of `bool _actually_attacking`
+    BM_ASSERT(g_attack_type[_move.m_attack]!=BME_ATTACK_TYPE_0_0);
+
 	// clear value
 	// KONSTANT: don't reroll
 	if (!HasProperty(BME_PROPERTY_KONSTANT))
@@ -2680,7 +2683,6 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
     // unless the player passed (there must be SOME attack involved)
     if (_move.m_attack != BME_ATTACK_INVALID)
     {
-        BM_ASSERT(g_attack_type[_move.m_attack]!=BME_ATTACK_TYPE_0_0);
         for (i=0; i<attacker->GetAvailableDice(); i++)
         {
             att_die = attacker->GetDie(i);
