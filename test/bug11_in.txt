@@ -1,0 +1,17 @@
+game
+preround
+player 0 3 0
+W
+om34
+T
+player 1 5 0
+^10
+s11
+d12
+z13
+X
+ply 3
+max_sims 100
+min_sims 5
+maxbranch 400
+getaction

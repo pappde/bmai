@@ -7,7 +7,7 @@ $ITER = 3;
 
 # HACK
 # Task Scheduler: doesn't have Y: drive mapped and starts in "C:\Windows"
-system "net use y: \\\\fnord\\denis";
+system "net use y: \\\\NAS\\SHARE";
 chdir("y:\\dev\\bmai");
 
 &log("run.pl started\n");
@@ -30,7 +30,7 @@ sub log
 
 	open(F,">>test.log");
 	open(F2,">>y:/dev/bmai/test2.log");
-	open(F3,">>\\\\fnord\\denis\\dev\\bmai\\test3.log");
+	open(F3,">>\\\\NAS\\SHARE\\dev\\bmai\\test3.log");
 	print F "$msg";
 	print F2 "$msg";
 	print F3 "$msg";

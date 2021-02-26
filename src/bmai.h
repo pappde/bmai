@@ -21,6 +21,12 @@
 // some compilers want to be very explicit
 #include <cstdio>   // FILE
 
+// to help make a cross-platform case insensitive compare
+// we need transform and string
+// drp022521 - moved to main header
+#include <algorithm>
+#include <string>
+
 // forward declarations
 class BMC_Player;
 class BMC_Game;
@@ -342,7 +348,7 @@ public:
 			~BMC_MoveList() { Clear(); }
 	void	Clear();
 	void	Add(BMC_Move  & _move );
-	INT		Size() { return list.size(); }
+	INT		Size() { return (INT)list.size(); }
 	BMC_Move *	Get(INT _i) { return &list[_i]; }
 	bool	Empty() { return Size()<1; }
 	void	Remove(int _index);
@@ -399,7 +405,8 @@ public:
 	bool		HasProperty(INT _p)  { return m_properties & _p; }
 	BME_SWING	GetSwingType(INT _d) { return (BME_SWING)m_swing_type[_d]; }
 	bool		Valid()				 { return (m_properties & BME_PROPERTY_VALID); }
-	bool		Dice()				 { return (m_properties & BME_PROPERTY_TWIN) ? 2 : 1; }
+	// drp022521 - fixed to return INT instead of bool
+	INT			Dice()				 { return (m_properties & BME_PROPERTY_TWIN) ? 2 : 1; }
 	INT			GetSides(INT _t)	{ return m_sides[_t]; }
 
 protected:

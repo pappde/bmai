@@ -77,7 +77,8 @@ void BMC_QAI::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 	INT i,j;
 	BMC_Game	sim(true);
 	BMC_Move *	best_move = NULL;
-	float		best_score, score, delta;
+	// drp022521 - fix uninitialized variables
+	float		best_score = 0, score = 0, delta = 0;
 	BMC_Player *attacker = _game->GetPhasePlayer();
 	BMC_Die *	die;
 
@@ -103,7 +104,7 @@ void BMC_QAI::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 		case BME_ATTACK_TYPE_1_1:
 		case BME_ATTACK_TYPE_1_N:
 			die = attacker->GetDie(attack->m_attacker);
-			delta = (die->GetSidesMax() + 1) * 0.5 - die->GetValueTotal();
+			delta = (die->GetSidesMax() + 1) * 0.5f - (float)die->GetValueTotal();
 			if ( die->HasProperty(BME_PROPERTY_SHADOW))
 				 score += 0;
 			else
@@ -118,7 +119,7 @@ void BMC_QAI::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 				if (!attack->m_attackers.IsSet(j))
 					continue;
 				die = attacker->GetDie(j);
-				delta = (die->GetSidesMax() + 1) * 0.5 - die->GetValueTotal();
+				delta = (die->GetSidesMax() + 1) * 0.5f - (float)die->GetValueTotal();
 				if ( die->HasProperty(BME_PROPERTY_SHADOW))
 					score += 0;
 				else
@@ -467,7 +468,7 @@ void BMC_BMAI::OnPostSimulation(BMC_Game *_game, INT _enter_level)
 INT BMC_BMAI::ComputeNumberSims(INT _moves)
 {
 	float decay_factor = (float)pow(s_ply_decay, sm_level-1);
-	INT sims = m_max_branch * decay_factor / _moves;
+	INT sims = (INT)(m_max_branch * decay_factor / (float)_moves);
 
 	int adjusted_min_sims = (int)(m_min_sims * decay_factor + 0.99f);
 	if (adjusted_min_sims<1)

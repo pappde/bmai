@@ -253,11 +253,6 @@
 #include <cmath>	// for fabs()
 #include <cstdarg>  // for va_start() va_end()
 
-// to help make a cross-platform case insensitive compare
-// we need transform and string
-#include <algorithm>
-#include <string>
-
 // some compilers want to be very explicit
 #include <cstring>  // string functions on std namespace
 
@@ -474,7 +469,7 @@ BMC_RNG::BMC_RNG() :
 void BMC_RNG::SRand(UINT _seed)
 {
 	if (_seed==0)
-		_seed = time(NULL);
+		_seed = (UINT)time(NULL);
 
 	// bad arbitrary way of tweaking bad seed values
 	if (!_seed) m_seed=-1;
@@ -867,7 +862,8 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 		OnBeforeRollInGame(_owner);
 
 	// MORPHING - assume same size as target
-	if (HasProperty(BME_PROPERTY_MORPHING))
+	// drp022521 - this rule only applies if actually going to capture a die
+	if (HasProperty(BME_PROPERTY_MORPHING) && _move.m_attack != BME_ATTACK_INVALID)
 	{
 		BM_ASSERT(g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1 || g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1);
 		BMC_Player *target = _move.m_game->GetPlayer(_move.m_target_player);
@@ -4139,7 +4135,9 @@ int main(int argc, char *argv[])
 		fclose(fp);
 	}
 	else
+	{
 		g_parser.Parse();
+	}
 
 	//g_stats.DisplayStats();
 
