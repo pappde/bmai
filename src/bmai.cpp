@@ -259,13 +259,13 @@
 // definitions
 BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX] =
 {
-	BME_ATTACK_TYPE_1_1,
-	BME_ATTACK_TYPE_N_1,
-	BME_ATTACK_TYPE_1_N,
-	BME_ATTACK_TYPE_1_N,
-	BME_ATTACK_TYPE_1_1,
-	BME_ATTACK_TYPE_1_1,
-	BME_ATTACK_TYPE_0_0,
+	BME_ATTACK_TYPE_1_1,  // FIRST & POWER 1:1
+	BME_ATTACK_TYPE_N_1,  // SKILL N:1
+	BME_ATTACK_TYPE_1_N,  // BERSERK
+	BME_ATTACK_TYPE_1_N,  // SPEED
+	BME_ATTACK_TYPE_1_1,  // TRIP
+	BME_ATTACK_TYPE_1_1,  // SHADOW
+	BME_ATTACK_TYPE_0_0,  // INVALID
 };
 
 // MOOD dice - from BM page:
@@ -840,6 +840,9 @@ float BMC_Die::GetScore(bool _own)
 // PARAM: _actually_attacking is normally true, but may be false for forced attack rerolls like ORNERY
 void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _actually_attacking)
 {
+    // TODO determine how this may conflict with the design of `bool _actually_attacking`
+    BM_ASSERT(g_attack_type[_move.m_attack]!=BME_ATTACK_TYPE_0_0);
+
 	// clear value
 	// KONSTANT: don't reroll
 	if (!HasProperty(BME_PROPERTY_KONSTANT))
@@ -2677,12 +2680,16 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 	}
 
 	// ORNERY: all ornery dice on attacker must reroll (whether or not attacked)
-	for (i=0; i<attacker->GetAvailableDice(); i++)
-	{
-		att_die = attacker->GetDie(i);
-		if (att_die->HasProperty(BME_PROPERTY_ORNERY))
-			att_die->OnApplyAttackPlayer(_move,attacker,false);	// false means not _actually_attacking
-	}
+    // unless the player passed (there must be SOME attack involved)
+    if (_move.m_attack != BME_ATTACK_INVALID)
+    {
+        for (i=0; i<attacker->GetAvailableDice(); i++)
+        {
+            att_die = attacker->GetDie(i);
+            if (att_die->HasProperty(BME_PROPERTY_ORNERY))
+                att_die->OnApplyAttackPlayer(_move,attacker,false);	// false means not _actually_attacking
+        }
+    }
 }
 
 // DESC: simulate all random steps - reroll attackers, targets, MOOD
