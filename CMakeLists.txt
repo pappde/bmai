@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.14)
 project(bmai)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # to be able to reference header files
 include_directories(./src)
