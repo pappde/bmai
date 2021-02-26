@@ -12,5 +12,6 @@ include_directories(./src)
 
 # to collect only needed source files
 set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/bmai_player.cpp)
+set(HEADERS ./src/bmai.h ./src/bmai_ai.h)
 
-add_executable(${PROJECT_NAME} ${SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCE} ${HEADERS})
