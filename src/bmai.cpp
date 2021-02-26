@@ -2681,12 +2681,17 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 	}
 
 	// ORNERY: all ornery dice on attacker must reroll (whether or not attacked)
-	for (i=0; i<attacker->GetAvailableDice(); i++)
-	{
-		att_die = attacker->GetDie(i);
-		if (att_die->HasProperty(BME_PROPERTY_ORNERY))
-			att_die->OnApplyAttackPlayer(_move,attacker,false);	// false means not _actually_attacking
-	}
+    // unless the player passed (there must be SOME attack involved)
+    if (_move.m_attack != BME_ATTACK_INVALID)
+    {
+        BM_ASSERT(g_attack_type[_move.m_attack]!=BME_ATTACK_TYPE_0_0);
+        for (i=0; i<attacker->GetAvailableDice(); i++)
+        {
+            att_die = attacker->GetDie(i);
+            if (att_die->HasProperty(BME_PROPERTY_ORNERY))
+                att_die->OnApplyAttackPlayer(_move,attacker,false);	// false means not _actually_attacking
+        }
+    }
 }
 
 // DESC: simulate all random steps - reroll attackers, targets, MOOD
