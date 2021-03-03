@@ -249,6 +249,12 @@
 // includes
 #include "bmai.h"
 #include "bmai_ai.h"
+#include "dieindexstack.h"
+#include "game.h"
+#include "player.h"
+#include "parser.h"
+#include "stats.h"
+#include "logger.h"
 #include <ctime>	// for time()
 #include <cmath>	// for fabs()
 #include <cstdarg>  // for va_start() va_end()
@@ -271,9 +277,6 @@ BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX] =
 // MOOD dice - from BM page:
 //X?: Roll a d6. 1: d4; 2: d6; 3: d8; 4: d10; 5: d12; 6: d20. 
 //V?: Roll a d4. 1: d6; 2: d8; 3: d10; 4: d12. 
-#define BMD_MOOD_SIDES_RANGE_X	6
-#define BMD_MOOD_SIDES_RANGE_V	4
-
 INT g_mood_sides_X[BMD_MOOD_SIDES_RANGE_X] = { 4, 6, 8,  10, 12, 20 };
 INT g_mood_sides_V[BMD_MOOD_SIDES_RANGE_V] = { 6, 8, 10, 12 };
 
@@ -472,9 +475,12 @@ void BMC_RNG::SRand(UINT _seed)
 		_seed = (UINT)time(NULL);
 
 	// bad arbitrary way of tweaking bad seed values
-	if (!_seed) m_seed=-1;
-	else if((_seed>>16)==0) m_seed = _seed | (_seed<<16);
-	else m_seed = _seed;
+	if (!_seed) 
+		m_seed=-1;
+	else if((_seed>>16)==0) 
+		m_seed = _seed | (_seed<<16);
+	else 
+		m_seed = _seed;
 }
 
 UINT BMC_RNG::GetRand()
@@ -537,7 +543,9 @@ bool BMC_DieIndexStack::Cycle(bool _add_die)
 	}
 
 	if (_add_die)
+	{
 		Push(GetTopDieIndex() + 1);
+	}
 	else
 	{
 		// cycle top die
@@ -1339,7 +1347,9 @@ INT BMC_Game::CheckInitiative()
 			j--;
 		}
 		else
+		{
 			return (delta > 0) ? 1 : 0;
+		}
 	}
 }
 
@@ -1542,12 +1552,16 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 
 			// for POWER - check value >=
 			if (_move.m_attack == BME_ATTACK_POWER)
+			{
 				return att_die->GetValueTotal() >= tgt_die->GetValueTotal();
+			}
 
 			// for SHADOW - check value <= and total
 			else if (_move.m_attack == BME_ATTACK_SHADOW)
+			{
 				return att_die->GetValueTotal() <= tgt_die->GetValueTotal()
-					&& att_die->GetSidesMax() >= tgt_die->GetValueTotal() ;
+					&& att_die->GetSidesMax() >= tgt_die->GetValueTotal();
+			}
 
 			// for TRIP - always legal, except when can't capture (one die TRIP against two die)
 			else
@@ -2587,6 +2601,7 @@ void BMC_Game::ApplyUseReserve(BMC_Move &_move)
 	BMC_Die *die = player->GetDie(_move.m_use_reserve);
 
 	die->OnUseReserve();
+	player->OnReserveDieUsed(die);
 }
 
 // PARAM: _lock true means set to "SWING_SET_LOCKED", otherwise "SWING_SET_READY."  If used inappropriately, the latter
@@ -2811,7 +2826,9 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 			{
 				tgt_die = target->OnDieLost(_move.m_target);
 				if (null_attacker)
+				{
 					tgt_die->SetState(BME_STATE_NULLIFIED);
+				}
 				else
 				{
 					tgt_die->SetState(BME_STATE_CAPTURED);
@@ -2831,7 +2848,9 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 					i2 = i - removed++;	// determine true index
 					tgt_die = target->OnDieLost(i2);
 					if (null_attacker)
+					{
 						tgt_die->SetState(BME_STATE_NULLIFIED);
+					}
 					else
 					{
 						tgt_die->SetState(BME_STATE_CAPTURED);
@@ -3401,7 +3420,7 @@ bool BMC_Parser::Read(bool _fatal)
 	}
 
 	// remove EOL
-	INT len = std::strlen(line);
+	INT len = (INT)std::strlen(line);
 	if (len>0 && line[len-1]=='\n')
 		line[len-1] = 0;
 
@@ -3984,37 +4003,6 @@ void BMC_Parser::Parse()
 			BMF_Error("unrecognized command: %s\n", line);
 		}
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-// BMC_Stats
-///////////////////////////////////////////////////////////////////////////////////////////
-
-BMC_Stats::BMC_Stats()
-{
-	m_start = m_end = 0;
-	m_sims = 0;
-	for (int i=0; i<BMD_MAX_PLY; i++)
-		m_total_sims[i] = m_total_moves[i] = m_total_samples[i] = 0;
-}
-
-void BMC_Stats::DisplayStats()
-{
-	double diff = difftime(time(NULL), m_start);
-	printf("Time: %lf s ", diff);
-	printf("Sim: %d  Sims/Sec: %f  Mvs/Sms ", m_sims, diff>0 ? m_sims / diff : 0);
-	float leaves = 1;
-	for (int i=1; i<BMD_MAX_PLY; i++)
-	{
-		if (m_total_samples[i]==0)
-			break;
-		printf("| ");
-		float avg_moves = (float)m_total_moves[i]/m_total_samples[i];
-		float avg_sims = (float)m_total_sims[i]/m_total_samples[i];
-		printf("%.1f/%.1f ", avg_moves, avg_sims);
-		leaves *= avg_moves * avg_sims;
-	}
-	printf("= %.0f\n", leaves);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////

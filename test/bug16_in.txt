@@ -1,0 +1,23 @@
+game 3
+reserve
+player 0 8 0
+qT
+qW
+qX
+qZ
+rnR
+rzS
+rpU
+rfV
+player 1 5 0
+B8
+H8
+p8
+z8
+zU?-30
+ply 3
+max_sims 100
+min_sims 5
+maxbranch 400
+getaction
+quit

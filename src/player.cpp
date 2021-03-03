@@ -11,8 +11,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // includes
-#include <cassert>
 #include "bmai.h"
+#include "player.h"
+#include "logger.h"
+#include <cassert>
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_Player methods
@@ -335,4 +337,13 @@ bool BMC_Player::NeedsSetSwing()
 	}
 
 	return false;
+}
+
+// INVOKED: by BMC_Game when calling BMC_Die::OnUseReserve()
+// CODEP: same as what OnDiceParsed() does - we are keeping m_swing_dice[] counts in sync with the "BMC_Die::IsUsed()" state. Would be more robust if was 
+//  done through a pattern like "OnDieStateChanged()"
+void BMC_Player::OnReserveDieUsed(BMC_Die *_die)
+{
+	for (INT j = 0; j < _die->Dice(); j++)
+		m_swing_dice[_die->GetSwingType(j)]++;
 }
