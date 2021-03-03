@@ -8,11 +8,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(bmai)
 
 # to collect only needed source files
-set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/bmai_player.cpp)
+set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/player.cpp ./src/stats.cpp)
 
 # some IDEs really need the Headers added to the executable
 # to be able to index everything correctly
-set(HEADERS ./src/bmai.h ./src/bmai_ai.h)
+set(HEADERS ./src/bmai.h ./src/bmai_ai.h ./src/stats.h ./src/logger.h ./src/parser.h ./src/game.h ./src/player.h ./src/die.h ./src/dieindexstack.h)
 
 add_executable(${PROJECT_NAME} ${SOURCE} ${HEADERS})
 

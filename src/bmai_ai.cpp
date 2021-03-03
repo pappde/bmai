@@ -40,6 +40,11 @@
 
 #include "bmai.h"
 #include "bmai_ai.h"
+#include "die.h"
+#include "player.h"
+#include "game.h"
+#include "logger.h"
+#include "stats.h"
 #include <cmath>
 
 #define BMD_DEFAULT_SIMS	500
