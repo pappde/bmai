@@ -5,7 +5,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai.cpp
-// Copyright (c) 2001-2020 Denis Papp. All rights reserved.
+// Copyright (c) 2001-2021 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/hamstercrack/bmai
 // 
@@ -4109,7 +4109,7 @@ int main(int argc, char *argv[])
 	//g_ai.SetQAI(&g_ai_mode0);
 
 	// banner
-	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2020, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\n");
+	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2021, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\n");
 
 	//g_parser.SetupTestGame();
 	if (argc>1)
