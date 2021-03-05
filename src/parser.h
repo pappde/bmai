@@ -1,3 +1,15 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+// parser.h
+// Copyright (c) 2001-2021 Denis Papp. All rights reserved.
+// denis@accessdenied.net
+// https://github.com/hamstercrack/bmai
+// 
+// DESC: main parsing class for setting up game state
+//
+// REVISION HISTORY:
+// drp030321 - partial split out to individual headers
+///////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 class BMC_Parser

@@ -1,3 +1,15 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+// player.h
+// Copyright (c) 2001-2021 Denis Papp. All rights reserved.
+// denis@accessdenied.net
+// https://github.com/hamstercrack/bmai
+// 
+// DESC: player class
+//
+// REVISION HISTORY:
+// drp030321 - partial split out to individual headers
+///////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 // TODO_HEADERS: drp030321 - clean up headers
