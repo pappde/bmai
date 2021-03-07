@@ -1,3 +1,15 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+// bmai_ai.h
+// Copyright (c) 2001-2021 Denis Papp. All rights reserved.
+// denis@accessdenied.net
+// https://github.com/hamstercrack/bmai
+// 
+// DESC: main header for BMAI AI classes
+//
+// REVISION HISTORY:
+// drp030321 - partial split out to individual headers
+///////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef __BMAI_AI_H__
 #define __BMAI_AI_H__
 
