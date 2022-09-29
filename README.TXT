@@ -279,4 +279,3 @@ f) You will not use the source code (or modified source code) to have an
    AI player play other players (whether online through a BM web site or
    through other means), without posting a notice or otherwise
    indicating that the player is an AI.
-
