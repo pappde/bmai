@@ -50,5 +50,5 @@ echo or build from command line
 cmake --build build --config Debug
 echo for a subsequent Release build you will need to rebuild the build/ dir
 cmake -S . -B build
-echo --build build --config Release
+cmake --build build --config Release
 ```
