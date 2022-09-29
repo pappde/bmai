@@ -1,10 +1,24 @@
 name: CMake
 
-on: [push, pull_request]
+on: 
+  push:
+  pull_request:
+
+  # this allows us to manually dispatch the build from GH Actions UI
+  workflow_dispatch:
+    inputs:
+      buildType:
+        description: CMake build type (config)
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+        - Release
+        - Debug
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  # if the build is not manually dispatched we will default to 'Release' build
+  BUILD_TYPE: ${{ inputs.buildType || 'Release' }}
 
 jobs:
   build:
@@ -17,7 +31,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
     - uses: lukka/get-cmake@latest
 
     - name: CMake Configure
@@ -32,7 +45,20 @@ jobs:
     - name: CMake Build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build build --config $BUILD_TYPE 
+      run: cmake --build build --config $BUILD_TYPE
+
+
+
+    # NOTICE current error is 
+
+    #    Run ctest -C $BUILD_TYPE
+    #    env:
+    #      BUILD_TYPE: Release
+    #    Test project /home/runner/work/bmai/bmai/build
+    #    No tests were found!!!
+
+    # maybe we havent written tests and I just put this in here to follow some template?
+    # TODO add some tests, or fix the problem running them
 
     - name: Test
       working-directory: build
@@ -40,22 +66,17 @@ jobs:
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C $BUILD_TYPE
-
-    # - name: find file
-    #   shell: bash
-    #   run: find / -type f -iname "*bmai*"
     
     - name: Upload *NIX Binary
       uses: actions/upload-artifact@v3
       if: matrix.os != 'windows-latest'
       with:
-          name: bmai-${{runner.os}}-${{runner.arch}}
+          name: bmai-${{runner.os}}
           path: ./build/bmai
 
     - name: Upload WINDOWS Binary
       uses: actions/upload-artifact@v3
       if: matrix.os == 'windows-latest'
       with:
-          name: bmai-${{runner.os}}-${{runner.arch}}.exe
-          path: ${{github.workspace}}\build\${{env.BUILD_TYPE}}\bmai.exe
-
+          name: bmai-${{runner.os}}
+          path: ${{github.workspace}}\build\${{ env.BUILD_TYPE }}\bmai.exe
