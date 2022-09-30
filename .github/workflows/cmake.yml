@@ -1,8 +1,14 @@
 name: CMake
 
-on: 
+# if you are doing development on another branch and want GHActions to auto build the branch
+# then add the branch name to the `push` section below
+# you only need to make that change ON THE BRANCH to be built
+# I like to remove it when merging into `main`
+on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
   # this allows us to manually dispatch the build from GH Actions UI
   workflow_dispatch:
