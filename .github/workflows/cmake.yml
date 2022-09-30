@@ -1,8 +1,14 @@
 name: CMake
 
-on: 
+# if you are doing development on another branch and want GHActions to auto build the branch
+# then add the branch name to the `push` section below
+# you only need to make that change ON THE BRANCH to be built
+# I like to remove it when merging into `main`
+on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
   # this allows us to manually dispatch the build from GH Actions UI
   workflow_dispatch:
@@ -30,7 +36,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: lukka/get-cmake@latest
 
     - name: CMake Configure
@@ -71,12 +77,12 @@ jobs:
       uses: actions/upload-artifact@v3
       if: matrix.os != 'windows-latest'
       with:
-          name: bmai-${{runner.os}}
+          name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
           path: ./build/bmai
 
     - name: Upload WINDOWS Binary
       uses: actions/upload-artifact@v3
       if: matrix.os == 'windows-latest'
       with:
-          name: bmai-${{runner.os}}
-          path: ${{github.workspace}}\build\${{ env.BUILD_TYPE }}\bmai.exe
+          name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
+          path: ${{ github.workspace }}\build\${{ env.BUILD_TYPE }}\bmai.exe
