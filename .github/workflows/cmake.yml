@@ -77,12 +77,12 @@ jobs:
       uses: actions/upload-artifact@v3
       if: matrix.os != 'windows-latest'
       with:
-          name: bmai-${{runner.os}}
+          name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
           path: ./build/bmai
 
     - name: Upload WINDOWS Binary
       uses: actions/upload-artifact@v3
       if: matrix.os == 'windows-latest'
       with:
-          name: bmai-${{runner.os}}
-          path: ${{github.workspace}}\build\${{ env.BUILD_TYPE }}\bmai.exe
+          name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
+          path: ${{ github.workspace }}\build\${{ env.BUILD_TYPE }}\bmai.exe
