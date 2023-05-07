@@ -30,7 +30,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-18.04, windows-latest, macos-latest]
+        os: [ubuntu-20.04, windows-latest, macos-latest]
     # The CMake configure and build commands are platform agnostic
     # and should work equally well on Windows or Mac.
     runs-on: ${{ matrix.os }}
