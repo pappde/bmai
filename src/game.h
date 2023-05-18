@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // game.h
-// Copyright (c) 2001-2021 Denis Papp. All rights reserved.
+// Copyright (c) 2001-2023 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/hamstercrack/bmai
 // 
