@@ -5,7 +5,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai.cpp
-// Copyright (c) 2001-2021 Denis Papp. All rights reserved.
+// Copyright (c) 2001-2023 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/hamstercrack/bmai
 // 
@@ -94,6 +94,7 @@
 //				  the AI would almost always pick "pass". Now pass "pov_player" to EvaluateMove() functions.
 //				  This was a big problem and explains the 42.4% with "Legend of the Five Rings" or
 //				  46.7% with Yoyodyne, 
+// dbl051823	- added P-Swing support
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // TOP TODO
@@ -290,6 +291,8 @@ INT g_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12
 INT g_swing_sides_range[BME_SWING_MAX][2] = 
 {
 	{ 0, 0 },
+	{ 1, 30 },	// P
+	{ 0, 0 },	// Q not used
 	{ 2, 16 },
 	{ 6, 20 },
 	{ 2, 12 },
@@ -304,6 +307,8 @@ INT g_swing_sides_range[BME_SWING_MAX][2] =
 const char * g_swing_name[BME_SWING_MAX] =
 {
 	"None",
+	"P",
+	"Q",
 	"R",
 	"S",
 	"T",
@@ -3156,7 +3161,7 @@ void BMC_Parser::ParseDieSides(INT & _pos, INT _die)
 {
 	if (DieIsSwing(line[_pos]))
 	{
-		BME_SWING	swing_type = (BME_SWING)((INT)BME_SWING_R + (line[_pos] - BMD_FIRST_SWING_CHAR));
+		BME_SWING	swing_type = (BME_SWING)(BME_SWING_FIRST + (line[_pos] - BMD_FIRST_SWING_CHAR));
 		d->m_swing_type[_die] =  swing_type;
 		d->m_sides[_die] = 0;
 		p->m_swing_set = BMC_Player::SWING_SET_NOT;
@@ -3461,7 +3466,7 @@ void BMC_Parser::SendSetSwing(BMC_Move &_move)
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
 		if (p->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
-			Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + i - BME_SWING_R, _move.m_swing_value[i]);
+			Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + i - BME_SWING_FIRST, _move.m_swing_value[i]);
 	}
 
 	// check option dice
@@ -3634,7 +3639,7 @@ void BMC_Parser::SendAttack(BMC_Move &_move)
 			}
 			else // TURBO SWING
 			{
-				Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + att_die->GetSwingType(0) - BME_SWING_R, _move.m_turbo_option);
+				Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + att_die->GetSwingType(0) - BME_SWING_FIRST, _move.m_turbo_option);
 				break;
 			}
 		}
@@ -4109,7 +4114,7 @@ int main(int argc, char *argv[])
 	//g_ai.SetQAI(&g_ai_mode0);
 
 	// banner
-	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2021, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\n");
+	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2023, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\n");
 
 	//g_parser.SetupTestGame();
 	if (argc>1)

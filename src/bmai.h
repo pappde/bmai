@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai.h
-// Copyright (c) 2001-2021 Denis Papp. All rights reserved.
+// Copyright (c) 2001-2023 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/hamstercrack/bmai
 // 
@@ -8,6 +8,7 @@
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
+// dbl051823 - added P-Swing support
 //
 // TODO:
 // 1) drp030321 - setup a main precompiled header that includes everything (bmai.h) vs a header for the key types/enums/classes. Split out modules
@@ -195,6 +196,8 @@ enum BME_PROPERTY
 enum BME_SWING
 {
 	BME_SWING_NOT,
+	BME_SWING_P,
+	BME_SWING_Q,
 	BME_SWING_R,
 	BME_SWING_S,
 	BME_SWING_T,
@@ -204,10 +207,11 @@ enum BME_SWING
 	BME_SWING_X,
 	BME_SWING_Y,
 	BME_SWING_Z,
-	BME_SWING_MAX
+	BME_SWING_MAX,
+	BME_SWING_FIRST = BME_SWING_NOT+1
 };
 
-#define	BMD_FIRST_SWING_CHAR	'R'
+#define	BMD_FIRST_SWING_CHAR	'P'
 #define BMD_LAST_SWING_CHAR		'Z'
 
 enum BME_STATE
