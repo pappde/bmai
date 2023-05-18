@@ -292,6 +292,7 @@ INT g_swing_sides_range[BME_SWING_MAX][2] =
 {
 	{ 0, 0 },
 	{ 1, 30 },	// P
+	{ 0, 0 },	// Q not used
 	{ 2, 16 },
 	{ 6, 20 },
 	{ 2, 12 },
@@ -307,6 +308,7 @@ const char * g_swing_name[BME_SWING_MAX] =
 {
 	"None",
 	"P",
+	"Q",
 	"R",
 	"S",
 	"T",
@@ -3159,7 +3161,7 @@ void BMC_Parser::ParseDieSides(INT & _pos, INT _die)
 {
 	if (DieIsSwing(line[_pos]))
 	{
-		BME_SWING	swing_type = (BME_SWING)((INT)BME_SWING_R + (line[_pos] - BMD_FIRST_SWING_CHAR));
+		BME_SWING	swing_type = (BME_SWING)(1 + (line[_pos] - BMD_FIRST_SWING_CHAR));
 		d->m_swing_type[_die] =  swing_type;
 		d->m_sides[_die] = 0;
 		p->m_swing_set = BMC_Player::SWING_SET_NOT;
@@ -3464,7 +3466,7 @@ void BMC_Parser::SendSetSwing(BMC_Move &_move)
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
 		if (p->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
-			Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + i - BME_SWING_R, _move.m_swing_value[i]);
+			Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + i - 1, _move.m_swing_value[i]);
 	}
 
 	// check option dice
@@ -3637,7 +3639,7 @@ void BMC_Parser::SendAttack(BMC_Move &_move)
 			}
 			else // TURBO SWING
 			{
-				Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + att_die->GetSwingType(0) - BME_SWING_R, _move.m_turbo_option);
+				Send("swing %c %d\n", BMD_FIRST_SWING_CHAR + att_die->GetSwingType(0) - 1, _move.m_turbo_option);
 				break;
 			}
 		}
