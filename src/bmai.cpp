@@ -94,6 +94,7 @@
 //				  the AI would almost always pick "pass". Now pass "pov_player" to EvaluateMove() functions.
 //				  This was a big problem and explains the 42.4% with "Legend of the Five Rings" or
 //				  46.7% with Yoyodyne, 
+// dbl051823	- added P-Swing support
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // TOP TODO
@@ -290,6 +291,7 @@ INT g_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12
 INT g_swing_sides_range[BME_SWING_MAX][2] = 
 {
 	{ 0, 0 },
+	{ 1, 30 },	// P
 	{ 2, 16 },
 	{ 6, 20 },
 	{ 2, 12 },
@@ -304,6 +306,7 @@ INT g_swing_sides_range[BME_SWING_MAX][2] =
 const char * g_swing_name[BME_SWING_MAX] =
 {
 	"None",
+	"P",
 	"R",
 	"S",
 	"T",
