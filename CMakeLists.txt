@@ -1,5 +1,6 @@
 # drp022521 - reduced from 3.14 to 3.8 for VS2017 support
 # dbl051923 - capture git describe for banner
+
 cmake_minimum_required (VERSION 3.8)
 
 set(CMAKE_CXX_STANDARD 14)
