@@ -13,10 +13,10 @@ project(bmai)
 execute_process(
     COMMAND git describe --dirty --always --tags
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-    OUTPUT_VARIABLE GIT_TAG_HASH
+    OUTPUT_VARIABLE GIT_DESCRIBE
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-add_definitions("-DGIT_TAG_HASH=\"${GIT_TAG_HASH}\"")
+add_definitions("-DGIT_DESCRIBE=\"${GIT_DESCRIBE}\"")
 
 # to collect only needed source files
 set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/player.cpp ./src/stats.cpp)

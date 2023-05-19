@@ -49,8 +49,8 @@ typedef float			F32;
 typedef std::vector<float>	BMC_FloatVector;
 
 // version number
-#ifndef GIT_TAG_HASH
-#define GIT_TAG_HASH "n/a"
+#ifndef GIT_DESCRIBE
+#define GIT_DESCRIBE "n/a"
 #endif
 
 // assert
