@@ -8,7 +8,7 @@
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
-// dbl051823 - added P-Swing support
+// dbl051823 - added P-Swing, Q-Swing support
 //
 // TODO:
 // 1) drp030321 - setup a main precompiled header that includes everything (bmai.h) vs a header for the key types/enums/classes. Split out modules
