@@ -16,6 +16,12 @@ set(HEADERS ./src/bmai.h ./src/bmai_ai.h ./src/stats.h ./src/logger.h ./src/pars
 
 add_executable(${PROJECT_NAME} ${SOURCE} ${HEADERS})
 
+if(UNIX AND NOT APPLE)
+   target_link_libraries(${PROJECT_NAME} -static)
+else()
+    target_link_libraries(${PROJECT_NAME})
+endif()
+
 # to be able to reference header files
 target_include_directories(${PROJECT_NAME} PRIVATE ./src)
 
