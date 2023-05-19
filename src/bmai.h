@@ -48,6 +48,11 @@ typedef float			F32;
 // special types
 typedef std::vector<float>	BMC_FloatVector;
 
+// version number
+#ifndef GIT_DESCRIBE
+#define GIT_DESCRIBE "n/a"
+#endif
+
 // assert
 #define BM_ASSERT	assert
 #define BM_ERROR(check)	{ if (!(check)) { BMF_Error(#check); } }

@@ -4114,7 +4114,7 @@ int main(int argc, char *argv[])
 	//g_ai.SetQAI(&g_ai_mode0);
 
 	// banner
-	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2023, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\n");
+	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2023, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\nVersion: %s\n", GIT_DESCRIBE);
 
 	//g_parser.SetupTestGame();
 	if (argc>1)

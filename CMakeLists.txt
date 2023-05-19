@@ -1,4 +1,6 @@
 # drp022521 - reduced from 3.14 to 3.8 for VS2017 support
+# dbl051923 - capture git describe for banner
+
 cmake_minimum_required (VERSION 3.8)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -6,6 +8,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(bmai)
+
+# Get the latest git tag and short commit hash
+execute_process(
+    COMMAND git describe --dirty --always --tags
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE GIT_DESCRIBE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+add_definitions("-DGIT_DESCRIBE=\"${GIT_DESCRIBE}\"")
 
 # to collect only needed source files
 set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/player.cpp ./src/stats.cpp)
