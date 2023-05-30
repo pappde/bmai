@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <cmath>
 #include "../src/game.h"
 #include "../src/bmai_ai.h"
 
