@@ -16,10 +16,13 @@ TEST_F(LegacyMembers, SetupTestGame) {
 
     // Comment out next line to be able to easily run this code from IDE
     // or to include this in the overall test execution
-    GTEST_SKIP() << "Skipping Setup Test Game";
+//    GTEST_SKIP() << "Skipping Setup Test Game";
 
     class TEST_DieData : public BMC_DieData {
-        friend class LegacyMembers_SetupTestGame_Test;
+    public:
+        void setProperties(U32 properties) { m_properties=properties;}
+        void setSides(U8 sides) { m_sides[0]=sides;}
+        void setSwingType(U8 swing_type) { m_swing_type[0]=swing_type;}
     protected:
         U8 m_swing_type[BMD_MAX_TWINS];
     };
@@ -27,39 +30,39 @@ TEST_F(LegacyMembers, SetupTestGame) {
     TEST_DieData *die;
 
     die = reinterpret_cast<TEST_DieData *>(tg_testman1.GetDieData(0));
-    die->m_properties = BME_PROPERTY_VALID;
-    die->m_sides[0] = 12;
-    die->m_swing_type[0] = BME_SWING_NOT;
+    die->setProperties(BME_PROPERTY_VALID);
+    die->setSides(12);
+    die->setSwingType(BME_SWING_NOT);
 
     die = reinterpret_cast<TEST_DieData *>(tg_testman1.GetDieData(1));
-    die->m_properties = BME_PROPERTY_VALID;
-    die->m_sides[0] = 8;
-    die->m_swing_type[0] = BME_SWING_NOT;
+    die->setProperties(BME_PROPERTY_VALID);
+    die->setSides(8);
+    die->setSwingType(BME_SWING_NOT);
 
     die = reinterpret_cast<TEST_DieData *>(tg_testman1.GetDieData(2));
-    die->m_properties = BME_PROPERTY_VALID;
-    die->m_sides[0] = 4;
-    die->m_swing_type[0] = BME_SWING_NOT;
+    die->setProperties(BME_PROPERTY_VALID);
+    die->setSides(4);
+    die->setSwingType(BME_SWING_NOT);
 
     die = reinterpret_cast<TEST_DieData *>(tg_testman1.GetDieData(3));
-    die->m_properties = BME_PROPERTY_VALID;
-    die->m_sides[0] = 10;
-    die->m_swing_type[0] = BME_SWING_NOT;
+    die->setProperties(BME_PROPERTY_VALID);
+    die->setSides(10);
+    die->setSwingType(BME_SWING_NOT);
 
     die = reinterpret_cast<TEST_DieData *>(tg_testman2.GetDieData(0));
-    die->m_properties = BME_PROPERTY_VALID;
-    die->m_sides[0] = 8;
-    die->m_swing_type[0] = BME_SWING_NOT;
+    die->setProperties(BME_PROPERTY_VALID);
+    die->setSides(8);
+    die->setSwingType(BME_SWING_NOT);
 
     die = reinterpret_cast<TEST_DieData *>(tg_testman2.GetDieData(1));
-    die->m_properties = BME_PROPERTY_VALID;
-    die->m_sides[0] = 20;
-    die->m_swing_type[0] = BME_SWING_NOT;
+    die->setProperties(BME_PROPERTY_VALID);
+    die->setSides(20);
+    die->setSwingType(BME_SWING_NOT);
 
     die = reinterpret_cast<TEST_DieData *>(tg_testman2.GetDieData(2));
-    die->m_properties = BME_PROPERTY_VALID;
-    die->m_sides[0] = 6;
-    die->m_swing_type[0] = BME_SWING_NOT;
+    die->setProperties(BME_PROPERTY_VALID);
+    die->setSides(6);
+    die->setSwingType(BME_SWING_NOT);
 
     tg_game.SetAI(0, &tg_ai);
     tg_game.SetAI(1, &tg_ai);
