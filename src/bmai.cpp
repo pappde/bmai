@@ -372,7 +372,6 @@ const char *g_debug_name[BME_DEBUG_MAX] =
 
 // globals
 BMC_RNG		g_rng;
-BMC_Man		g_testman1, g_testman2;
 BMC_BMAI3	g_ai;	// the main AI used
 BMC_Game	g_game(false);
 BMC_Parser	g_parser;
@@ -3208,7 +3207,7 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 		U8 ch = line[pos++];
 		#define	DEFINE_PROPERTY(_s, _v)	case _s: d->m_properties |= _v; break;
 
-		// WARNING: don't use SWING dice here (RSTUVWXYZ)
+		// WARNING: don't use SWING dice here (PQRSTUVWXYZ)
 		switch (ch)
 		{
 			DEFINE_PROPERTY('z', BME_PROPERTY_SPEED)
@@ -4014,90 +4013,8 @@ void BMC_Parser::Parse()
 // main
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-void BMC_Parser::SetupTestGame()
+int bmai_main(int argc, char *argv[])
 {
-	BMC_DieData *die;
-
-	die = g_testman1.GetDieData(0);
-	die->m_properties = BME_PROPERTY_VALID;
-	die->m_sides[0] = 12;
-	die->m_swing_type[0] = BME_SWING_NOT;
-
-	die = g_testman1.GetDieData(1);
-	die->m_properties = BME_PROPERTY_VALID;
-	die->m_sides[0] = 8;
-	die->m_swing_type[0] = BME_SWING_NOT;
-
-	die = g_testman1.GetDieData(2);
-	die->m_properties = BME_PROPERTY_VALID;
-	die->m_sides[0] = 4;
-	die->m_swing_type[0] = BME_SWING_NOT;
-
-	die = g_testman1.GetDieData(3);
-	die->m_properties = BME_PROPERTY_VALID;
-	die->m_sides[0] = 10;
-	die->m_swing_type[0] = BME_SWING_NOT;
-
-	die = g_testman2.GetDieData(0);
-	die->m_properties = BME_PROPERTY_VALID;
-	die->m_sides[0] = 8;
-	die->m_swing_type[0] = BME_SWING_NOT;
-
-	die = g_testman2.GetDieData(1);
-	die->m_properties = BME_PROPERTY_VALID;
-	die->m_sides[0] = 20;
-	die->m_swing_type[0] = BME_SWING_NOT;
-
-	die = g_testman2.GetDieData(2);
-	die->m_properties = BME_PROPERTY_VALID;
-	die->m_sides[0] = 6;
-	die->m_swing_type[0] = BME_SWING_NOT;
-
-	g_game.SetAI(0, &g_ai);
-	g_game.SetAI(1, &g_ai);
-	g_game.PlayGame(&g_testman1, &g_testman2);
-}
-
-void TestRNG()
-{
-	const int ranges = 10;
-	const float range_size = 1.0f / ranges;
-	const int sims = 1000000;
-	int i,r;
-	float f;
-	int range[ranges] = {0,};
-
-	// sampling
-	for (i=0; i<sims; i++)
-	{
-		f = g_rng.GetFRand();
-		BM_ASSERT(f>=0.0f && f<1.0f);
-		r = (int)(f / range_size);
-		range[r]++;
-	}
-
-	// analysis
-	// var = tot2 / avg2
-	double max_error = 0;
-	double total = 0, total2 = 0;
-	for (i=0; i<ranges; i++)
-	{
-		double dist = (double)range[i] / (double)sims;
-		double error = fabs(dist - range_size);
-		total += error;
-		total2 += error*error;
-		max_error = std::max(max_error,error);
-		printf ("range %d dist %lf error %lf\n", i, dist, error);
-	}
-	double avg = total / ranges;
-	double var = total2 / (avg*avg);
-	printf("max error %lf var %lf stddev %lf\n", max_error/range_size, var, sqrt(var));
-}
-
-
-int main(int argc, char *argv[])
-{
-	//TestRNG();
 	g_stats.OnAppStarted();
 
 	// set up logging
@@ -4116,7 +4033,6 @@ int main(int argc, char *argv[])
 	// banner
 	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2023, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\nVersion: %s\n", GIT_DESCRIBE);
 
-	//g_parser.SetupTestGame();
 	if (argc>1)
 	{
 		FILE *fp = fopen(argv[1],"r");

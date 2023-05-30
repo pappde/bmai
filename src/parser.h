@@ -16,7 +16,6 @@ class BMC_Parser
 {
 public:
 	BMC_Parser();
-	void	SetupTestGame();
 	void	ParseGame();
 	void	Parse();
 	void	Parse(FILE *_fp) { file = _fp; Parse(); }

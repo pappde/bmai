@@ -3,11 +3,12 @@
 
 cmake_minimum_required (VERSION 3.8)
 
+set(NAME bmai)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-project(bmai)
+project(${NAME})
 
 # Get the latest git tag and short commit hash
 execute_process(
@@ -25,16 +26,20 @@ set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/player.cpp ./src/stats.cpp)
 # to be able to index everything correctly
 set(HEADERS ./src/bmai.h ./src/bmai_ai.h ./src/stats.h ./src/logger.h ./src/parser.h ./src/game.h ./src/player.h ./src/die.h ./src/dieindexstack.h)
 
-add_executable(${PROJECT_NAME} ${SOURCE} ${HEADERS})
+## Key idea: SEPARATE OUT your main() function into its own file so it can be its
+## own executable. Separating out main() means you can add this library to be
+## used elsewhere.
+add_library(${NAME}_lib ${SOURCE} ${HEADERS})
+add_executable(${NAME} ./src/main.cpp)
 
 if(UNIX AND NOT APPLE)
-   target_link_libraries(${PROJECT_NAME} -static)
+   target_link_libraries(${NAME} ${NAME}_lib -static)
 else()
-    target_link_libraries(${PROJECT_NAME})
+    target_link_libraries(${NAME} ${NAME}_lib)
 endif()
 
 # to be able to reference header files
-target_include_directories(${PROJECT_NAME} PRIVATE ./src)
+target_include_directories(${NAME} PRIVATE ./src)
 
 # remove ZERO_CHECK build
 set(CMAKE_SUPPRESS_REGENERATION true)
@@ -42,3 +47,5 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 # HIDE away ALL_BUILD in VS
 # for Xcode see https://gitlab.kitware.com/cmake/cmake/-/issues/21853
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+add_subdirectory(test)

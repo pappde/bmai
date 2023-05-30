@@ -2,7 +2,7 @@ The project leverages CMake, a cross-platform build management tool.
 Most popular IDEs, like CLion and Visual Studio, understand and support CMake based projects. 
 
 The C++ project structure I have chosen to follow is detailed on [Project Heuristics](https://medium.com/heuristics/c-application-development-part-1-project-structure-454b00f9eddc).
-The C++ convention for CMake builds is what is called an "out of source" build, meaning you give room for your build to generate artifacts that dont clutter your source directories. 
+The C++ convention for CMake builds is what is called an "out of source" build, meaning you give room for your build to generate artifacts that don't clutter your source directories. 
 The `.gitignore` has been tuned for out of source builds to happen in the `./build/` dir. 
 
 Consider using a pattern like the one below for your builds should you want to build the project in a non-IDE, command line way.
@@ -27,7 +27,7 @@ devenv bmai.sln /build
 
 ------
 
-UPDATE: I have learned about a more modern apporach to using CMake. There are 2 patterns that are becoming common. 
+UPDATE: I have learned about a more modern approach to using CMake. There are 2 patterns that are becoming common. 
 
 For command line only builds
 ```sh
@@ -52,3 +52,5 @@ echo for a subsequent Release build you will need to rebuild the build/ dir
 cmake -S . -B build
 cmake --build build --config Release
 ```
+
+TODO: add notes about buidling and execute the `bmai_tests` target.
