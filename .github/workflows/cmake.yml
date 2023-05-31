@@ -55,6 +55,8 @@ jobs:
       shell: bash
       # Execute tests defined in the CMake configuration.  
       run: ctest -C $BUILD_TYPE --no-tests=error --output-junit ctest-results.xml
+
+  # someday I want to try again to display the test results
     
     - name: Upload *NIX Binary
       uses: actions/upload-artifact@v3

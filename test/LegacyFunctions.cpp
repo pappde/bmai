@@ -16,7 +16,7 @@ TEST_F(LegacyMembers, SetupTestGame) {
 
     // Comment out next line to be able to easily run this code from IDE
     // or to include this in the overall test execution
-//    GTEST_SKIP() << "Skipping Setup Test Game";
+    GTEST_SKIP() << "Skipping Setup Test Game";
 
     class TEST_DieData : public BMC_DieData {
     public:
