@@ -31,13 +31,15 @@ UPDATE: I have learned about a more modern approach to using CMake. There are 2 
 
 For command line only builds
 ```sh
-echo configuring Debug and Release dirs
+echo configuring, building, testing Debug
 cmake -S . -B build/Debug -D CMAKE_BUILD_TYPE=Debug
-cmake -S . -B build/Release -D CMAKE_BUILD_TYPE=Release
-
-echo building Debug and Release binaries
 cmake --build build/Debug
+ctest --test-dir build/Debug
+
+echo configuring, building, testing Release
+cmake -S . -B build/Release -D CMAKE_BUILD_TYPE=Release
 cmake --build build/Release
+ctest --test-dir build/Release
 ```
 
 and for a multi-config / IDE based approach
@@ -48,9 +50,10 @@ echo you can point your IDE at build/ dir
 
 echo or build from command line
 cmake --build build --config Debug
+ctest --test-dir build
+
 echo for a subsequent Release build you will need to rebuild the build/ dir
 cmake -S . -B build
 cmake --build build --config Release
+ctest --test-dir build
 ```
-
-TODO: add notes about buidling and execute the `bmai_tests` target.
