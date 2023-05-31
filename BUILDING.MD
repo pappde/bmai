@@ -47,7 +47,7 @@ and for a multi-config / IDE based approach
 echo configuring for IDE
 cmake -S . -B build -G Xcode
 # OR
-cmake -S. -B build -G 'Visual Studio 17 2022'
+cmake -S . -B build -G 'Visual Studio 17 2022'
 
 echo or build from command line
 cmake --build build --config Debug
