@@ -44,9 +44,10 @@ ctest --test-dir build/Release
 
 and for a multi-config / IDE based approach
 ```sh
-echo configuring build dir
-cmake -S . -B build
-echo you can point your IDE at build/ dir
+echo configuring for IDE
+cmake -S . -B build -G Xcode
+# OR
+cmake -S. -B build -G 'Visual Studio 17 2022'
 
 echo or build from command line
 cmake --build build --config Debug
