@@ -107,7 +107,7 @@ TEST_F(LegacyMembers, TestRNG) {
 
     // TODO determine what tests could actually be done against BMC_RNG
     // based on BMC comments I have these ideas
-    ASSERT_LT(err*100, 0.3);
-    ASSERT_LT(stddev, 3.8);
+    EXPECT_LT(err*100, 0.3);
+    EXPECT_LT(stddev, 3.8);
 
 }

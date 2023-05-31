@@ -53,8 +53,8 @@ jobs:
     - name: Test
       working-directory: build
       shell: bash
-      # Execute tests defined by the CMake configuration.  
-      run: ctest --output-junit ctest-results.xml -C $BUILD_TYPE
+      # Execute tests defined in the CMake configuration.  
+      run: ctest -C $BUILD_TYPE --no-tests=error --output-junit ctest-results.xml
     
     - name: Upload *NIX Binary
       uses: actions/upload-artifact@v3
