@@ -19,6 +19,8 @@ execute_process(
 )
 add_definitions("-DGIT_DESCRIBE=\"${GIT_DESCRIBE}\"")
 
+enable_testing()
+
 # to collect only needed source files
 set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/player.cpp ./src/stats.cpp)
 
