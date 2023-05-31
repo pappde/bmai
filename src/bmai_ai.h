@@ -10,6 +10,8 @@
 // drp030321 - partial split out to individual headers
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+#include "game.h"
+
 #ifndef __BMAI_AI_H__
 #define __BMAI_AI_H__
 

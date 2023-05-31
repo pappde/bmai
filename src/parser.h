@@ -30,7 +30,9 @@ protected:
 	bool			Read(bool _fatal = true);
 
 	// output
-	void			Send(char *_fmt, ...);
+
+    // virtual can be overridden in subclass. makes testing a little easier
+	virtual void	Send(char *_fmt, ...);
 	void			SendStats();
 	void			SendSetSwing(BMC_Move &_move);
 	void			SendUseReserve(BMC_Move &_move);
