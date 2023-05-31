@@ -55,25 +55,12 @@ jobs:
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build build --config $BUILD_TYPE
 
-
-
-    # NOTICE current error is 
-
-    #    Run ctest -C $BUILD_TYPE
-    #    env:
-    #      BUILD_TYPE: Release
-    #    Test project /home/runner/work/bmai/bmai/build
-    #    No tests were found!!!
-
-    # maybe we havent written tests and I just put this in here to follow some template?
-    # TODO add some tests, or fix the problem running them
-
     - name: Test
       working-directory: build
       shell: bash
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C $BUILD_TYPE
+      run: ctest --output-junit ctest-results.xml -C $BUILD_TYPE
     
     - name: Upload *NIX Binary
       uses: actions/upload-artifact@v3
