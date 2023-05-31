@@ -47,7 +47,7 @@ jobs:
 
     - name: CMake Build
       shell: bash
-      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      # Execute the build. You can specify a specific target with "--target <NAME>"
       run: cmake --build build --config $BUILD_TYPE --target bmai bmai_tests
 
     - name: Test
