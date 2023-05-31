@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../src/bmai_ai.h"
 #include "../src/parser.h"
-
+#include <cstdarg>  // for va_start() va_end()
 
 // Support ancient versions of GCC still used in stubborn distros.
 #if defined(__GNUC__) && !__has_include(<filesystem>)
