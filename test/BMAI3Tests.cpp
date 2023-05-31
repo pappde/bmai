@@ -1,12 +1,24 @@
 #include <gtest/gtest.h>
 #include "../src/bmai_ai.h"
 #include "../src/parser.h"
+
+
+// Support ancient versions of GCC still used in stubborn distros.
+#if defined(__GNUC__) && !__has_include(<filesystem>)
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
 #include <filesystem>
+#ifdef __APPLE__
+namespace fs = std::__fs::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
+#endif
 
 // a path util
 inline std::string resolvePath(const std::string &relPath)
 {
-    namespace fs = std::__fs::filesystem;
     auto baseDir = fs::current_path();
     while (baseDir.has_parent_path())
     {
