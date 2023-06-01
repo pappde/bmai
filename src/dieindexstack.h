@@ -2,7 +2,7 @@
 // dieindexstack.h
 // Copyright (c) 2001-2023 Denis Papp. All rights reserved.
 // denis@accessdenied.net
-// https://github.com/hamstercrack/bmai
+// https://github.com/pappde/bmai
 // 
 // DESC: manage a stack of BMC_Die for a given BMC_Player
 //
