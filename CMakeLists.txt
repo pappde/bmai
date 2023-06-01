@@ -1,7 +1,8 @@
 # drp022521 - reduced from 3.14 to 3.8 for VS2017 support
 # dbl051923 - capture git describe for banner
+# dbl053123 - cmake 3.11 adds very useful FetchContent and is supported/available with VS2017
 
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.11)
 
 set(NAME bmai)
 set(CMAKE_CXX_STANDARD 14)

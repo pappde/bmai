@@ -40,6 +40,9 @@ jobs:
       with:
         fetch-depth: 0
     - uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: "~3.11.0"
+        # by forcing an specific version we can maintain compatibility with some of the contributors
 
     - name: CMake Configure
       shell: bash
