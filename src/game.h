@@ -79,8 +79,8 @@ public:
 	float		PlayFight_EvaluateMove(INT _pov_player, BMC_Move &_move);
 	float		PlayRound_EvaluateMove(INT _pov_player);
 
-    bool        IsSurrenderAllowed() {return m_surrender_allowed;};
-    void        SetSurrenderAllowed(bool _surrender_allowed) {m_surrender_allowed=_surrender_allowed;};
+	bool		IsSurrenderAllowed() {return m_surrender_allowed;};
+	void		SetSurrenderAllowed(bool _surrender_allowed) {m_surrender_allowed=_surrender_allowed;};
 
 protected:
 	// game simulation - level 1

@@ -1,11 +1,13 @@
 name: CMake
 
-# if you are doing development on another branch and want GHActions to auto build the branch
-# then add the branch name to the `push` section below
+# when developing on another branch 
+# if you want GHActions to auto build the branch
+# add the branch name to the `push` section below
 # you only need to make that change ON THE BRANCH to be built
-# I like to remove it when merging into `main`
+# please remove it when merging into `main`
 on:
   push:
+    # TODO remove the extra branch before merging into main
     branches: [ main, no_surrender ]
   pull_request:
     branches: [ main ]
@@ -54,14 +56,14 @@ jobs:
 #      shell: bash
 #      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-- name: CMake Configure
+    - name: CMake Configure
       shell: bash
       run: mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 ## later versions of cmake auto-create the build folder
 
     - name: CMake Build
       shell: bash
-      ## In later versions of cmake we can specify targets with "--target <NAMEA> <NAMEB>"
+ ## In later versions of cmake we can specify targets with "--target NAMEa NAMEb"
       run: cmake --build build --config $BUILD_TYPE
 
     - name: CTest

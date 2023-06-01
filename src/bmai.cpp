@@ -1280,7 +1280,7 @@ BMC_Game::BMC_Game(bool _simulation)
 	m_target_wins = BMD_DEFAULT_WINS;
 	m_simulation = _simulation;
 	m_last_action = BME_ACTION_MAX;
-    m_surrender_allowed = true;
+	m_surrender_allowed = true;
 }
 
 BMC_Game::BMC_Game(const BMC_Game & _game)

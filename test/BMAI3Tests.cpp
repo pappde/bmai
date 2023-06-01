@@ -2,11 +2,13 @@
 #include "../src/bmai_ai.h"
 #include "../src/parser.h"
 #include <cstdarg>  // for va_start() va_end()
-#include <ghc/filesystem.hpp>
 
+// filesystem was weird in c++14 with various ways the operating systems juggled the experimental namespace
+// this util i found gives us c++17 filesystem patterns down in older c++
+#include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
-// a path util
+// a path util, if useful consider creaking out into generic utility
 inline std::string resolvePath(const std::string &relPath)
 {
     auto baseDir = fs::current_path();
@@ -27,7 +29,7 @@ inline std::string resolvePath(const std::string &relPath)
     throw std::runtime_error("File not found!");
 }
 
-// shim util
+// lets us collect what is being sent to Send for inspection during tests
 class TEST_Parser : public BMC_Parser {
 public:
     void Send(char *_fmt, ...) {
@@ -49,6 +51,12 @@ class BMAISurrenderTests :public ::testing::TestWithParam<std::tuple<std::string
 protected:
     TEST_Parser parser;
 };
+
+// I wanted to test the smaller objects and methods. 
+// For example i could build an AI object and just execute the method GetAttackAction()
+// to inspect the behavior arround surrender
+// however the code is not currently built in a way that is friendly to unit testing
+// so the current pattern is to run full simulations and to monitor the output
 
 INSTANTIATE_TEST_SUITE_P(
         BMAI3Tests,
