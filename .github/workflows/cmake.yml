@@ -44,13 +44,15 @@ jobs:
         cmakeVersion: "~3.11.0"
         # by forcing a specific version we can maintain compatibility with some of the contributors
 
-    - name: crate build dir
-      shell: bash
-      run: mkdir -p build
+## onl later versions of cmake we can use the -S -B syntax
+#    - name: CMake Configure
+#      shell: bash
+#      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: CMake Configure
       shell: bash
-      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
 
     - name: CMake Build
       shell: bash
