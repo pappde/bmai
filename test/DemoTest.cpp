@@ -1,16 +1,15 @@
 #include <gtest/gtest.h>
 
 int factorial( const int number ) {
-  //  return number <= 1 ? number : Factorial( number - 1 ) * number;  // fail
-return number <= 1 ? 1      : factorial( number - 1 ) * number;  // pass
+    return number <= 1 ? 1 : factorial( number - 1 ) * number;  // pass
 }
 
 // Demonstrate some basic assertions.
 TEST(DemoTest, BasicAssertions) {
-    // Expect two strings not to be equal.
-    EXPECT_STRNE("hello", "world");
-    // Expect equality.
     EXPECT_EQ(7 * 6, 42);
+
+    // EXPECT STRings are Not Equal
+    EXPECT_STRNE("hello", "world");
 }
 
 TEST(DemoTest, FacOf0Is1  ) {

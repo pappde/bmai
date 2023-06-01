@@ -32,7 +32,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     # The CMake configure and build commands are platform-agnostic
-    # and should work equally well on Windows or Mac.
+    # and _should_ work equally well on Windows/Mac/Linux.
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -42,33 +42,32 @@ jobs:
     - uses: lukka/get-cmake@latest
       with:
         cmakeVersion: "~3.11.0"
-        # by forcing a specific version we can maintain compatibility with some of the contributors
+        # forcing a specific version to maintain compatibility with VS2017
 
-## onl later versions of cmake we can use the -S -B syntax
-#    - name: CMake Configure
-#      shell: bash
-#      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-
+## later versions of cmake wont need msbuild setup with an action 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
       if: matrix.os == 'windows-latest'
+
+## on later versions of cmake we can use the -S -B syntax
+#    - name: CMake Configure
+#      shell: bash
+#      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+## later versions of cmake auto-create the build folder
 
     - name: CMake Configure
       shell: bash
       run: mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-
     - name: CMake Build
       shell: bash
-      # Execute the build. You can specify a specific target with "--target <NAME>" on later versions of cmake
+      ## In later versions of cmake we can specify targets with "--target <NAMEA> <NAMEB>"
       run: cmake --build build --config $BUILD_TYPE
 
-    - name: Test
+    - name: CTest
       working-directory: build
       shell: bash
-      # Execute tests defined in the CMake configuration.  
       run: ctest -C $BUILD_TYPE --no-tests=error --output-junit ctest-results.xml
-
   # someday I want to try again to display the test results
     
     - name: Upload *NIX Binary

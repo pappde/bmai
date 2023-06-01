@@ -1,6 +1,6 @@
 # drp022521 - reduced from 3.14 to 3.8 for VS2017 support
 # dbl051923 - capture git describe for banner
-# dbl053123 - cmake 3.11 adds very useful FetchContent and is supported/available with VS2017
+# dbl053123 - cmake 3.11 adds FetchContent and is supported/available with VS2017
 
 cmake_minimum_required (VERSION 3.11)
 
@@ -25,13 +25,13 @@ enable_testing()
 # to collect only needed source files
 set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/player.cpp ./src/stats.cpp)
 
-# some IDEs really need the Headers added to the executable
-# to be able to index everything correctly
+# some IDEs need Headers added to the executable for indexing
 set(HEADERS ./src/bmai.h ./src/bmai_ai.h ./src/stats.h ./src/logger.h ./src/parser.h ./src/game.h ./src/player.h ./src/die.h ./src/dieindexstack.h)
 
-## Key idea: SEPARATE OUT your main() function into its own file so it can be its
-## own executable. Separating out main() means you can add this library to be
-## used elsewhere.
+## Key idea: SEPARATE OUT main() function to its own executable.
+## And contain the application to a library
+## allowing you can add this library elsewhere, such as testing
+
 add_library(${NAME}_lib ${SOURCE} ${HEADERS})
 add_executable(${NAME} ./src/main.cpp)
 
