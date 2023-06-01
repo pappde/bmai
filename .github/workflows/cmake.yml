@@ -49,6 +49,10 @@ jobs:
 #      shell: bash
 #      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3.1
+      if: matrix.os == 'windows-latest'
+
     - name: CMake Configure
       shell: bash
       run: mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
