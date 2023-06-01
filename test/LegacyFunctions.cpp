@@ -3,6 +3,16 @@
 #include "../src/game.h"
 #include "../src/bmai_ai.h"
 
+// //
+//
+// This file contains some functions that where originally in `bmai.cpp`
+// The functions were occasionally uncommented to test specific scenarios
+// Ideally by wrapping up these test scenarios into a "test" we gain a few benefits:
+//  - your IDE will help you kick off the test whenever you need to without changing primary source code
+//  - the build process can easily run the code to make usre it functions as needed
+//  - the task of unit testing will encourage more sound object design and pattern usage
+//
+// //
 
 class LegacyMembers : public ::testing::Test {
 protected:
@@ -17,6 +27,10 @@ TEST_F(LegacyMembers, SetupTestGame) {
     // Comment out next line to be able to easily run this code from IDE
     // or to include this in the overall test execution
     GTEST_SKIP() << "Skipping Setup Test Game";
+
+    // until the objects are better suited for testing
+    // it may be necessary to use a couple hacks to access members
+    // http://www.gotw.ca/gotw/076.htm
 
     class TEST_DieData : public BMC_DieData {
     public:
@@ -105,9 +119,8 @@ TEST_F(LegacyMembers, TestRNG) {
     double stddev = sqrt(var);
     printf("max error %lf var %lf stddev %lf\n", err, var, stddev);
 
-    // TODO determine what tests could actually be done against BMC_RNG
-    // based on BMC comments I have these ideas
     EXPECT_LT(err*100, 0.3);
     EXPECT_LT(stddev, 3.8);
+    // TODO consider if other expectations would be more valuable
 
 }

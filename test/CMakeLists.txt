@@ -17,22 +17,21 @@ include(FetchContent)
 FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googletest.git GIT_TAG v1.13.0)
 # For VS/Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# use fetchcontent_makeavailable when you upgrade to later version of cmake
+# when upgrading to later version of cmake
+# replace FetContent_Populate+add_subdirectory with FetchContent_MakeAvailable(A B C)
 FetchContent_Populate(googletest)
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
 # i wanted to do some file system work in the tests
-# std::filesystem doesnt exist until c++17
+# std::filesystem doesnt exist until c++17 & Boost is HUGE
+# found this nice little utility with brings c++17 filesystem apis to older versions
 FetchContent_Declare(ghc GIT_REPOSITORY https://github.com/gulrak/filesystem.git GIT_TAG v1.5.14)
-# use fetchcontent_makeavailable when you upgrade to later version of cmake
 FetchContent_Populate(ghc)
 add_subdirectory(${ghc_SOURCE_DIR} ${ghc_BINARY_DIR})
 
 
 
 file(GLOB TEST_SOURCES *.cpp *.h)
-
-# Now simply link against gtest or gtest_main as needed. Eg
 add_executable(${NAME}_tests ${TEST_SOURCES})
 target_link_libraries(${NAME}_tests ${NAME}_lib gtest_main ghc_filesystem)
 

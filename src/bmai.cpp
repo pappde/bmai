@@ -95,6 +95,7 @@
 //				  This was a big problem and explains the 42.4% with "Legend of the Five Rings" or
 //				  46.7% with Yoyodyne, 
 // dbl051823	- added P-Swing, Q-Swing support
+// dbl053123	- moved TestRNG and SetupTestGame to a `./test/` dir and testing framework
 // dbl053123	- added ability to disallow surrenders
 ///////////////////////////////////////////////////////////////////////////////////////////
 
