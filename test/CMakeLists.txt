@@ -34,7 +34,7 @@ file(GLOB TEST_SOURCES *.cpp *.h)
 
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(${NAME}_tests ${TEST_SOURCES})
-target_link_libraries(${NAME}_tests ${NAME}_lib gtest_main)
+target_link_libraries(${NAME}_tests ${NAME}_lib gtest_main ghc_filesystem)
 
 
 ##
