@@ -2,19 +2,9 @@
 #include "../src/bmai_ai.h"
 #include "../src/parser.h"
 #include <cstdarg>  // for va_start() va_end()
+#include <ghc/filesystem.hpp>
 
-// Support ancient versions of GCC still used in stubborn distros.
-#if defined(__GNUC__) && !__has_include(<filesystem>)
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#else
-#include <filesystem>
-#ifdef __APPLE__
-namespace fs = std::__fs::filesystem;
-#else
-namespace fs = std::filesystem;
-#endif
-#endif
+namespace fs = ghc::filesystem;
 
 // a path util
 inline std::string resolvePath(const std::string &relPath)
