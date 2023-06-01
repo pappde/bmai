@@ -19,6 +19,8 @@ FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googlet
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 # use fetchcontent_makeavailable when youupgrade to later version of cmake
 FetchContent_Populate(googletest)
+add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+
 
 file(GLOB TEST_SOURCES *.cpp *.h)
 
