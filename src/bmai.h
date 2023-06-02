@@ -31,6 +31,8 @@
 #include <algorithm>
 #include <string>
 
+int bmai_main(int argc, char *argv[]);
+
 // forward declarations
 class BMC_Player;
 class BMC_Game;

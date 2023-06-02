@@ -23,7 +23,7 @@ class BMC_Player	// 204b
 public:
 	typedef enum {
 		SWING_SET_NOT,
-		SWING_SET_READY,	// set this round, esults should not be "known" to opponent - to simulate simultaneous swing set
+		SWING_SET_READY,	// set this round, results should not be "known" to opponent - to simulate simultaneous swing set
 		SWING_SET_LOCKED,	// set from previous round
 	} SWING_SET;
 
