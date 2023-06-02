@@ -1,7 +1,7 @@
 BMAI - the Button Men AI
 Copyright (c) 2001-2023 Denis Papp. All rights reserved.
 Author: Denis Papp (denis@accessdenied.net)
-Homepage: https://github.com/hamstercrack/bmai
+Homepage: https://github.com/pappde/bmai
 
 Releases:
 Version 1.0, Released 10/28/01

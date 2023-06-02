@@ -30,7 +30,7 @@ FetchContent_Populate(ghc)
 add_subdirectory(${ghc_SOURCE_DIR} ${ghc_BINARY_DIR})
 
 
-
+# TODO: get rid of glob, bad practice apparently
 file(GLOB TEST_SOURCES *.cpp *.h)
 add_executable(${NAME}_tests ${TEST_SOURCES})
 target_link_libraries(${NAME}_tests ${NAME}_lib gtest_main ghc_filesystem)

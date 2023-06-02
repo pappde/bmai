@@ -2,7 +2,7 @@
 // man.h
 // Copyright (c) 2001-2023 Denis Papp. All rights reserved.
 // denis@accessdenied.net
-// https://github.com/hamstercrack/bmai
+// https://github.com/pappde/bmai
 // 
 // DESC: BMC_Man represents a Button Man (a set of BMC_DieData)
 //

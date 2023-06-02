@@ -5,7 +5,7 @@
 #
 # Copyright (c) 2001-2020 Denis Papp. All rights reserved.
 # denis@accessdenied.net
-# https://github.com/hamstercrack/bmai
+# https://github.com/pappde/bmai
 #
 # DESCRIPTION: this is the front-end to BMAI.  It serves as the interface between the AI and
 # the BM web page by Dana Huyler.  It also is intended to do rating and evaluation of BMs,

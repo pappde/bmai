@@ -7,8 +7,7 @@ name: CMake
 # please remove it when merging into `main`
 on:
   push:
-    # TODO remove the extra branch before merging into main
-    branches: [ main, no_surrender ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
