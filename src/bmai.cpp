@@ -96,6 +96,7 @@
 //				  46.7% with Yoyodyne, 
 // dbl051823	- added P-Swing, Q-Swing support
 // dbl053123	- moved TestRNG and SetupTestGame to a `./test/` dir and testing framework
+// dbl053123	- added ability to disallow surrenders
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // TOP TODO
@@ -436,7 +437,7 @@ void BMC_Logger::Log(BME_DEBUG _cat, char *_fmt, ... )
 
 bool BMC_Logger::SetLogging(const char *_catname, bool _log)
 {
-	// case insensitive compares are not easy to come by in a cross-platform way
+	// case-insensitive compares are not easy to come by in a cross-platform way
 	// so lets uppercase the input and do a normal std::strcmp below
 	std::string _cn(_catname);
 	std::transform(_cn.begin(), _cn.end(), _cn.begin(), ::toupper);
@@ -531,7 +532,7 @@ void BMC_DieIndexStack::SetBits(BMC_BitArray<BMD_MAX_DICE> & _bits)
 
 // DESC: add the next die to the stack.  If we can't, then remove the top die in the stack 
 //       and replace it with the next available die 
-// PARAM: _add_die: if specificed, then force cycling the top die 
+// PARAM: _add_die: if specified, then force cycling the top die
 // RETURNS: if finished (couldn't cycle)
 bool BMC_DieIndexStack::Cycle(bool _add_die)
 {
@@ -1279,6 +1280,7 @@ BMC_Game::BMC_Game(bool _simulation)
 	m_target_wins = BMD_DEFAULT_WINS;
 	m_simulation = _simulation;
 	m_last_action = BME_ACTION_MAX;
+	m_surrender_allowed = true;
 }
 
 BMC_Game::BMC_Game(const BMC_Game & _game)
@@ -3862,6 +3864,7 @@ maxbranch %1		maximum number of total simulations to run at a ply (valid moves *
 debug %1 %2			adjust logging settings (e.g. "debug SIMULATION 0")
 debugply %1
 ai %1 %2			set player %1 (0-1) to AI type %2 (0 = BMAI, 1 = QAI, 2 = BMAI v2)
+surrender %1        set if AI is allowed to surrender. If off then AI will continue to play loosing positions. [default is on]
 
 ACTIONS
 playgame %1			play %1 games and output results 
@@ -3995,6 +3998,10 @@ void BMC_Parser::Parse()
 			g_rng.SRand(param);
 			printf("Seeding with %d\n", param);
 		}
+        else if (sscanf(line, "surrender %32s", &sparam)==1)
+        {
+            g_game.SetSurrenderAllowed(std::string(sparam)=="on");
+        }
 		else if (!std::strcmp(line, "quit"))
 		{
 			return;

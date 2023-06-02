@@ -12,12 +12,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(${NAME})
 
 # Get the latest git tag and short commit hash
-execute_process(
-    COMMAND git describe --dirty --always --tags
-    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-    OUTPUT_VARIABLE GIT_DESCRIBE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+if(NOT DEFINED GIT_DESCRIBE)
+    execute_process(
+        COMMAND git describe --dirty --always --tags --match="v[0-9]*"
+        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+        OUTPUT_VARIABLE GIT_DESCRIBE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+endif ()
 add_definitions("-DGIT_DESCRIBE=\"${GIT_DESCRIBE}\"")
 
 enable_testing()

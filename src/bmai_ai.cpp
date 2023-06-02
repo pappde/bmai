@@ -1094,7 +1094,7 @@ void BMC_BMAI3::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 	}
 
 	// SURRENDER: if best move is 0% win, then surrender
-	if (t.best_score==0)
+	if (t.best_score==0 && _game->IsSurrenderAllowed())
 		t.best_move->m_action = BME_ACTION_SURRENDER;
 
 	if (enter_level < sm_debug_level)

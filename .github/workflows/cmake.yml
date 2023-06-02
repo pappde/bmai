@@ -1,9 +1,10 @@
 name: CMake
 
-# if you are doing development on another branch and want GHActions to auto build the branch
-# then add the branch name to the `push` section below
+# when developing on another branch 
+# if you want GHActions to auto build the branch
+# add the branch name to the `push` section below
 # you only need to make that change ON THE BRANCH to be built
-# I like to remove it when merging into `main`
+# please remove it when merging into `main`
 on:
   push:
     branches: [ main ]
@@ -22,6 +23,9 @@ on:
         - Release
         - Debug
 
+  schedule:
+    - cron: '30 2 * * SUN' # run at 02:30 UTC Sundays
+
 env:
   # if the build is not manually dispatched we will default to 'Release' build
   BUILD_TYPE: ${{ inputs.buildType || 'Release' }}
@@ -29,6 +33,7 @@ env:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     # The CMake configure and build commands are platform-agnostic
@@ -48,20 +53,31 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.1
       if: matrix.os == 'windows-latest'
+      
+    # for some reason the git describe done inside of CMake
+    # isnt producing the desired results anymore
+    # so i am executing it out here and passing it on the command line
+    - name: git-describe for version string
+      shell: bash
+      run: |
+        echo GIT_DESCRIBE="$(git describe --always --tags --match='v[0-9]*' ${{'pull_request'==github.event_name && 'HEAD^2)-PR' || '--dirty)'}}" >> $GITHUB_ENV
 
 ## on later versions of cmake we can use the -S -B syntax
 #    - name: CMake Configure
 #      shell: bash
-#      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-## later versions of cmake auto-create the build folder
+#      run: cmake -S . -B build -DGIT_DESCRIBE="$GIT_DESCRIBE" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G"Unix Makefiles"
 
     - name: CMake Configure
       shell: bash
-      run: mkdir -p build && cd build && cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: mkdir -p build && cd build && cmake .. -DGIT_DESCRIBE="$GIT_DESCRIBE" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G"Unix Makefiles"
+      # Unix Makefiles allow the build to behave similarly cross-platform
+      # if we want to ensure that the project can build under a certain build type (like VS2017)
+      # we should consider a very specific GHAction Workflow for that case
+## later versions of cmake auto-create the build folder
 
     - name: CMake Build
       shell: bash
-      ## In later versions of cmake we can specify targets with "--target <NAMEA> <NAMEB>"
+ ## In later versions of cmake we can specify targets with "--target NAMEa NAMEb"
       run: cmake --build build --config $BUILD_TYPE
 
     - name: CTest
@@ -69,17 +85,40 @@ jobs:
       shell: bash
       run: ctest -C $BUILD_TYPE --no-tests=error --output-junit ctest-results.xml
   # someday I want to try again to display the test results
-    
-    - name: Upload *NIX Binary
-      uses: actions/upload-artifact@v3
-      if: matrix.os != 'windows-latest'
-      with:
-          name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
-          path: ./build/bmai
 
-    - name: Upload WINDOWS Binary
-      uses: actions/upload-artifact@v3
-      if: matrix.os == 'windows-latest'
+    - uses: actions/upload-artifact@v3
       with:
-          name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
-          path: ${{ github.workspace }}\build\${{ env.BUILD_TYPE }}\bmai.exe
+        name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
+        if-no-files-found: error
+        path: |
+          ./build/bmai*
+
+    - name: get data for release body
+      shell: bash
+      if: ${{ 'schedule' == github.event_name || 'workflow_dispatch' == github.event_name }}
+      run: |
+        SINCE_TAG="$(git describe --tags --abbrev=0 --match='v[0-9]*')"
+        TEMP_COMMIT_LOG="$(git log $SINCE_TAG..HEAD --oneline)"
+        echo SINCE_TAG="$SINCE_TAG" >> $GITHUB_ENV
+        echo COMMIT_LOG="${TEMP_COMMIT_LOG//$'\n'/<br />}" >> $GITHUB_ENV
+        echo DATE="$(date -u)" >> $GITHUB_ENV
+
+    - name: auto-release tag and upload
+      uses: andelf/nightly-release@main
+      if: ${{ 'schedule' == github.event_name || 'workflow_dispatch' == github.event_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: auto-release-${{ runner.os }}
+        name: '[auto] BMAI-${{ runner.os }}'
+        prerelease: true
+        body: |
+          Branch: ${{ github.head_ref || github.ref_name || github.ref }} 
+          Build Type: ${{ env.BUILD_TYPE }}
+          Run At: ${{ env.DATE }}
+          Trigger: ${{ github.event_name }}
+          Binary Version: ${{ env.GIT_DESCRIBE }} 
+          <details><summary>Changes since ${{ env.SINCE_TAG }}</summary>${{ env.COMMIT_LOG }}</details>
+        files: |
+          ./build/bmai*
+      # TODO: add other files maybe like test results

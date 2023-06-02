@@ -22,10 +22,18 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_Populate(googletest)
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
+# i wanted to do some file system work in the tests
+# std::filesystem doesnt exist until c++17 & Boost is HUGE
+# found this nice little utility with brings c++17 filesystem apis to older versions
+FetchContent_Declare(ghc GIT_REPOSITORY https://github.com/gulrak/filesystem.git GIT_TAG v1.5.14)
+FetchContent_Populate(ghc)
+add_subdirectory(${ghc_SOURCE_DIR} ${ghc_BINARY_DIR})
 
+
+# TODO: get rid of glob, bad practice apparently
 file(GLOB TEST_SOURCES *.cpp *.h)
 add_executable(${NAME}_tests ${TEST_SOURCES})
-target_link_libraries(${NAME}_tests ${NAME}_lib gtest_main)
+target_link_libraries(${NAME}_tests ${NAME}_lib gtest_main ghc_filesystem)
 
 
 ##
