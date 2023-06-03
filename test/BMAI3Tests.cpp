@@ -32,7 +32,7 @@ inline std::string resolvePath(const std::string &relPath)
 // lets us collect what is being sent to Send for inspection during tests
 class TEST_Parser : public BMC_Parser {
 public:
-    void Send(char *_fmt, ...) {
+    void Send(const char *_fmt, ...) {
         tm_next_to_last_fmt = tm_last_fmt;
 
         char buff[BMD_MAX_STRING];

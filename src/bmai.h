@@ -9,6 +9,7 @@
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
 // dbl051823 - added P-Swing, Q-Swing support
+// drp060323 - added const modifier to vararg format params
 //
 // TODO:
 // 1) drp030321 - setup a main precompiled header that includes everything (bmai.h) vs a header for the key types/enums/classes. Split out modules
@@ -31,24 +32,14 @@
 #include <algorithm>
 #include <string>
 
+#include "types.h"
+
 int bmai_main(int argc, char *argv[]);
 
 // forward declarations
 class BMC_Player;
 class BMC_Game;
 class BMC_AI;
-
-// typedefs
-typedef unsigned long	U32;
-typedef unsigned char	U8;
-typedef signed char		S8;
-typedef unsigned short	U16;
-typedef int				INT;
-typedef unsigned int	UINT;
-typedef float			F32;
-
-// special types
-typedef std::vector<float>	BMC_FloatVector;
 
 // version number
 #ifndef GIT_DESCRIBE
@@ -60,7 +51,7 @@ typedef std::vector<float>	BMC_FloatVector;
 #define BM_ERROR(check)	{ if (!(check)) { BMF_Error(#check); } }
 
 // C prototypes
-void BMF_Error( char *_fmt, ... );
+void BMF_Error( const char *_fmt, ... );
 
 // template classes
 template <int SIZE>
@@ -416,7 +407,7 @@ private:
 
 // Utility functions
 
-void BMF_Error( char *_fmt, ... );
-void BMF_Log(BME_DEBUG _cat, char *_fmt, ... );
+void BMF_Error( const char *_fmt, ... );
+void BMF_Log(BME_DEBUG _cat, const char *_fmt, ... );
 
 #endif //__BMAI_H__

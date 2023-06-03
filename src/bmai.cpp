@@ -392,7 +392,7 @@ BMC_AI *	g_ai_type[BMD_AI_TYPES] = { &g_bmai, &g_qai2, &g_bmai3 };
 // logging methods
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-void BMF_Error( char *_fmt, ... )
+void BMF_Error( const char *_fmt, ... )
 {
 	va_list	ap;
 	va_start(ap, _fmt), 
@@ -402,7 +402,7 @@ void BMF_Error( char *_fmt, ... )
 	exit(1);
 }
 
-void BMF_Log(BME_DEBUG _cat, char *_fmt, ... )
+void BMF_Log(BME_DEBUG _cat, const char *_fmt, ... )
 {
 	if (!g_logger.IsLogging(_cat))
 		return;
@@ -424,7 +424,7 @@ BMC_Logger::BMC_Logger()
 		m_logging[i] = true;
 }
 
-void BMC_Logger::Log(BME_DEBUG _cat, char *_fmt, ... )
+void BMC_Logger::Log(BME_DEBUG _cat, const char *_fmt, ... )
 {
 	if (!m_logging[_cat])
 		return;
@@ -491,7 +491,8 @@ void BMC_RNG::SRand(UINT _seed)
 
 UINT BMC_RNG::GetRand()
 {
-    register long LO, HI;
+	// drp060323 - removed "register" keyword, which is no longer supported in C++ versions after 14. Optimizer should be making it irrelevant.
+	long LO, HI;
 
     LO = ( (m_seed) & 0177777 ) * 16807;
     HI = ( (m_seed) >> 16 ) * 16807 + ( LO >> 16 );
@@ -1508,11 +1509,13 @@ bool BMC_Game::ValidSetSwing(BMC_Move &_move)
 		if (!d->IsUsed())
 			continue;
 	
+		/* REMOVED: drp060323 - m_option_die[] is now boolean, so check no longer relevant. 
 		if (d->HasProperty(BME_PROPERTY_OPTION))
 		{
 			if (_move.m_option_die[i]>1)
 				return false;
 		}
+		*/
 
 		// check UNIQUE:  we check if current swing value>0 because some AIs use this function before having set all swing dice
 		// NOTE: does not work for twin
@@ -3434,7 +3437,7 @@ bool BMC_Parser::Read(bool _fatal)
 	return true;
 }
 
-void BMC_Parser::Send( char *_fmt, ... )
+void BMC_Parser::Send( const char *_fmt, ... )
 {
 	va_list	ap;
 	va_start(ap, _fmt), 
