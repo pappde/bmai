@@ -32,7 +32,7 @@ protected:
 	// output
 
     // virtual can be overridden in subclass. makes testing a little easier
-	virtual void	Send(char *_fmt, ...);
+	virtual void	Send(const char *_fmt, ...);
 	void			SendStats();
 	void			SendSetSwing(BMC_Move &_move);
 	void			SendUseReserve(BMC_Move &_move);

@@ -18,7 +18,7 @@ public:
 	BMC_Logger();
 
 	// methods
-	void			Log(BME_DEBUG _cat, char *_fmt, ...);
+	void			Log(BME_DEBUG _cat, const char *_fmt, ...);
 
 	// mutators
 	void			SetLogging(BME_DEBUG _cat, bool _log) { m_logging[_cat] = _log; }
