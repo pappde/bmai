@@ -1509,11 +1509,13 @@ bool BMC_Game::ValidSetSwing(BMC_Move &_move)
 		if (!d->IsUsed())
 			continue;
 	
+		/* REMOVED: drp060323 - m_option_die[] is now boolean, so check no longer relevant. 
 		if (d->HasProperty(BME_PROPERTY_OPTION))
 		{
 			if (_move.m_option_die[i]>1)
 				return false;
 		}
+		*/
 
 		// check UNIQUE:  we check if current swing value>0 because some AIs use this function before having set all swing dice
 		// NOTE: does not work for twin
