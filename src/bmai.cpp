@@ -814,8 +814,8 @@ void BMC_Die::Roll()
 		BM_ASSERT(i>0 || m_sides[i]>0);	// swing die hasn't been set
 		if (m_sides[i]==0)
 			break;
-		// WARRIOR: always rolls highest number
-		if (HasProperty(BME_PROPERTY_WARRIOR))
+		// WARRIOR, MAXIMUM: always rolls highest number
+		if (HasProperty(BME_PROPERTY_WARRIOR)||HasProperty(BME_PROPERTY_MAXIMUM))
 			m_value_total += m_sides[i];
 		else
 			m_value_total += g_rng.GetRand(m_sides[i])+1;
@@ -3242,6 +3242,7 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 			DEFINE_PROPERTY('g', BME_PROPERTY_STINGER)
 			DEFINE_PROPERTY('G', BME_PROPERTY_RAGE)
 			DEFINE_PROPERTY('k', BME_PROPERTY_KONSTANT)
+			DEFINE_PROPERTY('M', BME_PROPERTY_MAXIMUM)
 		default:
 			BMF_Error("error parsing die %s (pre-fix property at %c)", line, ch);
 		}
