@@ -815,7 +815,7 @@ void BMC_Die::Roll()
 		if (m_sides[i]==0)
 			break;
 		// WARRIOR, MAXIMUM: always rolls highest number
-		if (HasProperty(BME_PROPERTY_WARRIOR)||HasProperty(BME_PROPERTY_MAXIMUM))
+		if (HasProperty(BME_PROPERTY_WARRIOR) || HasProperty(BME_PROPERTY_MAXIMUM))
 			m_value_total += m_sides[i];
 		else
 			m_value_total += g_rng.GetRand(m_sides[i])+1;

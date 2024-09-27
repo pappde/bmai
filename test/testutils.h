@@ -6,9 +6,10 @@
 // http://www.gotw.ca/gotw/076.htm
 class TEST_DieData : public BMC_DieData {
 public:
-    void setProperties(U32 properties) { m_properties=properties;}
-    void setSides(U8 sides) { m_sides[0]=sides;}
-    void setSwingType(U8 swing_type) { m_swing_type[0]=swing_type;}
+    void setProperties(U32 properties) { m_properties = properties; }
+    void setSides(U8 sides) { m_sides[0] = sides; }
+    void setSwingType(U8 swing_type) { m_swing_type[0] = swing_type; }
+
 protected:
     U8 m_swing_type[BMD_MAX_TWINS];
 };
@@ -18,10 +19,11 @@ public:
     static BMC_Die createTestDie(U8 sides, U32 properties) {
         return createTestDie(sides, properties, BME_SWING_NOT);
     }
+
     static BMC_Die createTestDie(U8 sides, U32 properties, U8 swing_type) {
         TEST_DieData die_data;
         die_data.setSides(sides);
-        die_data.setProperties(BME_PROPERTY_VALID|properties);
+        die_data.setProperties(BME_PROPERTY_VALID | properties);
         die_data.setSwingType(swing_type);
 
         BMC_Die die;
