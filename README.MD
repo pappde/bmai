@@ -1,6 +1,6 @@
 # BMAI - the Button Men AI
 
-Copyright (c) 2001-2023 Denis Papp. All rights reserved.
+Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 
 Author: Denis Papp (denis@accessdenied.net)
 

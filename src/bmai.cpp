@@ -5,7 +5,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai.cpp
-// Copyright (c) 2001-2023 Denis Papp. All rights reserved.
+// Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
 // 
@@ -4043,7 +4043,7 @@ int bmai_main(int argc, char *argv[])
 	//g_ai.SetQAI(&g_ai_mode0);
 
 	// banner
-	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2023, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\nVersion: %s\n", GIT_DESCRIBE);
+	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2024, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\nVersion: %s\n", GIT_DESCRIBE);
 
 	if (argc>1)
 	{
