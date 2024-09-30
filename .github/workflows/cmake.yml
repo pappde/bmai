@@ -51,7 +51,7 @@ jobs:
 
 ## later versions of cmake wont need msbuild setup with an action 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.3.1
+      uses: microsoft/setup-msbuild@v2.0.0
       if: matrix.os == 'windows-latest'
       
     # for some reason the git describe done inside of CMake
