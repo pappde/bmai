@@ -4,6 +4,8 @@ The project leverages CMake, a cross-platform build management tool.
 Most popular IDEs, like CLion, Xcode, and Visual Studio, understand and support CMake based projects. 
 
 The C++ project structure I have chosen to follow is detailed on [Project Heuristics](https://medium.com/heuristics/c-application-development-part-1-project-structure-454b00f9eddc).
+(Though I plan to in time migrate to something more like [Modern CMake](https://cliutils.gitlab.io/modern-cmake/))
+
 The C++ convention for CMake builds is what is called an "out of source" build, meaning you give room for your build to generate artifacts that don't clutter your source directories. 
 The `.gitignore` has been tuned for out of source builds to happen in the `./build/` dir. 
 
