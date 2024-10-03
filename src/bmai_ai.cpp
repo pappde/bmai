@@ -1025,9 +1025,11 @@ void BMC_BMAI3::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 	BMC_ThinkState	t(this,_game,movelist);
 
 	if (enter_level < sm_debug_level)
-	g_logger.Log(BME_DEBUG_SIMULATION, "l%d p%d Valid Moves %d Sims %d\n", sm_level, _game->GetPhasePlayerID(), 
-		movelist.Size(), 
-		t.sims);
+	{
+		g_logger.Log(BME_DEBUG_SIMULATION, "l%d p%d Valid Moves %d Sims %d\n", sm_level, _game->GetPhasePlayerID(),
+			movelist.Size(),
+			t.sims);
+	}
 
 	while (t.sims_run < t.sims)
 	{

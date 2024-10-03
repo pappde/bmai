@@ -566,6 +566,12 @@ bool BMC_DieIndexStack::Cycle(bool _add_die)
 	return false;	// not finished
 }
 
+void BMC_DieIndexStack::Pop()
+{
+	value_total -= GetTopDie()->GetValueTotal();
+	die_stack_size--;
+}
+
 void BMC_DieIndexStack::Push(INT _index)
 {
 	die_stack[die_stack_size++] = _index;
@@ -2324,7 +2330,9 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						}
 
 						// if full (using all target dice) and att value is <= tgt total value, give up since won't be able to do any other matches
-						if (die_stack.ContainsAllDice() && die_stack.GetValueTotal()<=target->GetMaxValue())
+						// drp100224 - this check was wrong. We can abort if GetValueTotal() <= target->GetMinValue(), since that's the highest we can combine to,
+						//  but otherwise we should keep cycling since other combniations will have lower totals.
+						if (die_stack.ContainsAllDice() && die_stack.GetValueTotal()<=target->GetMinValue())
 							break;
 
 						// if att_total matches or exceeds tgt_total, don't add a die
@@ -2366,7 +2374,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// step
 
 						// if full (using all target dice) and tgt tot value is <= att value, give up since won't be able to do any other matches
-						if (die_stack.ContainsAllDice() && att_total>=die_stack.GetValueTotal())
+						if (die_stack.ContainsAllDice() && att_total >= die_stack.GetValueTotal())
 							break;
 
 						// if tgt_total matches or exceeds att_total, don't add a die (no sense continuing on this line)

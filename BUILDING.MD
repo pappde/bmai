@@ -22,7 +22,9 @@ We are coding to the lowest common denominator of the contributors. This is curr
 There are lots of nice features added in later versions of CMake (3.14+) and C++ (17+) that we will work to progress towards. 
 
 ## COMPILING 
-*nix environments
+
+### *nix environments
+
 ```sh
 mkdir -p build
 cd build
@@ -30,7 +32,8 @@ cmake ..
 make
 ```
 
-windows ms visual studio environments
+### Windows MS Visual Studio environments
+
 ```sh
 \path\to\VsDevCmd.bat
 mkdir build
@@ -39,6 +42,9 @@ cmake ..
 devenv bmai.sln /build
 ```
 
+At this point, you can also load the solution into the IDE and build from there if you prefer. Make sure to change the "StartUp Project" in the IDE to the **bmai** project.
+
+### WIP
 
 ------
 
