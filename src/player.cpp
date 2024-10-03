@@ -170,11 +170,12 @@ void BMC_Player::DebugAllDice(BME_DEBUG _cat)
 // - all READY dice are at the front, sorted largest to smallest.  These are followed by
 //   all other dice that are not NOTUSED (not sorted by value)
 // - m_available_dice is set
-// - m_max_value is set 
+// - m_max_value and m_min_value are set 
 void BMC_Player::OptimizeDice()
 {
 	m_available_dice = 0;
 	m_max_value = 0;
+	m_min_value = INT_MAX;
 
 	// bubble-sort
 	// TODO: do better
@@ -218,6 +219,8 @@ void BMC_Player::OptimizeDice()
 		m_available_dice++;
 		if (GetDie(i)->GetValueTotal() > m_max_value)
 			m_max_value = GetDie(i)->GetValueTotal();
+		else if (GetDie(i)->GetValueTotal() < m_min_value)
+			m_min_value = GetDie(i)->GetValueTotal();
 	}
 }
 
@@ -242,7 +245,7 @@ void BMC_Player::OnDieSidesChanged(BMC_Die *_die)
 // POST:
 // - captured die moved after ready dice, invalidating pointers (*)
 // - m_available_dice is updated
-// - m_max_value is updated
+// - m_max_value and m_min_value are updated
 // RETURNS:
 // - pointer to the die in it's new position
 BMC_Die * BMC_Player::OnDieLost(INT _d)
@@ -265,7 +268,8 @@ BMC_Die * BMC_Player::OnDieLost(INT _d)
 	// update available dice
 	m_available_dice--;
 
-	// update m_max_value if appropriate
+	// update m_min/max_value if appropriate
+
 	if (m_die[_d].GetValueTotal() >= m_max_value) // OPTIMIZATION: only if was max
 	{
 		m_max_value = 0;
@@ -273,6 +277,15 @@ BMC_Die * BMC_Player::OnDieLost(INT _d)
 		{
 			if (m_die[i].GetValueTotal() > m_max_value)
 				m_max_value = m_die[i].GetValueTotal();
+		}
+	}
+	if (m_die[_d].GetValueTotal() <= m_min_value) // OPTIMIZATION: only if was min
+	{
+		m_min_value = INT_MAX;
+		for (i = 0; i < GetAvailableDice(); i++)
+		{
+			if (m_die[i].GetValueTotal() < m_min_value)
+				m_min_value = m_die[i].GetValueTotal();
 		}
 	}
 

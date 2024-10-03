@@ -63,6 +63,7 @@ public:
 	BMC_Die *	GetDie(INT _d) { return &m_die[_d]; }
 	INT			GetAvailableDice() { return m_available_dice; }
 	INT			GetMaxValue() { return m_max_value; }
+	INT			GetMinValue() { return m_min_value; }
 	float		GetScore() { return m_score; }
 	//bool		SwingDiceSet() { return m_swing_set; }
 	SWING_SET	GetSwingDiceSet() { return m_swing_set; }
@@ -84,5 +85,6 @@ private:
 	U8			m_swing_dice[BME_SWING_MAX];	// number of dice of each swing type
 	INT			m_available_dice;				// only valid after Optimize
 	INT			m_max_value;					// only valid after Optimize, useful to know for skill attacks
+	INT			m_min_value;					// only valid after Optimize, useful to know for skill attacks
 	float		m_score;
 };

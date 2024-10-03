@@ -21,7 +21,7 @@ public:
 	BMC_DieIndexStack(BMC_Player *_owner);
 
 	// mutators
-	void			Pop() { die_stack_size--; }
+	void			Pop();
 	void			Push(INT _index);
 	bool			Cycle(bool _add_die = true);
 
