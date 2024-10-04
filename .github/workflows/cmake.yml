@@ -36,8 +36,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    # The CMake configure and build commands are platform-agnostic
-    # and _should_ work equally well on Windows/Mac/Linux.
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -46,52 +44,44 @@ jobs:
         fetch-depth: 0
     - uses: lukka/get-cmake@latest
       with:
-        cmakeVersion: "~3.11.0"
-        # forcing a specific version to maintain compatibility with VS2017
+        cmakeVersion: "~3.19.0"
+        # forcing a specific version to maintain compatibility with VS2022
 
-## later versions of cmake wont need msbuild setup with an action 
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2.0.0
-      if: matrix.os == 'windows-latest'
-      
-    # for some reason the git describe done inside of CMake
-    # isnt producing the desired results anymore
-    # so i am executing it out here and passing it on the command line
+    # cmake can its own git describe,
+    # but it gets complex around PRs and to make sure its consistent
+    # we can generate a git-describe out here and pass it in
     - name: git-describe for version string
       shell: bash
       run: |
-        echo GIT_DESCRIBE="$(git describe --always --tags --match='v[0-9]*' ${{'pull_request'==github.event_name && 'HEAD^2)-PR' || '--dirty)'}}" >> $GITHUB_ENV
-
-## on later versions of cmake we can use the -S -B syntax
-#    - name: CMake Configure
-#      shell: bash
-#      run: cmake -S . -B build -DGIT_DESCRIBE="$GIT_DESCRIBE" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G"Unix Makefiles"
+        echo GIT_DESCRIBE="$(git describe --always --tags --match='v[0-9]*' ${{'pull_request'==github.event_name && 'HEAD^2)-PR' || '--dirty)'}}${{ github.event.pull_request.number }}" >> $GITHUB_ENV      
 
     - name: CMake Configure
       shell: bash
-      run: mkdir -p build && cd build && cmake .. -DGIT_DESCRIBE="$GIT_DESCRIBE" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G"Unix Makefiles"
-      # Unix Makefiles allow the build to behave similarly cross-platform
-      # if we want to ensure that the project can build under a certain build type (like VS2017)
-      # we should consider a very specific GHAction Workflow for that case
-## later versions of cmake auto-create the build folder
+      run: cmake -S . -B build -DGIT_DESCRIBE="$GIT_DESCRIBE" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G"Unix Makefiles"
 
     - name: CMake Build
       shell: bash
- ## In later versions of cmake we can specify targets with "--target NAMEa NAMEb"
-      run: cmake --build build --config $BUILD_TYPE
+      run: cmake --build build --config $BUILD_TYPE --target bmai_lib bmai bmai_tests
 
     - name: CTest
       working-directory: build
       shell: bash
       run: ctest -C $BUILD_TYPE --no-tests=error --output-junit ctest-results.xml
-  # someday I want to try again to display the test results
+      # someday I want to try again to display the test results
+
+    - name: prep archive
+      shell: bash
+      run: mkdir archive && cp ./build/bmai* ./archive/ && cp ./test/sample*.txt ./archive/
+
+    # if all the files for the archive are in same dir
+    # then the archive won't have a lit of different dirs in it
+    # couldn't find an easier way to flatten
 
     - uses: actions/upload-artifact@v4
       with:
         name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
         if-no-files-found: error
-        path: |
-          ./build/bmai*
+        path: ./archive/*
 
     - name: get data for release body
       shell: bash

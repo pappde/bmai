@@ -1,0 +1,13 @@
+game
+fight
+player 0 4 27.5
+4:3
+d6:3
+d10:5
+R-11:9
+player 1 3 34
+20:16
+20:10
+20:15
+
+getaction

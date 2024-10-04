@@ -63,7 +63,7 @@ It has only been tested in older versions of Visual Studio (likely 5).
 #### 2.2. BMAI Web interface files
 
 The second set of files are all PERL modules. They form the interface for the
-unofficial BM web site (mentioned above).  These files parse the web interface, and,
+unofficial BM website (mentioned above).  These files parse the web interface, and,
 for each active game that needs a turn, interfaces with BMAI and submits an action.
 It is very vulnerable to page layouts and forms changing. It has only been tested 
 on Win32 with ActivePerl 5.6.  It requires Net::SMTP, LWP::UserAgent, and HTTP::Cookies.
@@ -215,7 +215,7 @@ probability of winning.  Within the simulations, it models both the opponent
 and itself with an AI object (which could be any AI class) referred to
 as the QAI (quick AI).  This class is supposed to provide a quick but
 decent approximation of behavior.  The accuracy of the QAI model has a
-strong impact on the simulations.  If BMAI was setup to run 2-ply, it would
+strong impact on the simulations.  If BMAI was set up to run 2-ply, it would
 actually not start the simulations until it was a level further down.
 
 Due to the non-deterministic nature of BM (the nature element), the

@@ -432,7 +432,7 @@ void BMC_BMAI::OnEndEvaluation(BMC_Game *_game, INT _enter_level)
 		for (pl=0; pl<2; pl++)
 			_game->SetAI(pl, m_qai);
 	}
-#endif;
+#endif
 }
 
 // DESC: if level has gone past max_ply, then ensure BMAI is not used in this simulation.  Otherwise, ensure to
