@@ -15,11 +15,9 @@ Consider using a pattern like the one below for your builds should you want to b
 
 We are coding to the lowest common denominator of the contributors. This is currently:
 
-* Visual Studio (15) 2017 (which supports up to CMake 3.12)
-* C++ 14
-* CMake 3.11
-
-There are lots of nice features added in later versions of CMake (3.14+) and C++ (17+) that we will work to progress towards. 
+* Visual Studio (17) 2022 (which supports up to CMake 3.19 and beyond)
+* C++ 17
+* CMake 3.19
 
 ## COMPILING 
 
@@ -48,7 +46,7 @@ At this point, you can also load the solution into the IDE and build from there 
 
 ------
 
-UPDATE: I have learned about a more modern approach to using CMake. There are 2 patterns that are becoming common. However some of these commands may only work on later versions of cmake. 
+UPDATE: I have learned about a more modern approach to using CMake. There are 2 patterns that are becoming common. However, some of these commands may only work on later versions of cmake. 
 
 For command line only builds
 ```sh

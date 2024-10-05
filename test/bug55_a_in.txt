@@ -1,4 +1,4 @@
-game 3
+game
 fight
 player 0 3 28
 4:1
@@ -8,10 +8,6 @@ player 1 3 6
 p(4,4):4
 12:10
 X-4:2
-ply 2
-max_sims 100
-min_sims 5
-maxbranch 400
-surrender off
+
+
 getaction
-quit
