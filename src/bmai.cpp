@@ -610,7 +610,7 @@ void BMC_DieData::Reset()
 
 void BMC_DieData::Debug(BME_DEBUG _cat)
 {
-	BMF_Log(_cat,"(%x)", m_properties & (~BME_PROPERTY_VALID));
+	BMF_Log(_cat,"(%lx)", m_properties & (~BME_PROPERTY_VALID));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
