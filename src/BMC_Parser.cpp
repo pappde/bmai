@@ -20,6 +20,8 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
+#include <cstdlib>
+#include <string>
 #include "bmai_ai.h"
 #include "BMC_Logger.h"
 #include "BMC_RNG.h"
