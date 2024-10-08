@@ -17,7 +17,6 @@ Homepage: https://github.com/pappde/bmai
 3. [BMAI Interface](#3-bmai-interface)
 4. [BMAI SUMMARY](#4-bmai-summary)
 5. [POSSIBLE IMPROVEMENTS](#5-possible-improvements)
-6. [LICENSE AGREEMENT](#6-license-agreement)
 
 ## CONTENTS
 
@@ -286,29 +285,3 @@ recognize appropriate matchups and so on.  Some major items to do:
 
 It might also be worthwhile to create a graphical or web frontend to
 BMAI, so that games can be played in a direct environment.
-
-### 6. LICENSE AGREEMENT
-
-> TODO: address the fact that that following legacy license text is non-conforming to the MIT License included in the repository.
-
-By using or modifying the contained source code, you agree to the following
-terms:
-
-a) You are hereby granted license to use and modify the contained source code.
-
-b) You are not permitted to sell or otherwise use the source code (or modified
-source code) for commercial means, without consent of the original author.
-
-c) You are not permitted to distribute the source code (or modified source code),
-without consent of the original author.
-
-d) The original author must be acknowledged in derivative works.
-
-e) You will not use the source code (or modified source code) to assist
-   you in playing online against other human players, without notifying
-   your opponent that you have this advantage.
-
-f) You will not use the source code (or modified source code) to have an
-   AI player play other players (whether online through a BM website or
-   through other means), without posting a notice or otherwise
-   indicating that the player is an AI.
