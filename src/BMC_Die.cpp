@@ -11,6 +11,7 @@
 
 #include "BMC_Die.h"
 
+#include <cstdio>
 #include "BMC_Game.h"
 #include "BMC_Logger.h"
 #include "BMC_Player.h"
