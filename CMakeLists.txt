@@ -97,4 +97,6 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 # for Xcode see https://gitlab.kitware.com/cmake/cmake/-/issues/21853
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+enable_testing()
+
 add_subdirectory(test)

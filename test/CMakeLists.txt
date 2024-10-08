@@ -36,8 +36,6 @@ set(TEST_SOURCES
         DemoTest.cpp
 )
 
-enable_testing()
-
 add_executable(${NAME}_tests ${TEST_SOURCES})
 
 if(APPLE)
