@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// game.h
+// BMC_Game.h
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
@@ -8,12 +8,15 @@
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
+// dbl100524 - further split out of individual headers
 ///////////////////////////////////////////////////////////////////////////////////////////
-
 
 #pragma once
 
-#include "player.h"
+#include "BMC_Player.h"
+
+
+class BMC_AI;
 
 class BMC_Game		// 420b
 {
@@ -121,3 +124,6 @@ private:
 
 	bool		m_surrender_allowed;
 };
+
+// global
+inline BMC_Game g_game(false);

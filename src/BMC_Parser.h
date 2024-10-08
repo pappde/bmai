@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// parser.h
+// BMC_Parser.h
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
@@ -8,9 +8,17 @@
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
+// dbl100524 - further split out of individual headers
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include "BMC_AI.h"
+#include "BMC_AI_Maximize.h"
+#include "BMC_AI_MaximizeOrRandom.h"
+#include "BMC_BMAI.h"
+#include "BMC_Die.h"
+
 
 class BMC_Parser
 {
@@ -59,3 +67,9 @@ private:
 	char			line[BMD_MAX_STRING];
 	FILE *file;
 };
+
+extern BMC_AI					g_ai_mode0;
+extern BMC_AI_Maximize			g_ai_mode1;
+extern BMC_AI_MaximizeOrRandom	g_ai_mode1b;
+extern BMC_BMAI					g_ai_mode2;
+extern BMC_BMAI					g_ai_mode3;

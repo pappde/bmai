@@ -24,20 +24,62 @@ endif()
 
 add_definitions("-DGIT_DESCRIBE=\"${GIT_DESCRIBE}\"")
 
-enable_testing()
-
 # to collect only needed source files
-set(SOURCE ./src/bmai.cpp ./src/bmai_ai.cpp ./src/player.cpp ./src/stats.cpp)
+set(SOURCE
+        #src/bmai.cpp this file is references below in add_executable
+
+        src/BMC_AI.cpp
+        src/BMC_AI_Maximize.cpp
+        src/BMC_AI_MaximizeOrRandom.cpp
+        src/BMC_BMAI.cpp
+        src/BMC_BMAI3.cpp
+        src/BMC_Die.cpp
+        src/BMC_DieData.cpp
+        src/BMC_DieIndexStack.cpp
+        src/BMC_Game.cpp
+        src/BMC_Logger.cpp
+        src/BMC_Move.cpp
+        src/BMC_Parser.cpp
+        src/BMC_Player.cpp
+        src/BMC_QAI.cpp
+        src/BMC_RNG.cpp
+        src/BMC_Stats.cpp
+)
 
 # some IDEs need Headers added to the executable for indexing
-set(HEADERS ./src/bmai.h ./src/bmai_ai.h ./src/stats.h ./src/logger.h ./src/parser.h ./src/game.h ./src/player.h ./src/die.h ./src/dieindexstack.h)
+set(HEADERS
+        src/bmai.h
+        src/bmai_ai.h
+
+        src/BMC_AI.h
+        src/BMC_AI_Maximize.h
+        src/BMC_AI_MaximizeOrRandom.h
+        src/BMC_BitArray.h
+        src/BMC_BMAI.h
+        src/BMC_BMAI3.h
+        src/BMC_Die.h
+        src/BMC_DieData.h
+        src/BMC_DieIndexStack.h
+        src/BMC_Game.h
+        src/BMC_Logger.h
+        src/BMC_Man.h
+        src/BMC_Move.h
+        src/BMC_Parser.h
+        src/BMC_Player.h
+        src/BMC_QAI.h
+        src/BMC_RNG.h
+        src/BMC_Stats.h
+)
 
 ## Key idea: SEPARATE OUT main() function to its own executable.
 ## And contain the application to a library
 ## allowing you can add this library elsewhere, such as testing
 
 add_library(${NAME}_lib ${SOURCE} ${HEADERS})
-add_executable(${NAME} ./src/main.cpp)
+add_executable(${NAME} ./src/bmai.cpp)
+
+# Add precompiled header
+target_precompile_headers(${NAME}_lib PRIVATE ./src/bmai.h)
 
 if(WIN32)
     target_link_libraries(${NAME} PRIVATE ${NAME}_lib -static)

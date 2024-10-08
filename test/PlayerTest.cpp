@@ -1,6 +1,5 @@
+#include "../src/BMC_Player.h"
 #include <gtest/gtest.h>
-#include "../src/player.h"
-
 
 TEST(PlayerTests, CopyConstructor) {
 

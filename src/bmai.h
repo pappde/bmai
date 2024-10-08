@@ -10,118 +10,64 @@
 // drp030321 - partial split out to individual headers
 // dbl051823 - added P-Swing, Q-Swing support
 // drp060323 - added const modifier to vararg format params
+// dbl100824 - pulled a lot out of bmai.h depends on very little and initializes a lot for precompilation
 //
 // TODO:
 // 1) drp030321 - setup a main precompiled header that includes everything (bmai.h) vs a header for the key types/enums/classes. Split out modules
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BMAI_H__
-#define __BMAI_H__
+#pragma once
 
-// dependent includes (and high-level)
-#include <cassert>
+// i like that this include is VERY small and include no BMC_ classes
 #include <vector>
-#include <ctime>
 
-// some compilers want to be very explicit
-#include <cstdio>   // FILE
 
-// to help make a cross-platform case insensitive compare
-// we need transform and string
-// drp022521 - moved to main header
-#include <algorithm>
-#include <string>
-
-#include "types.h"
-
-int bmai_main(int argc, char *argv[]);
-
-// forward declarations
-class BMC_Player;
-class BMC_Game;
-class BMC_AI;
+int main(int argc, char *argv[]);
 
 // version number
 #ifndef GIT_DESCRIBE
 #define GIT_DESCRIBE "n/a"
 #endif
 
-// assert
-#define BM_ASSERT	assert
-#define BM_ERROR(check)	{ if (!(check)) { BMF_Error(#check); } }
+// TODO consider best place to organize globals. should classes host their own?
+// note that right now many classes are hosting their own global instance
+// see BMC_Logger, BMC_RNG, BMC_Stats, BMC_Game
+// and to clean up some circular/referential dependency issues bmai_ai.h holds some AI globals
 
-// C prototypes
-void BMF_Error( const char *_fmt, ... );
+// typedefs
+typedef unsigned long	U32;
+typedef unsigned char	U8;
+typedef signed char		S8;
+typedef unsigned short	U16;
+typedef int				INT;
+typedef unsigned int	UINT;
+typedef float			F32;
 
-// template classes
-template <int SIZE>
-class BMC_BitArray
-{
-public:
-	static const INT m_bytes;
-
-	// mutators
-	void SetAll();
-	void Set() { SetAll(); }
-	void ClearAll();
-	void Clear() { ClearAll(); }
-	void Set(int _bit)		{ INT byte = _bit/8; bits[byte] |= (1<<(_bit-byte*8)); }
-	void Clear(int _bit)	{ INT byte = _bit/8; bits[byte] &= ~(1<<(_bit-byte*8)); }
-	void Set(int _bit, bool _on)	{ if (_on) Set(_bit); else Clear(_bit); }
-
-	// accessors
-	bool	IsSet(INT _bit)	{ INT byte = _bit/8; return bits[byte] & (1<<(_bit-byte*8)); }
-	bool	operator[](int _bit) { return IsSet(_bit) ? 1 : 0; }
-
-private:
-	U8	bits[(SIZE+7)>>3];	
-};
-
-template<int SIZE>
-const INT BMC_BitArray<SIZE>::m_bytes = (SIZE+7)>>3;
-
-template<int SIZE>
-void BMC_BitArray<SIZE>::SetAll()
-{
-	INT i;
-	for (i=0; i<m_bytes; i++)
-		bits[i] = 0xFF;
-}
-
-template<int SIZE>
-void BMC_BitArray<SIZE>::ClearAll()
-{
-	INT i;
-	for (i=0; i<m_bytes; i++)
-		bits[i] = 0x00;
-}
-
-// utilities
-
-class BMC_RNG
-{
-public:
-	BMC_RNG();
-
-	UINT	GetRand(UINT _i)	{ return GetRand() % _i; }
-	F32		GetFRand()			{ return (float)GetRand() / (float)0x80000000; }
-	UINT	GetRand();		
-	void	SRand(UINT _seed);
-
-private:
-	UINT	m_seed;
-};
+// special types
+typedef std::vector<float>	BMC_FloatVector;
 
 // settings
-#define BMD_MAX_TWINS	2
-#define BMD_MAX_DICE	10
-#define BMD_MAX_PLAYERS	2
-#define BMD_DEFAULT_WINS	3
-#define	BMD_VALUE_OWN_DICE	0.5f
+#define BMD_MAX_TWINS			2
+#define BMD_MAX_DICE			10
+#define BMD_MAX_PLAYERS			2
+#define BMD_DEFAULT_WINS		3
+#define	BMD_VALUE_OWN_DICE		0.5f
 #define BMD_SURRENDERED_SCORE	-1000
-#define BMD_MAX_STRING	256
-#define BMD_DEFAULT_WINS	3
-#define BMD_MAX_PLY		10
+#define BMD_MAX_STRING			256
+#define BMD_DEFAULT_WINS		3
+#define BMD_MAX_PLY				10
+
+// ai settings
+#define BMD_DEFAULT_SIMS		500
+#define BMD_MIN_SIMS			10
+#define BMD_QAI_FUZZINESS		5
+#define BMD_MAX_PLY_PREROUND	2
+#define BMD_AI_TYPES			3
+
+inline float s_ply_decay = 0.5f;
+inline float g_turbo_accuracy = 1;	// 0 is worst, 1 is best
+
+// TODO consider a header for each BME_ enum, or enums.h/globals.h ?
 
 // debug categories
 enum BME_DEBUG
@@ -187,8 +133,8 @@ enum BME_PROPERTY
 	BME_PROPERTY_UNSKILLED		= 0x8000000,	// attacks [The Flying Squirrel]	// TODO: implement as BM property?
 	BME_PROPERTY_STINGER		=0x10000000,	// initiative effect, (D) skill attacks
 	BME_PROPERTY_RAGE			=0x20000000,	// TODO
-	BME_PROPERTY_KONSTANT			=0x40000000,	
-	BME_PROPERTY_MAXIMUM			=0x80000000,
+	BME_PROPERTY_KONSTANT		=0x40000000,
+	BME_PROPERTY_MAXIMUM		=0x80000000,
 	BME_PROPERTY_MAX
 };
 
@@ -268,147 +214,112 @@ enum BME_ATTACK_TYPE
 };
 
 // global definitions
+inline BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX] =
+{
+	BME_ATTACK_TYPE_1_1,  // FIRST & POWER 1:1
+	BME_ATTACK_TYPE_N_1,  // SKILL N:1
+	BME_ATTACK_TYPE_1_N,  // BERSERK
+	BME_ATTACK_TYPE_1_N,  // SPEED
+	BME_ATTACK_TYPE_1_1,  // TRIP
+	BME_ATTACK_TYPE_1_1,  // SHADOW
+	BME_ATTACK_TYPE_0_0,  // INVALID
+};
 
-extern BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX];
-extern INT g_swing_sides_range[BME_SWING_MAX][2];
+// SWING dice - from spindisc's page
+inline INT g_swing_sides_range[BME_SWING_MAX][2] =
+{
+	{ 0, 0 },
+	{ 1, 30 },	// P
+	{ 2, 20 },	// Q
+	{ 2, 16 },
+	{ 6, 20 },
+	{ 2, 12 },
+	{ 8, 30 },	// U
+	{ 6, 12 },
+	{ 4, 12 },
+	{ 4, 20 },	// X
+	{ 1, 20 },
+	{ 4, 30 },	// Z
+};
 
-// globals
-
-extern class BMC_Logger	g_logger;
-extern class BMC_QAI	g_qai;
-extern class BMC_Stats	g_stats;
-
-// MOOD dice
+// MOOD dice - from BM page:
 #define BMD_MOOD_SIDES_RANGE_X	6
 #define BMD_MOOD_SIDES_RANGE_V	4
-extern INT g_mood_sides_X[BMD_MOOD_SIDES_RANGE_X];
-extern INT g_mood_sides_V[BMD_MOOD_SIDES_RANGE_V];
+//X?: Roll a d6. 1: d4; 2: d6; 3: d8; 4: d10; 5: d12; 6: d20.
+//V?: Roll a d4. 1: d6; 2: d8; 3: d10; 4: d12.
+inline INT g_mood_sides_X[BMD_MOOD_SIDES_RANGE_X] = { 4, 6, 8,  10, 12, 20 };
+inline INT g_mood_sides_V[BMD_MOOD_SIDES_RANGE_V] = { 6, 8, 10, 12 };
 
-///////////////////////////////////////////////////////////////////////////////////////////
-// classes
-///////////////////////////////////////////////////////////////////////////////////////////
+// MIGHTY dice - index by old number of sides
+inline INT g_mighty_sides[20] = { 1, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20 };
 
-class BMC_Move
+// WEAK dice - index by old number of sides
+inline INT g_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12, 16, 16, 16 };
+
+
+
+inline const char *g_swing_name[BME_SWING_MAX] =
 {
-public:
-	BMC_Move() {} //: m_pool_index(-1)	{}
-
-	// methods
-	void	Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS, const char *_postfix = "\n");
-	bool	operator<  (const BMC_Move &_m) const  { return this < &_m; }
-	bool	operator==	(const BMC_Move &_m) const { return this == &_m; }
-
-	// accessors
-	bool	MultipleAttackers() { return g_attack_type[m_attack]==BME_ATTACK_TYPE_N_1; }
-	bool	MultipleTargets()	{ return g_attack_type[m_attack]==BME_ATTACK_TYPE_1_N; }
-	BMC_Player *	GetAttacker(); 
-	BMC_Player *	GetTarget(); 
-
-	// data
-	BME_ACTION					m_action;
-	//INT							m_pool_index;
-	BMC_Game					*m_game;
-	union
-	{
-		// BME_ACTION_ATTACK
-		struct {
-			BME_ATTACK					m_attack;
-			BMC_BitArray<BMD_MAX_DICE>	m_attackers;
-			BMC_BitArray<BMD_MAX_DICE>	m_targets;
-			S8							m_attacker;
-			S8							m_target;
-			U8							m_attacker_player;
-			U8							m_target_player;
-			S8							m_turbo_option;	// only supports one die, 0/1 for which sides to go with. -1 means none
-		};
-
-		// BME_ACTION_SET_SWING_AND_OPTION: work data for BMAI::RandomlySelectMoves
-
-		// BME_ACTION_SET_SWING_AND_OPTION,
-		struct {
-			U8			m_swing_value[BME_SWING_MAX];	
-			//U8			m_option_die[BMD_MAX_DICE];	// use die 0 or 1
-			BMC_BitArray<BMD_MAX_DICE>	m_option_die;	// use die 0 or 1
-			U8			m_extreme_settings;			// work data for "BMAI::RandomlySelectMoves"
-		};
-
-		// BME_ACTION_USE_CHANCE
-		struct {
-			BMC_BitArray<BMD_MAX_DICE>	m_chance_reroll;
-		};
-
-		// BME_ACTION_USE_FOCUS,
-		struct {
-			U8			m_focus_value[BMD_MAX_DICE];
-		};
-
-		// BME_ACTION_USE_RESERVE (use ACTION_PASS to use none)
-		struct {
-			U8			m_use_reserve;
-		};
-	};
+	"None",
+	"P",
+	"Q",
+	"R",
+	"S",
+	"T",
+	"U",
+	"V",
+	"W",
+	"X",
+	"Y",
+	"Z",
 };
 
-#define	BMC_MoveAttack	BMC_Move
-
-typedef std::vector<BMC_Move>	BMC_MoveVector;
-
-class BMC_MoveList
+// PHASE names
+inline const char *g_phase_name[BME_PHASE_MAX] =
 {
-public:
-			BMC_MoveList();
-			~BMC_MoveList() { Clear(); }
-	void	Clear();
-	void	Add(BMC_Move  & _move );
-	INT		Size() { return (INT)list.size(); }
-	BMC_Move *	Get(INT _i) { return &list[_i]; }
-	bool	Empty() { return Size()<1; }
-	void	Remove(int _index);
-	BMC_Move &	operator[](int _index) { return list[_index]; }
-
-protected:
-private:
-	BMC_MoveVector	list;
+	"preround",
+	"reserve",
+	"initiative",
+	"chance",
+	"focus",
+	"fight",
+	"gameover"
 };
 
-class TGC_MovePower
+// ATTACK names
+inline const char *g_attack_name[BME_ATTACK_MAX] =
 {
-public:
-protected:
-private:
-	U8	m_attacker;
-	U8	m_target;
+	"power",
+	"skill",
+	"berserk",
+	"speed",
+	"trip",
+	"shadow",
+	"invalid",
 };
 
-/*
-class TGC_MoveSkill
+// ACTION names
+inline const char *g_action_name[BME_ACTION_MAX] =
 {
-public:
-protected:
-private:
-	BMC_BitArray<BMD_MAX_DICE>	m_attackers;
-	U8	m_target;
+	"aux",
+	"chance",
+	"focus",
+	"swing/option",
+	"reserve",
+	"attack",
+	"pass",
+	"surrender",
 };
 
-class TGC_MoveSpeed
+// BME_DEBUG setting names
+inline const char *g_debug_name[BME_DEBUG_MAX] =
 {
-public:
-protected:
-private:
-	U8	m_attacker;
-	BMC_BitArray<BMD_MAX_DICE>	m_targets;
+	"ALWAYS",
+	"WARNING",
+	"PARSER",
+	"SIMULATION",
+	"ROUND",
+	"GAME",
+	"QAI",
+	"BMAI",
 };
-*/
-
-
-
-
-
-
-
-// Utility functions
-
-void BMF_Error( const char *_fmt, ... );
-void BMF_Log(BME_DEBUG _cat, const char *_fmt, ... );
-
-#endif //__BMAI_H__

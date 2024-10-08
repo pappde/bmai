@@ -1,7 +1,9 @@
-#include <gtest/gtest.h>
+#include "../src/BMC_Game.h"
+#include "../src/BMC_RNG.h"
+#include "../src/BMC_BMAI3.h"
+#include "../src/BMC_Logger.h"
 #include <cmath>
-#include "../src/game.h"
-#include "../src/bmai_ai.h"
+#include <gtest/gtest.h>
 
 // //
 //

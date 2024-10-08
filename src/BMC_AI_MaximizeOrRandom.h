@@ -1,32 +1,30 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// logger.h
+// BMC_AI_MaximizeOrRandom.h
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
-// 
-// DESC: logging class
+//
+// DESC:
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
+// dbl100824 - migrated this logic from bmai_ai.h
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-class BMC_Logger
+#include "BMC_AI.h"
+
+
+// Randomly selects between a basic AI and a maximizing AI
+// P(p) use Maximize (mode 1), else Basic (mode 0)
+class BMC_AI_MaximizeOrRandom : public BMC_AI
 {
 public:
-	BMC_Logger();
+	virtual void		GetAttackAction(BMC_Game *_game, BMC_Move &_move);
 
-	// methods
-	void			Log(BME_DEBUG _cat, const char *_fmt, ...);
-
-	// mutators
-	void			SetLogging(BME_DEBUG _cat, bool _log) { m_logging[_cat] = _log; }
-	bool			SetLogging(const char *_catname, bool _log);
-
-	// accessors
-	bool			IsLogging(BME_DEBUG _cat) { return m_logging[_cat]; }
+	void	SetP(F32 _p) { p = _p; }
 
 private:
-	bool			m_logging[BME_DEBUG_MAX];
+	F32	p;
 };
