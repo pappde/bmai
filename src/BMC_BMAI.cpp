@@ -12,6 +12,7 @@
 
 #include "BMC_BMAI.h"
 
+#include <cmath>
 #include "bmai_ai.h"
 #include "BMC_Logger.h"
 #include "BMC_Stats.h"
