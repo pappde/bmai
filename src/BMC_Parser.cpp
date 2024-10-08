@@ -18,6 +18,8 @@
 #include "BMC_Parser.h"
 
 #include <cstdio>
+#include <cstring>
+#include <cstdarg>
 #include "bmai_ai.h"
 #include "BMC_Logger.h"
 #include "BMC_RNG.h"
