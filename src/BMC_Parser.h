@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <cstdio>
 #include "BMC_AI.h"
 #include "BMC_AI_Maximize.h"
 #include "BMC_AI_MaximizeOrRandom.h"
