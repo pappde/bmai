@@ -12,6 +12,7 @@
 
 #include "BMC_Game.h"
 
+#include <cstring>
 #include "BMC_AI.h"
 #include "BMC_BMAI3.h"
 #include "BMC_DieIndexStack.h"
