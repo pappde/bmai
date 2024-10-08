@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "BMC_Player.h"
 
 

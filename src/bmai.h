@@ -10,7 +10,7 @@
 // drp030321 - partial split out to individual headers
 // dbl051823 - added P-Swing, Q-Swing support
 // drp060323 - added const modifier to vararg format params
-// dbl100824 - pulled a lot out of bmai.h depends on very little and initializes a lot for precompilation
+// dbl100824 - pulled a lot out of bmai.h depends on very little and initializes a lot for pre-compilation
 //
 // TODO:
 // 1) drp030321 - setup a main precompiled header that includes everything (bmai.h) vs a header for the key types/enums/classes. Split out modules
