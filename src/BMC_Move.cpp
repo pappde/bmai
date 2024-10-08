@@ -10,6 +10,7 @@
 
 #include "BMC_Move.h"
 
+#include <cstdio>
 #include "BMC_Game.h"
 #include "BMC_Logger.h"
 

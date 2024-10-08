@@ -17,6 +17,7 @@
 
 #include "BMC_Parser.h"
 
+#include <cstdio>
 #include "bmai_ai.h"
 #include "BMC_Logger.h"
 #include "BMC_RNG.h"

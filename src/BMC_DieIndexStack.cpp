@@ -11,6 +11,7 @@
 
 #include "BMC_DieIndexStack.h"
 
+#include <cstdio>
 #include "BMC_Logger.h"
 
 

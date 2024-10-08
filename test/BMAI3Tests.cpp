@@ -1,4 +1,5 @@
 #include "../src/BMC_Parser.h"
+#include <cstdio>
 #include <cstdarg> // for va_start() va_end()
 #include <filesystem>
 #include <gtest/gtest.h>

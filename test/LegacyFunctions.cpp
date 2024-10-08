@@ -2,6 +2,7 @@
 #include "../src/BMC_RNG.h"
 #include "../src/BMC_BMAI3.h"
 #include "../src/BMC_Logger.h"
+#include <cstdio>
 #include <cmath>
 #include <gtest/gtest.h>
 

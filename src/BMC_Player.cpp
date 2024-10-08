@@ -13,6 +13,7 @@
 // includes
 #include "BMC_Player.h"
 
+#include <cstdio>
 #include <climits>
 #include "BMC_Logger.h"
 
