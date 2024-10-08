@@ -12,6 +12,8 @@
 
 #include "BMC_Logger.h"
 
+#include <algorithm>
+#include <cstring>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
