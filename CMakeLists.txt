@@ -25,7 +25,7 @@ add_definitions("-DGIT_DESCRIBE=\"${GIT_DESCRIBE}\"")
 
 # to collect only needed source files
 set(SOURCE
-       # src/bmai_lib.cpp
+        src/bmai_lib.cpp
 
         src/BMC_AI.cpp
         src/BMC_AI_Maximize.cpp

@@ -62,8 +62,8 @@ typedef std::vector<float>	BMC_FloatVector;
 #define BMD_MAX_PLY_PREROUND	2
 #define BMD_AI_TYPES			3
 
-inline float s_ply_decay = 0.5f;
-inline float g_turbo_accuracy = 1;	// 0 is worst, 1 is best
+extern float s_ply_decay;
+extern float g_turbo_accuracy;
 
 // TODO consider a header for each BME_ enum, or enums.h/globals.h ?
 
@@ -211,113 +211,29 @@ enum BME_ATTACK_TYPE
 	BME_ATTACK_TYPE_MAX
 };
 
-// global definitions
-inline BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX] =
-{
-	BME_ATTACK_TYPE_1_1,  // FIRST & POWER 1:1
-	BME_ATTACK_TYPE_N_1,  // SKILL N:1
-	BME_ATTACK_TYPE_1_N,  // BERSERK
-	BME_ATTACK_TYPE_1_N,  // SPEED
-	BME_ATTACK_TYPE_1_1,  // TRIP
-	BME_ATTACK_TYPE_1_1,  // SHADOW
-	BME_ATTACK_TYPE_0_0,  // INVALID
-};
+extern BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX];
 
-// SWING dice - from spindisc's page
-inline INT g_swing_sides_range[BME_SWING_MAX][2] =
-{
-	{ 0, 0 },
-	{ 1, 30 },	// P
-	{ 2, 20 },	// Q
-	{ 2, 16 },
-	{ 6, 20 },
-	{ 2, 12 },
-	{ 8, 30 },	// U
-	{ 6, 12 },
-	{ 4, 12 },
-	{ 4, 20 },	// X
-	{ 1, 20 },
-	{ 4, 30 },	// Z
-};
+extern INT g_swing_sides_range[BME_SWING_MAX][2];
 
 // MOOD dice - from BM page:
 #define BMD_MOOD_SIDES_RANGE_X	6
 #define BMD_MOOD_SIDES_RANGE_V	4
-//X?: Roll a d6. 1: d4; 2: d6; 3: d8; 4: d10; 5: d12; 6: d20.
-//V?: Roll a d4. 1: d6; 2: d8; 3: d10; 4: d12.
-inline INT g_mood_sides_X[BMD_MOOD_SIDES_RANGE_X] = { 4, 6, 8,  10, 12, 20 };
-inline INT g_mood_sides_V[BMD_MOOD_SIDES_RANGE_V] = { 6, 8, 10, 12 };
 
-// MIGHTY dice - index by old number of sides
-inline INT g_mighty_sides[20] = { 1, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20 };
+extern INT g_mood_sides_X[BMD_MOOD_SIDES_RANGE_X];
+extern INT g_mood_sides_V[BMD_MOOD_SIDES_RANGE_V];
 
-// WEAK dice - index by old number of sides
-inline INT g_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12, 16, 16, 16 };
+extern INT g_mighty_sides[20];
+
+extern INT g_weak_sides[20];
 
 
 
-inline const char *g_swing_name[BME_SWING_MAX] =
-{
-	"None",
-	"P",
-	"Q",
-	"R",
-	"S",
-	"T",
-	"U",
-	"V",
-	"W",
-	"X",
-	"Y",
-	"Z",
-};
+extern const char *g_swing_name[BME_SWING_MAX];
 
-// PHASE names
-inline const char *g_phase_name[BME_PHASE_MAX] =
-{
-	"preround",
-	"reserve",
-	"initiative",
-	"chance",
-	"focus",
-	"fight",
-	"gameover"
-};
+extern const char *g_phase_name[BME_PHASE_MAX];
 
-// ATTACK names
-inline const char *g_attack_name[BME_ATTACK_MAX] =
-{
-	"power",
-	"skill",
-	"berserk",
-	"speed",
-	"trip",
-	"shadow",
-	"invalid",
-};
+extern const char *g_attack_name[BME_ATTACK_MAX];
 
-// ACTION names
-inline const char *g_action_name[BME_ACTION_MAX] =
-{
-	"aux",
-	"chance",
-	"focus",
-	"swing/option",
-	"reserve",
-	"attack",
-	"pass",
-	"surrender",
-};
+extern const char *g_action_name[BME_ACTION_MAX];
 
-// BME_DEBUG setting names
-inline const char *g_debug_name[BME_DEBUG_MAX] =
-{
-	"ALWAYS",
-	"WARNING",
-	"PARSER",
-	"SIMULATION",
-	"ROUND",
-	"GAME",
-	"QAI",
-	"BMAI",
-};
+extern const char *g_debug_name[BME_DEBUG_MAX];
