@@ -67,12 +67,4 @@ private:
 	BMC_Die *d;
 	char			line[BMD_MAX_STRING];
 	FILE *file;
-
-	BMC_Game m_game;
 };
-
-extern BMC_AI					g_ai_mode0;
-extern BMC_AI_Maximize			g_ai_mode1;
-extern BMC_AI_MaximizeOrRandom	g_ai_mode1b;
-extern BMC_BMAI					g_ai_mode2;
-extern BMC_BMAI					g_ai_mode3;

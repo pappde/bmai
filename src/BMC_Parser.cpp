@@ -27,6 +27,7 @@
 #include "BMC_RNG.h"
 #include "BMC_Stats.h"
 
+BMC_Game m_game(false);
 
 INT BMC_Parser::ParseDieNumber(INT & _pos)
 {
@@ -306,7 +307,7 @@ void BMC_Parser::ParseGame()
 	m_game.SetAI(1, &g_ai);
 }
 
-BMC_Parser::BMC_Parser(): m_game(false) {
+BMC_Parser::BMC_Parser() {
 	file = stdin;
 }
 
@@ -655,13 +656,13 @@ void BMC_Parser::CompareAI(INT _games)
 // evaluating fairness
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-// AI globals - for fairness test
+// AI instances - for fairness test
 
-BMC_AI					g_ai_mode0;
-BMC_AI_Maximize			g_ai_mode1;
-BMC_AI_MaximizeOrRandom	g_ai_mode1b;
-BMC_BMAI				g_ai_mode2;
-BMC_BMAI				g_ai_mode3;
+BMC_AI					m_ai_mode0;
+BMC_AI_Maximize			m_ai_mode1;
+BMC_AI_MaximizeOrRandom	m_ai_mode1b(m_ai_mode0, m_ai_mode1);
+BMC_BMAI				m_ai_mode2;
+BMC_BMAI				m_ai_mode3;
 
 
 // DESC: written for Zomulgustar fair testing fairness
@@ -680,24 +681,24 @@ void BMC_Parser::PlayFairGames(INT _games, INT _mode, F32 _p)
 	INT p, i;				// p here is player ID
 
 	// setup AIs
-	g_ai_mode1b.SetP(_p);
-	g_ai_mode2.SetQAI(&g_ai_mode1b);
-	g_ai_mode3.SetQAI(&g_qai);
+	m_ai_mode1b.SetP(_p);
+	m_ai_mode2.SetQAI(&m_ai_mode1b);
+	m_ai_mode3.SetQAI(&g_qai);
 
 	// set ply of BMAI according to whatever the "ply" command was
-	g_ai_mode2.SetMaxPly(g_ai.GetMaxPly());
-	g_ai_mode3.SetMaxPly(g_ai.GetMaxPly());
+	m_ai_mode2.SetMaxPly(g_ai.GetMaxPly());
+	m_ai_mode3.SetMaxPly(g_ai.GetMaxPly());
 
 	for (p=0; p<2; p++)
 	{
 		if (_mode==0)
-			m_game.SetAI(p, &g_ai_mode0);
+			m_game.SetAI(p, &m_ai_mode0);
 		else if (_mode==1)
-			m_game.SetAI(p, &g_ai_mode1);
+			m_game.SetAI(p, &m_ai_mode1);
 		else if (_mode==2)
-			m_game.SetAI(p, &g_ai_mode2);
+			m_game.SetAI(p, &m_ai_mode2);
 		else if (_mode==3)
-			m_game.SetAI(p, &g_ai_mode3);
+			m_game.SetAI(p, &m_ai_mode3);
 	}
 
 	// play games

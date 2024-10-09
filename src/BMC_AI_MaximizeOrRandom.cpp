@@ -19,7 +19,7 @@
 void BMC_AI_MaximizeOrRandom::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 {
 	if (g_rng.GetFRand()<p)
-		g_ai_mode1.GetAttackAction(_game, _move);
+		m_ai_mode1.GetAttackAction(_game, _move);
 	else
-		g_ai_mode0.GetAttackAction(_game, _move);
+		m_ai_mode0.GetAttackAction(_game, _move);
 }
