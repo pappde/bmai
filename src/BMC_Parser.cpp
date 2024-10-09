@@ -22,12 +22,22 @@
 #include <cstdarg>
 #include <cstdlib>
 #include <string>
-#include "bmai_ai.h"
+#include "BMC_BMAI3.h"
 #include "BMC_Logger.h"
+#include "BMC_QAI.h"
 #include "BMC_RNG.h"
 #include "BMC_Stats.h"
 
 BMC_Game m_game(false);
+
+// other AI instances that were once global
+BMC_QAI		m_qai;
+BMC_BMAI3	m_ai(&m_qai);
+BMC_QAI		m_qai2;
+BMC_BMAI	m_bmai(&m_qai);
+BMC_BMAI3	m_bmai3(&m_qai);
+
+BMC_AI * m_ai_type[BMD_AI_TYPES] = { &m_bmai, &m_qai2, &m_bmai3 };
 
 INT BMC_Parser::ParseDieNumber(INT & _pos)
 {
@@ -303,8 +313,8 @@ void BMC_Parser::ParseGame()
 	}
 
 	// set up AI
-	m_game.SetAI(0, &g_ai);
-	m_game.SetAI(1, &g_ai);
+	m_game.SetAI(0, &m_ai);
+	m_game.SetAI(1, &m_ai);
 }
 
 BMC_Parser::BMC_Parser() {
@@ -339,7 +349,7 @@ void BMC_Parser::Send( const char *_fmt, ... )
 void BMC_Parser::SendStats()
 {
 	extern float s_ply_decay;
-	printf("stats %d/%d-%d/%d/%.2f ", g_ai.GetMaxPly(), g_ai.GetMinSims(), g_ai.GetMaxSims(), g_ai.GetMaxBranch(), s_ply_decay);
+	printf("stats %d/%d-%d/%d/%.2f ", m_ai.GetMaxPly(), m_ai.GetMinSims(), m_ai.GetMaxSims(), m_ai.GetMaxBranch(), s_ply_decay);
 	g_stats.DisplayStats();
 }
 
@@ -661,10 +671,8 @@ void BMC_Parser::CompareAI(INT _games)
 BMC_AI					m_ai_mode0;
 BMC_AI_Maximize			m_ai_mode1;
 BMC_AI_MaximizeOrRandom	m_ai_mode1b(m_ai_mode0, m_ai_mode1);
-BMC_BMAI				m_ai_mode2;
-BMC_BMAI				m_ai_mode3;
-
-BMC_AI * m_ai_type[BMD_AI_TYPES] = { &g_bmai, &g_qai2, &g_bmai3 };
+BMC_BMAI				m_ai_mode2(&m_qai);
+BMC_BMAI				m_ai_mode3(&m_qai);
 
 // DESC: written for Zomulgustar fair testing fairness
 // PARAMS:
@@ -684,11 +692,11 @@ void BMC_Parser::PlayFairGames(INT _games, INT _mode, F32 _p)
 	// setup AIs
 	m_ai_mode1b.SetP(_p);
 	m_ai_mode2.SetQAI(&m_ai_mode1b);
-	m_ai_mode3.SetQAI(&g_qai);
+	m_ai_mode3.SetQAI(&m_qai);
 
 	// set ply of BMAI according to whatever the "ply" command was
-	m_ai_mode2.SetMaxPly(g_ai.GetMaxPly());
-	m_ai_mode3.SetMaxPly(g_ai.GetMaxPly());
+	m_ai_mode2.SetMaxPly(m_ai.GetMaxPly());
+	m_ai_mode3.SetMaxPly(m_ai.GetMaxPly());
 
 	for (p=0; p<2; p++)
 	{
@@ -816,7 +824,7 @@ void BMC_Parser::Parse()
 		}
 		else if (sscanf(line, "max_sims %d", &param)==1)
 		{
-			g_ai.SetMaxSims(param);
+			m_ai.SetMaxSims(param);
 			printf("Setting max # simulations to %d\n", param);
 		}
 		else if (sscanf(line, "min_sims %d %d", &param, &param2)==2)
@@ -830,7 +838,7 @@ void BMC_Parser::Parse()
 		}
 		else if (sscanf(line, "min_sims %d", &param)==1)
 		{
-			g_ai.SetMinSims(param);
+			m_ai.SetMinSims(param);
 			printf("Setting min # simulations to %d\n", param);
 		}
 		else if (sscanf(line, "turbo_accuracy %f", &fparam)==1)
@@ -849,7 +857,7 @@ void BMC_Parser::Parse()
 		}
 		else if (sscanf(line, "ply %d", &param)==1)
 		{
-			g_ai.SetMaxPly(param);
+			m_ai.SetMaxPly(param);
 			printf("Setting max ply to %d\n", param);
 		}
 		else if (sscanf(line, "debugply %d", &param)==1)
@@ -868,7 +876,7 @@ void BMC_Parser::Parse()
 		}
 		else if (sscanf(line, "maxbranch %d", &param)==1)
 		{
-			g_ai.SetMaxBranch(param);
+			m_ai.SetMaxBranch(param);
 			printf("Setting max branch to %d\n", param);
 		}
 		else if (!std::strcmp(line, "getaction"))

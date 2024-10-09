@@ -13,7 +13,6 @@
 #include "BMC_BMAI.h"
 
 #include <cmath>
-#include "bmai_ai.h"
 #include "BMC_Logger.h"
 #include "BMC_Stats.h"
 
@@ -29,7 +28,7 @@ INT BMC_BMAI::sm_debug_level = 2;		// default so only up to level 2 is output
 // BMAI methods
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-BMC_BMAI::BMC_BMAI() : m_qai(&g_qai)
+BMC_BMAI::BMC_BMAI(BMC_AI * _ai) : m_qai(_ai)
 {
 	m_max_ply = 1;
 	m_max_branch = 5000;

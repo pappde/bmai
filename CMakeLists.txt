@@ -48,7 +48,6 @@ set(SOURCE
 # some IDEs need Headers added to the executable for indexing
 set(HEADERS
         src/bmai_lib.h
-        src/bmai_ai.h
 
         src/BMC_AI.h
         src/BMC_AI_Maximize.h

@@ -19,8 +19,7 @@
 #include "BMC_Stats.h"
 
 
-BMC_BMAI3::BMC_BMAI3()
-{
+BMC_BMAI3::BMC_BMAI3(BMC_AI * _ai): BMC_BMAI(_ai) {
 	// SETTINGS
 	m_sims_per_check = m_min_sims;
 	m_min_best_score_threshold = 0.25f;

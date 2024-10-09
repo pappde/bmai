@@ -20,7 +20,7 @@
 class BMC_BMAI : public BMC_AI
 {
 public:
-	BMC_BMAI();
+	BMC_BMAI(BMC_AI * _ai);
 
 	virtual void	GetAttackAction(BMC_Game *_game, BMC_Move &_move);
 	virtual	void	GetSetSwingAction(BMC_Game *_game, BMC_Move &_move);

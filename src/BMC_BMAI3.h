@@ -21,7 +21,7 @@
 class BMC_BMAI3 : public BMC_BMAI
 {
 public:
-	BMC_BMAI3();
+	BMC_BMAI3(BMC_AI * _ai);
 	virtual void	GetAttackAction(BMC_Game *_game, BMC_Move &_move);
 	virtual	void	GetSetSwingAction(BMC_Game *_game, BMC_Move &_move);
 	virtual void	GetUseFocusAction(BMC_Game *_game, BMC_Move &_move);
