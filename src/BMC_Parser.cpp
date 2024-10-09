@@ -664,6 +664,7 @@ BMC_AI_MaximizeOrRandom	m_ai_mode1b(m_ai_mode0, m_ai_mode1);
 BMC_BMAI				m_ai_mode2;
 BMC_BMAI				m_ai_mode3;
 
+BMC_AI * m_ai_type[BMD_AI_TYPES] = { &g_bmai, &g_qai2, &g_bmai3 };
 
 // DESC: written for Zomulgustar fair testing fairness
 // PARAMS:
@@ -801,7 +802,7 @@ void BMC_Parser::Parse()
 				BMF_Error("invalid setting for ai type: %d", param2);
 			if (param<0 || param>1)
 				BMF_Error("invalid setting for ai player number: %d", param);
-			m_game.SetAI(param, g_ai_type[param2]);
+			m_game.SetAI(param, m_ai_type[param2]);
 			printf("Setting AI for player %d to type %d\n", param, param2);
 		}
 		else if (sscanf(line, "max_sims %d %d", &param, &param2)==2)

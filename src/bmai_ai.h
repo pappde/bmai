@@ -23,7 +23,6 @@ inline BMC_BMAI3  g_ai;
 inline BMC_QAI		g_qai2;
 inline BMC_BMAI		g_bmai;
 inline BMC_BMAI3	g_bmai3;
-inline BMC_AI * g_ai_type[BMD_AI_TYPES] = { &g_bmai, &g_qai2, &g_bmai3 };
 
 // found this one bouncing around somewhere also
 // TODO audit g_qai and g_qai2 usage. are both needed?
