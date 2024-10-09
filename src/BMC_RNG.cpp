@@ -21,6 +21,9 @@
 #include <ctime>
 
 
+// global
+BMC_RNG		g_rng;
+
 BMC_RNG::BMC_RNG() :
         m_seed(78904497)
 {

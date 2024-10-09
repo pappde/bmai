@@ -20,6 +20,9 @@
 #include <string>
 
 
+//global
+BMC_Logger	g_logger;
+
 BMC_Logger::BMC_Logger()
 {
   for (INT i = 0; i<BME_DEBUG_MAX; i++)

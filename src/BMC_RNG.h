@@ -30,4 +30,4 @@ private:
 };
 
 // global
-inline BMC_RNG		g_rng;
+extern BMC_RNG		g_rng;

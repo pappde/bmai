@@ -39,7 +39,7 @@ private:
 
 // To address a cyclical dependency the global logger can live here for now
 // TODO address & understand g_logger.Log() vs BMF_Log()
-inline BMC_Logger	g_logger;
+extern BMC_Logger	g_logger;
 
 // Utility functions
 
