@@ -41,4 +41,4 @@ private:
 };
 
 // global
-inline BMC_Stats  g_stats;
+extern BMC_Stats  g_stats;
