@@ -5,18 +5,17 @@
 
 cmake_minimum_required (VERSION 3.19)
 
-set(NAME bmai)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE) # MacOS Universal binary
 
-project(${NAME} VERSION 3.1)
-
+project(bmai VERSION 3.1)
 
 if(NOT DEFINED GIT_DESCRIBE)
+    find_package(Git)
     execute_process(
-        COMMAND git describe --dirty --always --tags --match=v[0-9]*
+        COMMAND ${GIT_EXECUTABLE} describe --dirty --always --tags --match=v[0-9]*
         OUTPUT_VARIABLE GIT_DESCRIBE
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
@@ -75,20 +74,17 @@ set(HEADERS
 ## And contain the application to a library
 ## allowing you can add this library elsewhere, such as testing
 
-add_library(${NAME}_lib ${SOURCE} ${HEADERS})
-add_executable(${NAME} ./src/bmai.cpp)
-
-# Add precompiled header
-target_precompile_headers(${NAME}_lib PRIVATE ./src/bmai.h)
+add_library(bmai_lib ${SOURCE} ${HEADERS})
+add_executable(bmai ./src/bmai.cpp)
 
 if(WIN32)
-    target_link_libraries(${NAME} PRIVATE ${NAME}_lib -static)
+    target_link_libraries(bmai PRIVATE bmai_lib -static)
 else()
-    target_link_libraries(${NAME} PRIVATE ${NAME}_lib)
+    target_link_libraries(bmai PRIVATE bmai_lib)
 endif()
 
 # to be able to reference header files
-target_include_directories(${NAME} PRIVATE ./src)
+target_include_directories(bmai PRIVATE ./src)
 
 # remove ZERO_CHECK build
 set(CMAKE_SUPPRESS_REGENERATION true)

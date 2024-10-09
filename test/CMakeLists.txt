@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.19)
 
-project(${NAME}_tests)
+project(bmai_tests)
 
 # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
@@ -36,12 +36,12 @@ set(TEST_SOURCES
         DemoTest.cpp
 )
 
-add_executable(${NAME}_tests ${TEST_SOURCES})
+add_executable(bmai_tests ${TEST_SOURCES})
 
 if(APPLE)
-    target_link_libraries(${NAME}_tests PRIVATE ${NAME}_lib GTest::gtest_main)
+    target_link_libraries(bmai_tests PRIVATE bmai_lib GTest::gtest_main)
 else()
-    target_link_libraries(${NAME}_tests PRIVATE ${NAME}_lib GTest::gtest_main -static)
+    target_link_libraries(bmai_tests PRIVATE bmai_lib GTest::gtest_main -static)
 endif()
 
 ##
@@ -49,4 +49,4 @@ endif()
 ##
 
 include(GoogleTest)
-gtest_discover_tests(${NAME}_tests DISCOVERY_MODE PRE_TEST)
+gtest_discover_tests(bmai_tests DISCOVERY_MODE PRE_TEST)
