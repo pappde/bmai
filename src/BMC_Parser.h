@@ -67,6 +67,8 @@ private:
 	BMC_Die *d;
 	char			line[BMD_MAX_STRING];
 	FILE *file;
+
+	BMC_Game m_game;
 };
 
 extern BMC_AI					g_ai_mode0;

@@ -86,7 +86,7 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 {
 	BM_ERROR(_die<BMD_MAX_DICE);
 
-	p = g_game.GetPlayer(_p);
+	p = m_game.GetPlayer(_p);
 	d = p->GetDie(_die);
 
 	// save original index
@@ -238,7 +238,7 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 
 void BMC_Parser::ParsePlayer(INT _p, INT _dice)
 {
-	BMC_Player *p = g_game.GetPlayer(_p);
+	BMC_Player *p = m_game.GetPlayer(_p);
 
 	p->Reset();
 
@@ -264,22 +264,22 @@ void BMC_Parser::ParseGame()
 	if (sscanf(line, "game %d", &i)==1)
 	{
 		BMF_Log(BME_DEBUG_ALWAYS, "target wins set to %d\n", i);
-		g_game.m_target_wins = i;
+		m_game.m_target_wins = i;
 	}
 
 	// TODO: parse standings
 	for (wlt=0; wlt < BME_WLT_MAX; wlt++)
-		g_game.m_standing[wlt] = 0;
+		m_game.m_standing[wlt] = 0;
 
 	// parse phase
 	Read();
-	g_game.m_phase = BME_PHASE_MAX;
+	m_game.m_phase = BME_PHASE_MAX;
 	for (i=0; i<BME_PHASE_MAX; i++)
 	{
 		if (!std::strcmp(g_phase_name[i], line))
-			g_game.m_phase = (BME_PHASE)i;
+			m_game.m_phase = (BME_PHASE)i;
 	}
-	if (g_game.m_phase == BME_PHASE_MAX)
+	if (m_game.m_phase == BME_PHASE_MAX)
 		BMF_Error( "phase not found");
 
 	// parse players
@@ -292,22 +292,21 @@ void BMC_Parser::ParseGame()
 			BMF_Error( "missing player: %s", line );
 		ParsePlayer(p, dice);
 		// don't clobber score in INITIATIVE phases
-		if (g_game.GetPhase()!=BME_PHASE_INITIATIVE && g_game.GetPhase()!=BME_PHASE_INITIATIVE_CHANCE && g_game.GetPhase()!=BME_PHASE_INITIATIVE_FOCUS)
-			g_game.GetPlayer(p)->m_score = score;
+		if (m_game.GetPhase()!=BME_PHASE_INITIATIVE && m_game.GetPhase()!=BME_PHASE_INITIATIVE_CHANCE && m_game.GetPhase()!=BME_PHASE_INITIATIVE_FOCUS)
+			m_game.GetPlayer(p)->m_score = score;
 		// if this is still preround, then print all dice (i.e. including those not ready)
-		if (g_game.IsPreround())
-			g_game.GetPlayer(p)->DebugAllDice();
+		if (m_game.IsPreround())
+			m_game.GetPlayer(p)->DebugAllDice();
 		else
-			g_game.GetPlayer(p)->Debug();
+			m_game.GetPlayer(p)->Debug();
 	}
 
 	// set up AI
-	g_game.SetAI(0, &g_ai);
-	g_game.SetAI(1, &g_ai);
+	m_game.SetAI(0, &g_ai);
+	m_game.SetAI(1, &g_ai);
 }
 
-BMC_Parser::BMC_Parser()
-{
+BMC_Parser::BMC_Parser(): m_game(false) {
 	file = stdin;
 }
 
@@ -457,7 +456,7 @@ void BMC_Parser::SendAttack(BMC_Move &_move)
 	Send("%s\n", g_attack_name[_move.m_attack]);
 
 	/// ensure m_game is correct
-	_move.m_game = &g_game;
+	_move.m_game = &m_game;
 
 	BMC_Player *attacker = _move.m_game->GetPhasePlayer();
 	BMC_Player *target = _move.m_game->GetTargetPlayer();
@@ -544,60 +543,60 @@ void BMC_Parser::SendAttack(BMC_Move &_move)
 
 void BMC_Parser::GetAction()
 {
-	if (g_game.m_phase == BME_PHASE_PREROUND)
+	if (m_game.m_phase == BME_PHASE_PREROUND)
 	{
 		INT i = 0;
 		BMC_Move move;
-		g_game.m_phase_player = i;	// setup phase player for the AI
-		g_game.m_ai[i]->GetSetSwingAction(&g_game, move);
+		m_game.m_phase_player = i;	// setup phase player for the AI
+		m_game.m_ai[i]->GetSetSwingAction(&m_game, move);
 
 		SendStats();
 
 		Send("action\n");
 		SendSetSwing(move);
 	}
-	else if (g_game.m_phase == BME_PHASE_RESERVE)
+	else if (m_game.m_phase == BME_PHASE_RESERVE)
 	{
 		INT i = 0;
 		BMC_Move move;
-		g_game.m_phase_player = i;	// setup phase player for the AI
-		g_game.m_ai[i]->GetReserveAction(&g_game, move);
+		m_game.m_phase_player = i;	// setup phase player for the AI
+		m_game.m_ai[i]->GetReserveAction(&m_game, move);
 
 		SendStats();
 
 		Send("action\n");
 		SendUseReserve(move);
 	}
-	else if (g_game.m_phase == BME_PHASE_FIGHT)
+	else if (m_game.m_phase == BME_PHASE_FIGHT)
 	{
-		g_game.m_phase_player = 0;
-		g_game.m_target_player = 1;
+		m_game.m_phase_player = 0;
+		m_game.m_target_player = 1;
 		BMC_Move move;
-		g_game.m_ai[0]->GetAttackAction(&g_game, move);
+		m_game.m_ai[0]->GetAttackAction(&m_game, move);
 
 		SendStats();
 
 		Send("action\n");
 		SendAttack(move);
 	}
-	else if (g_game.m_phase == BME_PHASE_INITIATIVE_CHANCE)
+	else if (m_game.m_phase == BME_PHASE_INITIATIVE_CHANCE)
 	{
-		g_game.m_phase_player = 0;
-		g_game.m_target_player = 1;
+		m_game.m_phase_player = 0;
+		m_game.m_target_player = 1;
 		BMC_Move move;
-		g_game.m_ai[0]->GetUseChanceAction(&g_game, move);
+		m_game.m_ai[0]->GetUseChanceAction(&m_game, move);
 
 		SendStats();
 
 		Send("action\n");
 		SendUseChance(move);
 	}
-	else if (g_game.m_phase == BME_PHASE_INITIATIVE_FOCUS)
+	else if (m_game.m_phase == BME_PHASE_INITIATIVE_FOCUS)
 	{
-		g_game.m_phase_player = 0;
-		g_game.m_target_player = 1;
+		m_game.m_phase_player = 0;
+		m_game.m_target_player = 1;
 		BMC_Move move;
-		g_game.m_ai[0]->GetUseFocusAction(&g_game, move);
+		m_game.m_ai[0]->GetUseFocusAction(&m_game, move);
 
 		SendStats();
 
@@ -612,7 +611,7 @@ void BMC_Parser::GetAction()
 
 void BMC_Parser::PlayGame(INT _games)
 {
-	if (g_game.GetPhase()!=BME_PHASE_PREROUND)
+	if (m_game.GetPhase()!=BME_PHASE_PREROUND)
 		BMF_Error("Cannot PlayGame unless it is preround");
 
 	INT wins[2] = {0,0};
@@ -620,7 +619,7 @@ void BMC_Parser::PlayGame(INT _games)
 	BMC_Game	g_sim(false);
 	while (_games-->0)
 	{
-		g_sim = g_game;
+		g_sim = m_game;
 		g_sim.PlayGame();
 		if (g_sim.GetStanding(0) > g_sim.GetStanding(1))
 			wins[0]++;
@@ -633,7 +632,7 @@ void BMC_Parser::PlayGame(INT _games)
 
 void BMC_Parser::CompareAI(INT _games)
 {
-	if (g_game.GetPhase()!=BME_PHASE_PREROUND)
+	if (m_game.GetPhase()!=BME_PHASE_PREROUND)
 		BMF_Error("Cannot PlayGame unless it is preround");
 
 	INT wins[2] = {0,0};
@@ -641,7 +640,7 @@ void BMC_Parser::CompareAI(INT _games)
 	BMC_Game	g_sim(false);
 	while (_games-->0)
 	{
-		g_sim = g_game;
+		g_sim = m_game;
 		g_sim.PlayGame();
 		if (g_sim.GetStanding(0) > g_sim.GetStanding(1))
 			wins[0]++;
@@ -674,7 +673,7 @@ BMC_BMAI				g_ai_mode3;
 //	_p = probability (0..1) that Maximizer/Random uses "Maximize", it will use random with probability (1-_p)
 void BMC_Parser::PlayFairGames(INT _games, INT _mode, F32 _p)
 {
-	if (g_game.GetPhase()!=BME_PHASE_PREROUND)
+	if (m_game.GetPhase()!=BME_PHASE_PREROUND)
 		BMF_Error("Cannot PlayGame unless it is preround");
 
 	INT wins[2][2] = {0, };	// indexes: [got_initiative] [winner]
@@ -692,13 +691,13 @@ void BMC_Parser::PlayFairGames(INT _games, INT _mode, F32 _p)
 	for (p=0; p<2; p++)
 	{
 		if (_mode==0)
-			g_game.SetAI(p, &g_ai_mode0);
+			m_game.SetAI(p, &g_ai_mode0);
 		else if (_mode==1)
-			g_game.SetAI(p, &g_ai_mode1);
+			m_game.SetAI(p, &g_ai_mode1);
 		else if (_mode==2)
-			g_game.SetAI(p, &g_ai_mode2);
+			m_game.SetAI(p, &g_ai_mode2);
 		else if (_mode==3)
-			g_game.SetAI(p, &g_ai_mode3);
+			m_game.SetAI(p, &g_ai_mode3);
 	}
 
 	// play games
@@ -706,7 +705,7 @@ void BMC_Parser::PlayFairGames(INT _games, INT _mode, F32 _p)
 	BMC_Game	g_sim(false);
 	for (g=0; g<_games; g++)
 	{
-		g_sim = g_game;
+		g_sim = m_game;
 		g_sim.PlayGame();
 		if (g_sim.GetStanding(0) > g_sim.GetStanding(1))
 			wins[g_sim.GetInitiativeWinner()][0]++;
@@ -801,12 +800,12 @@ void BMC_Parser::Parse()
 				BMF_Error("invalid setting for ai type: %d", param2);
 			if (param<0 || param>1)
 				BMF_Error("invalid setting for ai player number: %d", param);
-			g_game.SetAI(param, g_ai_type[param2]);
+			m_game.SetAI(param, g_ai_type[param2]);
 			printf("Setting AI for player %d to type %d\n", param, param2);
 		}
 		else if (sscanf(line, "max_sims %d %d", &param, &param2)==2)
 		{
-			BMC_AI * ai = g_game.GetAI(param);
+			BMC_AI * ai = m_game.GetAI(param);
 			if (ai->IsBMAI())
 			{
 				((BMC_BMAI*)ai)->SetMaxSims(param2);
@@ -820,7 +819,7 @@ void BMC_Parser::Parse()
 		}
 		else if (sscanf(line, "min_sims %d %d", &param, &param2)==2)
 		{
-			BMC_AI * ai = g_game.GetAI(param);
+			BMC_AI * ai = m_game.GetAI(param);
 			if (ai->IsBMAI())
 			{
 				((BMC_BMAI*)ai)->SetMinSims(param2);
@@ -839,7 +838,7 @@ void BMC_Parser::Parse()
 		}
 		else if (sscanf(line, "ply %d %d", &param, &param2)==2)
 		{
-			BMC_AI * ai = g_game.GetAI(param);
+			BMC_AI * ai = m_game.GetAI(param);
 			if (ai->IsBMAI())
 			{
 				((BMC_BMAI*)ai)->SetMaxPly(param2);
@@ -858,7 +857,7 @@ void BMC_Parser::Parse()
 		}
 		else if (sscanf(line, "maxbranch %d %d", &param, &param2)==2)
 		{
-			BMC_AI * ai = g_game.GetAI(param);
+			BMC_AI * ai = m_game.GetAI(param);
 			if (param>=0 && param<BMD_AI_TYPES && ai->IsBMAI())
 			{
 				((BMC_BMAI*)ai)->SetMaxBranch(param2);
@@ -886,7 +885,7 @@ void BMC_Parser::Parse()
 		}
         else if (sscanf(line, "surrender %32s", &sparam)==1)
         {
-            g_game.SetSurrenderAllowed(std::string(sparam)=="on");
+            m_game.SetSurrenderAllowed(std::string(sparam)=="on");
         }
 		else if (!std::strcmp(line, "quit"))
 		{

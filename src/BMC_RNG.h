@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "bmai_lib.h"
+
 
 class BMC_RNG
 {

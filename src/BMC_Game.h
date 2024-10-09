@@ -125,6 +125,3 @@ private:
 
 	bool		m_surrender_allowed;
 };
-
-// global
-inline BMC_Game g_game(false);

@@ -22,8 +22,6 @@
 #include <vector>
 
 
-int main(int argc, char *argv[]);
-
 // version number
 #ifndef GIT_DESCRIBE
 #define GIT_DESCRIBE "n/a"

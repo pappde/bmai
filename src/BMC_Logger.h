@@ -14,6 +14,7 @@
 #pragma once
 
 #include <cassert>
+#include "bmai_lib.h"
 
 
 class BMC_Logger

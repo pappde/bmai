@@ -13,6 +13,7 @@
 #pragma once
 
 #include <ctime>
+#include "bmai_lib.h"
 
 
 class BMC_Stats

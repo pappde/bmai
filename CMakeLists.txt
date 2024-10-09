@@ -25,7 +25,7 @@ add_definitions("-DGIT_DESCRIBE=\"${GIT_DESCRIBE}\"")
 
 # to collect only needed source files
 set(SOURCE
-        #src/bmai.cpp this file is references below in add_executable
+       # src/bmai_lib.cpp
 
         src/BMC_AI.cpp
         src/BMC_AI_Maximize.cpp
@@ -47,7 +47,7 @@ set(SOURCE
 
 # some IDEs need Headers added to the executable for indexing
 set(HEADERS
-        src/bmai.h
+        src/bmai_lib.h
         src/bmai_ai.h
 
         src/BMC_AI.h
@@ -70,12 +70,12 @@ set(HEADERS
         src/BMC_Stats.h
 )
 
-## Key idea: SEPARATE OUT main() function to its own executable.
-## And contain the application to a library
-## allowing you can add this library elsewhere, such as testing
+## Key idea: SEPARATE OUT main() function to its own bmai executable.
+## And contain the orimary app logic to a library, bmai_lib
+## then you can add this lib elsewhere, such as testing
 
 add_library(bmai_lib ${SOURCE} ${HEADERS})
-add_executable(bmai ./src/bmai.cpp)
+add_executable(bmai src/bmai.cpp)
 
 if(WIN32)
     target_link_libraries(bmai PRIVATE bmai_lib -static)

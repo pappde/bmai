@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "bmai.h"
+#include "bmai_lib.h"
 #include "BMC_BMAI.h"
 
 

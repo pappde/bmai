@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "bmai_lib.h"
+
 
 // NOTES:
 // - second die only used for Option and Twin

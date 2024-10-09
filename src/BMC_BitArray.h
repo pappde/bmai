@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "bmai.h"
+#include "bmai_lib.h"
 
 
 // template classes

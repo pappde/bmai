@@ -256,7 +256,7 @@
 //--------------------------------------------------------------------------------------------------------
 
 // includes
-#include "bmai.h"
+#include "bmai_lib.h"
 
 #include <cstdio>
 #include "BMC_Logger.h"
