@@ -62,10 +62,12 @@ typedef std::vector<float>	BMC_FloatVector;
 #define BMD_MAX_PLY_PREROUND	2
 #define BMD_AI_TYPES			3
 
+// MOOD dice - from BM page:
+#define BMD_MOOD_SIDES_RANGE_X	6
+#define BMD_MOOD_SIDES_RANGE_V	4
+
 extern float s_ply_decay;
 extern float g_turbo_accuracy;
-
-// TODO consider a header for each BME_ enum, or enums.h/globals.h ?
 
 // debug categories
 enum BME_DEBUG
@@ -122,10 +124,10 @@ enum BME_PROPERTY
 	BME_PROPERTY_RESERVE		=   0x40000,	// preround (after a loss)
 	BME_PROPERTY_ORNERY			=   0x80000,	// (N) post-attack effect on all dice
 	BME_PROPERTY_DOPPLEGANGER	=  0x100000,	// (P) post-attack effect
-	BME_PROPERTY_CHANCE			=  0x200000, // initiative action
-	BME_PROPERTY_MORPHING		=  0x400000, // (P) post-attack effect
-	BME_PROPERTY_RADIOACTIVE	=  0x800000, // (P) post-attack effect
-	BME_PROPERTY_WARRIOR		= 0x1000000, // attacks
+	BME_PROPERTY_CHANCE			=  0x200000,	// initiative action
+	BME_PROPERTY_MORPHING		=  0x400000,	// (P) post-attack effect
+	BME_PROPERTY_RADIOACTIVE	=  0x800000,	// (P) post-attack effect
+	BME_PROPERTY_WARRIOR		= 0x1000000,	// attacks
 	BME_PROPERTY_SLOW			= 0x2000000,	// initiative effect
 	BME_PROPERTY_UNIQUE			= 0x4000000,	// (D) swing rule
 	BME_PROPERTY_UNSKILLED		= 0x8000000,	// attacks [The Flying Squirrel]	// TODO: implement as BM property?
@@ -215,25 +217,4 @@ extern BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX];
 
 extern INT g_swing_sides_range[BME_SWING_MAX][2];
 
-// MOOD dice - from BM page:
-#define BMD_MOOD_SIDES_RANGE_X	6
-#define BMD_MOOD_SIDES_RANGE_V	4
-
-extern INT g_mood_sides_X[BMD_MOOD_SIDES_RANGE_X];
-extern INT g_mood_sides_V[BMD_MOOD_SIDES_RANGE_V];
-
-extern INT g_mighty_sides[20];
-
-extern INT g_weak_sides[20];
-
-
-
-extern const char *g_swing_name[BME_SWING_MAX];
-
-extern const char *g_phase_name[BME_PHASE_MAX];
-
 extern const char *g_attack_name[BME_ATTACK_MAX];
-
-extern const char *g_action_name[BME_ACTION_MAX];
-
-extern const char *g_debug_name[BME_DEBUG_MAX];

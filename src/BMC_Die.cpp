@@ -17,6 +17,15 @@
 #include "BMC_Player.h"
 #include "BMC_RNG.h"
 
+//X?: Roll a d6. 1: d4; 2: d6; 3: d8; 4: d10; 5: d12; 6: d20.
+//V?: Roll a d4. 1: d6; 2: d8; 3: d10; 4: d12.
+INT m_mood_sides_X[BMD_MOOD_SIDES_RANGE_X] = { 4, 6, 8,  10, 12, 20 };
+INT m_mood_sides_V[BMD_MOOD_SIDES_RANGE_V] = { 6, 8, 10, 12 };
+
+// MIGHTY dice - index by old number of sides
+INT m_mighty_sides[20] = { 1, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20 };
+// WEAK dice - index by old number of sides
+INT m_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12, 16, 16, 16 };
 
 void BMC_Die::Reset()
 {
@@ -344,7 +353,7 @@ void BMC_Die::OnBeforeRollInGame(BMC_Player *_owner)
 			if (m_sides[d]>=20)
 				m_sides_max += (m_sides[d] = 30);
 			else
-				m_sides_max += (m_sides[d] = g_mighty_sides[m_sides[d]]);
+				m_sides_max += (m_sides[d] = m_mighty_sides[m_sides[d]]);
 		}
 		_owner->OnDieSidesChanged(this);
 	}
@@ -363,7 +372,7 @@ void BMC_Die::OnBeforeRollInGame(BMC_Player *_owner)
 			else if (m_sides[d]==20)
 				m_sides_max += (m_sides[d] = 16);
 			else
-				m_sides_max += (m_sides[d] = g_weak_sides[m_sides[d]]);
+				m_sides_max += (m_sides[d] = m_weak_sides[m_sides[d]]);
 		}
 		_owner->OnDieSidesChanged(this);
 	}
@@ -386,10 +395,10 @@ void BMC_Die::OnApplyAttackNatureRollAttacker(BMC_Move &_move, BMC_Player *_owne
 			switch (swing)
 			{
 			case BME_SWING_X:
-				m_sides[i] = g_mood_sides_X[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_X)];
+				m_sides[i] = m_mood_sides_X[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_X)];
 				break;
 			case BME_SWING_V:
-				m_sides[i] = g_mood_sides_V[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_V)];
+				m_sides[i] = m_mood_sides_V[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_V)];
 				break;
 			default:
 				// some BM use MOOD SWING on other than X and V

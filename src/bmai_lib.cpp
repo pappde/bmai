@@ -45,46 +45,6 @@ INT g_swing_sides_range[BME_SWING_MAX][2] =
 	{ 4, 30 },	// Z
 };
 
-//X?: Roll a d6. 1: d4; 2: d6; 3: d8; 4: d10; 5: d12; 6: d20.
-//V?: Roll a d4. 1: d6; 2: d8; 3: d10; 4: d12.
-INT g_mood_sides_X[BMD_MOOD_SIDES_RANGE_X] = { 4, 6, 8,  10, 12, 20 };
-INT g_mood_sides_V[BMD_MOOD_SIDES_RANGE_V] = { 6, 8, 10, 12 };
-
-// MIGHTY dice - index by old number of sides
-INT g_mighty_sides[20] = { 1, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20 };
-
-// WEAK dice - index by old number of sides
-INT g_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12, 16, 16, 16 };
-
-
-const char *g_swing_name[BME_SWING_MAX] =
-{
-	"None",
-	"P",
-	"Q",
-	"R",
-	"S",
-	"T",
-	"U",
-	"V",
-	"W",
-	"X",
-	"Y",
-	"Z",
-};
-
-// PHASE names
-const char *g_phase_name[BME_PHASE_MAX] =
-{
-	"preround",
-	"reserve",
-	"initiative",
-	"chance",
-	"focus",
-	"fight",
-	"gameover"
-};
-
 // ATTACK names
 const char *g_attack_name[BME_ATTACK_MAX] =
 {
@@ -95,30 +55,4 @@ const char *g_attack_name[BME_ATTACK_MAX] =
 	"trip",
 	"shadow",
 	"invalid",
-};
-
-// ACTION names
-const char *g_action_name[BME_ACTION_MAX] =
-{
-	"aux",
-	"chance",
-	"focus",
-	"swing/option",
-	"reserve",
-	"attack",
-	"pass",
-	"surrender",
-};
-
-// BME_DEBUG setting names
-const char *g_debug_name[BME_DEBUG_MAX] =
-{
-	"ALWAYS",
-	"WARNING",
-	"PARSER",
-	"SIMULATION",
-	"ROUND",
-	"GAME",
-	"QAI",
-	"BMAI",
 };

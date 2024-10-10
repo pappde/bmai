@@ -20,6 +20,19 @@
 #include <string>
 
 
+// BME_DEBUG setting names
+const char *g_debug_name[BME_DEBUG_MAX] =
+{
+  "ALWAYS",
+  "WARNING",
+  "PARSER",
+  "SIMULATION",
+  "ROUND",
+  "GAME",
+  "QAI",
+  "BMAI",
+};
+
 //global
 BMC_Logger	g_logger;
 

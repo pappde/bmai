@@ -15,6 +15,35 @@
 #include "BMC_Logger.h"
 
 
+const char *m_swing_name[BME_SWING_MAX] =
+{
+	"None",
+	"P",
+	"Q",
+	"R",
+	"S",
+	"T",
+	"U",
+	"V",
+	"W",
+	"X",
+	"Y",
+	"Z",
+};
+
+// ACTION names
+const char *m_action_name[BME_ACTION_MAX] =
+{
+	"aux",
+	"chance",
+	"focus",
+	"swing/option",
+	"reserve",
+	"attack",
+	"pass",
+	"surrender",
+};
+
 void BMC_Move::Debug(BME_DEBUG _cat, const char *_postfix)
 {
 	if (!g_logger.IsLogging(_cat))
@@ -23,7 +52,7 @@ void BMC_Move::Debug(BME_DEBUG _cat, const char *_postfix)
 	INT i;
 	BMC_Player *phaser = m_game->GetPhasePlayer();
 
-	printf("%s ", g_action_name[m_action]);
+	printf("%s ", m_action_name[m_action]);
 
 	switch (m_action)
 	{
@@ -37,7 +66,7 @@ void BMC_Move::Debug(BME_DEBUG _cat, const char *_postfix)
 			for (i=0; i<BME_SWING_MAX; i++)
 			{
 				if (phaser->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
-	 				printf("%s %d  ", g_swing_name[i], m_swing_value[i]);
+	 				printf("%s %d  ", m_swing_name[i], m_swing_value[i]);
 			}
 
 			// check option dice

@@ -28,6 +28,19 @@
 #include "BMC_RNG.h"
 #include "BMC_Stats.h"
 
+
+// PHASE names
+const char *m_phase_name[BME_PHASE_MAX] =
+{
+	"preround",
+	"reserve",
+	"initiative",
+	"chance",
+	"focus",
+	"fight",
+	"gameover"
+};
+
 BMC_Game m_game(false);
 
 // other AI instances that were once global
@@ -287,7 +300,7 @@ void BMC_Parser::ParseGame()
 	m_game.m_phase = BME_PHASE_MAX;
 	for (i=0; i<BME_PHASE_MAX; i++)
 	{
-		if (!std::strcmp(g_phase_name[i], line))
+		if (!std::strcmp(m_phase_name[i], line))
 			m_game.m_phase = (BME_PHASE)i;
 	}
 	if (m_game.m_phase == BME_PHASE_MAX)
@@ -348,7 +361,6 @@ void BMC_Parser::Send( const char *_fmt, ... )
 
 void BMC_Parser::SendStats()
 {
-	extern float s_ply_decay;
 	printf("stats %d/%d-%d/%d/%.2f ", m_ai.GetMaxPly(), m_ai.GetMinSims(), m_ai.GetMaxSims(), m_ai.GetMaxBranch(), s_ply_decay);
 	g_stats.DisplayStats();
 }
