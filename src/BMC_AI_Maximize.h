@@ -1,28 +1,24 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// man.h
+// BMC_AI_Maximize.h
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
-// 
-// DESC: BMC_Man represents a Button Man (a set of BMC_DieData)
+//
+// DESC:
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
+// dbl100824 - migrated this logic from bmai_ai.h
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-// TODO_HEADERS: drp030321 - clean up headers
-#include "bmai.h"
-#include "die.h"
+#include "BMC_AI.h"
 
-class BMC_Man
+
+// Selects the maximizing move
+class BMC_AI_Maximize : public BMC_AI
 {
 public:
-	// accessors
-	BMC_DieData *GetDieData(INT _d) { return &m_die[_d]; }
-
-protected:
-private:
-	BMC_DieData	m_die[BMD_MAX_DICE];
+	virtual void		GetAttackAction(BMC_Game *_game, BMC_Move &_move);
 };

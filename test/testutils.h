@@ -1,5 +1,4 @@
-#include "../src/die.h"
-
+#include "../src/BMC_Die.h"
 
 // until the objects are better suited for testing
 // it may be necessary to use a couple hacks to access members
