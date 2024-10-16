@@ -28,8 +28,8 @@ public:
 	bool	operator==	(const BMC_Move &_m) const { return this == &_m; }
 
 	// accessors
-	bool	MultipleAttackers() { return g_attack_type[m_attack]==BME_ATTACK_TYPE_N_1; }
-	bool	MultipleTargets()	{ return g_attack_type[m_attack]==BME_ATTACK_TYPE_1_N; }
+	bool	MultipleAttackers() { return c_attack_type[m_attack]==BME_ATTACK_TYPE_N_1; }
+	bool	MultipleTargets()	{ return c_attack_type[m_attack]==BME_ATTACK_TYPE_1_N; }
 	BMC_Player *	GetAttacker();
 	BMC_Player *	GetTarget();
 

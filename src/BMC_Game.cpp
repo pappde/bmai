@@ -243,10 +243,10 @@ bool BMC_Game::ValidSetSwing(BMC_Move &_move)
 	// check swing dice
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
-		if (m_player[m_phase_player].GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+		if (m_player[m_phase_player].GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 		{
 			// check range
-			if (_move.m_swing_value[i]<g_swing_sides_range[i][0] || _move.m_swing_value[i]>g_swing_sides_range[i][1])
+			if (_move.m_swing_value[i]<c_swing_sides_range[i][0] || _move.m_swing_value[i]>c_swing_sides_range[i][1])
 				return false;
 		}
 	}
@@ -275,11 +275,11 @@ bool BMC_Game::ValidSetSwing(BMC_Move &_move)
 		{
 			INT swing_type = d->GetSwingType(0);
 			BM_ASSERT(swing_type != BME_SWING_NOT);
-			BM_ASSERT(_move.m_swing_value[swing_type]>=g_swing_sides_range[swing_type][0] && _move.m_swing_value[swing_type]<=g_swing_sides_range[swing_type][1]);
+			BM_ASSERT(_move.m_swing_value[swing_type]>=c_swing_sides_range[swing_type][0] && _move.m_swing_value[swing_type]<=c_swing_sides_range[swing_type][1]);
 			for (INT s=0; s<swing_type; s++)
 			{
 				if (	m_player[m_phase_player].GetTotalSwingDice(s)>0
-					&&	g_swing_sides_range[s][0]>0
+					&&	c_swing_sides_range[s][0]>0
 					&&  _move.m_swing_value[s]>0
 					&&	_move.m_swing_value[s]==_move.m_swing_value[swing_type])
 				{
@@ -847,14 +847,14 @@ void BMC_Game::GenerateValidSetSwing(BMC_MoveList & _movelist)
 	// walk dice and determine possible things to set
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
-		if (pl->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+		if (pl->GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 		{
 			swing_action[actions].swing = true;
 			swing_action[actions].index = i;
-			swing_action[actions].value = g_swing_sides_range[i][0];	// initialize to min
+			swing_action[actions].value = c_swing_sides_range[i][0];	// initialize to min
 			actions++;
 			//combinations *= (g_swing_sides_range[i][1]-g_swing_sides_range[i][0])+1;
-			move.m_swing_value[i] = g_swing_sides_range[i][0];
+			move.m_swing_value[i] = c_swing_sides_range[i][0];
 		}
 	}
 
@@ -904,7 +904,7 @@ void BMC_Game::GenerateValidSetSwing(BMC_MoveList & _movelist)
 			// past max?
 			INT max;
 			if (swing_action[p].swing)
-				max = g_swing_sides_range[swing_action[p].index][1];
+				max = c_swing_sides_range[swing_action[p].index][1];
 			else
 				max = 1;
 			if (swing_action[p].value <= max)
@@ -913,7 +913,7 @@ void BMC_Game::GenerateValidSetSwing(BMC_MoveList & _movelist)
 			// we are past max - reset to min and cycle the next value
 			if (swing_action[p].swing)
 			{
-				swing_action[p].value = g_swing_sides_range[swing_action[p].index][0];
+				swing_action[p].value = c_swing_sides_range[swing_action[p].index][0];
 				move.m_swing_value[swing_action[p].index] = swing_action[p].value;
 			}
 			else
@@ -972,7 +972,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 			move.m_turbo_option = -1;
 
-			switch (g_attack_type[move.m_attack])
+			switch (c_attack_type[move.m_attack])
 			{
 			case BME_ATTACK_TYPE_1_1:
 				{
@@ -1158,7 +1158,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 			attack = _movelist.Get(m);
 
 			// does move involve a turbo die?
-			switch (g_attack_type[attack->m_attack])
+			switch (c_attack_type[attack->m_attack])
 			{
 				case BME_ATTACK_TYPE_1_1:
 				case BME_ATTACK_TYPE_1_N:
@@ -1194,8 +1194,8 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 				INT swing = die->GetSwingType(0);
 				BM_ASSERT(swing!=BME_SWING_NOT);
 				INT sides;
-				INT min = g_swing_sides_range[swing][0];
-				INT max = g_swing_sides_range[swing][1];
+				INT min = c_swing_sides_range[swing][0];
+				INT max = c_swing_sides_range[swing][1];
 
 				// the move on the list already should be "no change"
 				attack->m_turbo_option = die->GetSides(0);
@@ -1218,7 +1218,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 				// now use g_turbo_accuracy
 				// step_size = 1 / g_turbo_accuracy
-				float step_size = (g_turbo_accuracy<=0) ? 1000 : 1 / g_turbo_accuracy;
+				float step_size = (s_turbo_accuracy<=0) ? 1000 : 1 / s_turbo_accuracy;
 				float sides_f;
 				for (sides_f = (float)(min + 1); sides_f<max; sides_f += step_size)
 				{
@@ -1387,7 +1387,7 @@ void BMC_Game::ApplySetSwing(BMC_Move &_move, bool _lock)
 	// check swing dice
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
-		if (m_player[m_phase_player].GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+		if (m_player[m_phase_player].GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 			m_player[m_phase_player].SetSwingDice(i, _move.m_swing_value[i]);
 	}
 
@@ -1423,7 +1423,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		_move.m_attack = BME_ATTACK_INVALID;
 
 	// capture - attacker effects
-	switch (g_attack_type[_move.m_attack])
+	switch (c_attack_type[_move.m_attack])
 	{
 	case BME_ATTACK_TYPE_1_1:
 	case BME_ATTACK_TYPE_1_N:
@@ -1448,7 +1448,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 	// for TRIP, mark target as needing a reroll
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
-		BM_ASSERT(g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
+		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
 
 		BMC_Die *tgt_die;
 		BMC_Player *target = &(m_player[m_target_player]);
@@ -1483,7 +1483,7 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 	INT i;
 
 	// reroll attackers
-	switch (g_attack_type[_move.m_attack])
+	switch (c_attack_type[_move.m_attack])
 	{
 	case BME_ATTACK_TYPE_1_1:
 	case BME_ATTACK_TYPE_1_N:
@@ -1509,7 +1509,7 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
 		// reroll target
-		BM_ASSERT(g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
+		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
 
 		tgt_die = target->GetDie(_move.m_target);
 		tgt_die->OnApplyAttackNatureRollTripped();
@@ -1535,7 +1535,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 	INT i;
 
 	// capture - attacker effects
-	switch (g_attack_type[_move.m_attack])
+	switch (c_attack_type[_move.m_attack])
 	{
 	case BME_ATTACK_TYPE_1_1:
 	case BME_ATTACK_TYPE_1_N:
@@ -1568,7 +1568,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 	// TRIP attack
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
-		BM_ASSERT(g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
+		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
 
 		tgt_die = target->GetDie(_move.m_target);
 
@@ -1583,7 +1583,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 	// capture - target effects
 	if (capture)
 	{
-		switch (g_attack_type[_move.m_attack])
+		switch (c_attack_type[_move.m_attack])
 		{
 		case BME_ATTACK_TYPE_N_1:
 		case BME_ATTACK_TYPE_1_1:

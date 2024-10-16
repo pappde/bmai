@@ -218,14 +218,14 @@ void BMC_BMAI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 	// walk dice and determine possible things to set
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
-		if (pl->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+		if (pl->GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 		{
 			swing_action[actions].swing = true;
 			swing_action[actions].index = i;
-			swing_action[actions].value = g_swing_sides_range[i][0];	// initialize to min
+			swing_action[actions].value = c_swing_sides_range[i][0];	// initialize to min
 			actions++;
-			combinations *= (g_swing_sides_range[i][1]-g_swing_sides_range[i][0])+1;
-			_move.m_swing_value[i] = g_swing_sides_range[i][0];
+			combinations *= (c_swing_sides_range[i][1]-c_swing_sides_range[i][0])+1;
+			_move.m_swing_value[i] = c_swing_sides_range[i][0];
 		}
 	}
 
@@ -318,7 +318,7 @@ void BMC_BMAI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 
 			// past max?
 			if (swing_action[p].swing)
-				max = g_swing_sides_range[swing_action[p].index][1];
+				max = c_swing_sides_range[swing_action[p].index][1];
 			else
 				max = 1;
 			if (swing_action[p].value <= max)
@@ -327,7 +327,7 @@ void BMC_BMAI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 			// we are past max - reset to min and cycle the next value
 			if (swing_action[p].swing)
 			{
-				swing_action[p].value = g_swing_sides_range[swing_action[p].index][0];
+				swing_action[p].value = c_swing_sides_range[swing_action[p].index][0];
 				_move.m_swing_value[swing_action[p].index] = swing_action[p].value;
 			}
 			else

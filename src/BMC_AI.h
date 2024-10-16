@@ -41,5 +41,5 @@ public:
 protected:
 
 private:
-	BMC_AI *	m_qai;
+
 };

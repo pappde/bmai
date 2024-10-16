@@ -91,9 +91,9 @@ void BMC_AI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 	// PRE: since using ValidSetSwing() all swing/option dice need to have valid settings
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
-		if (p->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+		if (p->GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 		{
-			_move.m_swing_value[i] = g_swing_sides_range[i][0];	// set first value
+			_move.m_swing_value[i] = c_swing_sides_range[i][0];	// set first value
 			actions++;
 		}
 	}
@@ -103,12 +103,12 @@ void BMC_AI::GetSetSwingAction(BMC_Game *_game, BMC_Move &_move)
 	{
 		for (i=0; i<BME_SWING_MAX; i++)
 		{
-			if (p->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+			if (p->GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 			{
-				int v = g_swing_sides_range[i][0];
+				int v = c_swing_sides_range[i][0];
 				do
 				{
-					BM_ASSERT(v<=g_swing_sides_range[i][1]);
+					BM_ASSERT(v<=c_swing_sides_range[i][1]);
 					_move.m_swing_value[i] = v++;
 				}
 				while (!_game->ValidSetSwing(_move));

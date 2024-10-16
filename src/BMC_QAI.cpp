@@ -62,7 +62,7 @@ void BMC_QAI::GetAttackAction(BMC_Game *_game, BMC_Move &_move)
 		score = sim.GetPhasePlayer()->GetScore() - sim.GetTargetPlayer()->GetScore();
 
 		// modify score according to what dice are going to be re-rolled
-		switch (g_attack_type[attack->m_attack])
+		switch (c_attack_type[attack->m_attack])
 		{
 		case BME_ATTACK_TYPE_1_1:
 		case BME_ATTACK_TYPE_1_N:

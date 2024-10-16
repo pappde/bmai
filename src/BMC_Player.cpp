@@ -334,7 +334,7 @@ bool BMC_Player::NeedsSetSwing()
 
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
-		if (GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+		if (GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 			return true;
 	}
 

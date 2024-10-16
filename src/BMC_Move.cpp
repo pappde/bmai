@@ -15,7 +15,7 @@
 #include "BMC_Logger.h"
 
 
-const char *m_swing_name[BME_SWING_MAX] =
+const char *c_swing_name[BME_SWING_MAX] =
 {
 	"None",
 	"P",
@@ -32,7 +32,7 @@ const char *m_swing_name[BME_SWING_MAX] =
 };
 
 // ACTION names
-const char *m_action_name[BME_ACTION_MAX] =
+const char *c_action_name[BME_ACTION_MAX] =
 {
 	"aux",
 	"chance",
@@ -52,7 +52,7 @@ void BMC_Move::Debug(BME_DEBUG _cat, const char *_postfix)
 	INT i;
 	BMC_Player *phaser = m_game->GetPhasePlayer();
 
-	printf("%s ", m_action_name[m_action]);
+	printf("%s ", c_action_name[m_action]);
 
 	switch (m_action)
 	{
@@ -65,8 +65,8 @@ void BMC_Move::Debug(BME_DEBUG _cat, const char *_postfix)
 			// check swing dice
 			for (i=0; i<BME_SWING_MAX; i++)
 			{
-				if (phaser->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
-	 				printf("%s %d  ", m_swing_name[i], m_swing_value[i]);
+				if (phaser->GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
+	 				printf("%s %d  ", c_swing_name[i], m_swing_value[i]);
 			}
 
 			// check option dice
@@ -122,7 +122,7 @@ void BMC_Move::Debug(BME_DEBUG _cat, const char *_postfix)
 			BMC_Player *target = GetTarget();
 			INT printed;
 
-			printf("%s - ", g_attack_name[m_attack]);
+			printf("%s - ", c_attack_name[m_attack]);
 
 			if (MultipleAttackers())
 			{

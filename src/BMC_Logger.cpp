@@ -21,7 +21,7 @@
 
 
 // BME_DEBUG setting names
-const char *g_debug_name[BME_DEBUG_MAX] =
+const char *c_debug_name[BME_DEBUG_MAX] =
 {
   "ALWAYS",
   "WARNING",
@@ -63,7 +63,7 @@ bool BMC_Logger::SetLogging(const char *_catname, bool _log)
   INT i;
   for (i=0; i<BME_DEBUG_MAX; i++)
   {
-    if (!std::strcmp(_catname, g_debug_name[i]))
+    if (!std::strcmp(_catname, c_debug_name[i]))
     {
       SetLogging((BME_DEBUG)i, _log);
       Log(BME_DEBUG_ALWAYS, "Debug %s set to %d\n", _catname, _log);

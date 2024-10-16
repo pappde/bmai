@@ -19,13 +19,13 @@
 
 //X?: Roll a d6. 1: d4; 2: d6; 3: d8; 4: d10; 5: d12; 6: d20.
 //V?: Roll a d4. 1: d6; 2: d8; 3: d10; 4: d12.
-INT m_mood_sides_X[BMD_MOOD_SIDES_RANGE_X] = { 4, 6, 8,  10, 12, 20 };
-INT m_mood_sides_V[BMD_MOOD_SIDES_RANGE_V] = { 6, 8, 10, 12 };
+INT c_mood_sides_X[BMD_MOOD_SIDES_RANGE_X] = { 4, 6, 8,  10, 12, 20 };
+INT c_mood_sides_V[BMD_MOOD_SIDES_RANGE_V] = { 6, 8, 10, 12 };
 
 // MIGHTY dice - index by old number of sides
-INT m_mighty_sides[20] = { 1, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20 };
+INT c_mighty_sides[20] = { 1, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 16, 16, 16, 16, 20, 20, 20, 20 };
 // WEAK dice - index by old number of sides
-INT m_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12, 16, 16, 16 };
+INT c_weak_sides[20] = { 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 12, 12, 16, 16, 16 };
 
 void BMC_Die::Reset()
 {
@@ -272,7 +272,7 @@ float BMC_Die::GetScore(bool _own)
 void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _actually_attacking)
 {
     // TODO determine how this may conflict with the design of `bool _actually_attacking`
-    BM_ASSERT(g_attack_type[_move.m_attack]!=BME_ATTACK_TYPE_0_0);
+    BM_ASSERT(c_attack_type[_move.m_attack]!=BME_ATTACK_TYPE_0_0);
 
 	// clear value
 	// KONSTANT: don't reroll
@@ -282,7 +282,7 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 	// BERSERK attack - half size and round fractions up
 	if (_actually_attacking && _move.m_attack == BME_ATTACK_BERSERK)
 	{
-		BM_ASSERT(g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_N);
+		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_N);
 		BM_ASSERT(Dice()==1);
 
 		_owner->OnDieSidesChanging(this);
@@ -299,7 +299,7 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 	// drp022521 - this rule only applies if actually going to capture a die
 	if (HasProperty(BME_PROPERTY_MORPHING) && _move.m_attack != BME_ATTACK_INVALID)
 	{
-		BM_ASSERT(g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1 || g_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1);
+		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1 || c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1);
 		BMC_Player *target = _move.m_game->GetPlayer(_move.m_target_player);
 
 		BM_ASSERT(Dice()==1);
@@ -353,7 +353,7 @@ void BMC_Die::OnBeforeRollInGame(BMC_Player *_owner)
 			if (m_sides[d]>=20)
 				m_sides_max += (m_sides[d] = 30);
 			else
-				m_sides_max += (m_sides[d] = m_mighty_sides[m_sides[d]]);
+				m_sides_max += (m_sides[d] = c_mighty_sides[m_sides[d]]);
 		}
 		_owner->OnDieSidesChanged(this);
 	}
@@ -372,7 +372,7 @@ void BMC_Die::OnBeforeRollInGame(BMC_Player *_owner)
 			else if (m_sides[d]==20)
 				m_sides_max += (m_sides[d] = 16);
 			else
-				m_sides_max += (m_sides[d] = m_weak_sides[m_sides[d]]);
+				m_sides_max += (m_sides[d] = c_weak_sides[m_sides[d]]);
 		}
 		_owner->OnDieSidesChanged(this);
 	}
@@ -395,15 +395,15 @@ void BMC_Die::OnApplyAttackNatureRollAttacker(BMC_Move &_move, BMC_Player *_owne
 			switch (swing)
 			{
 			case BME_SWING_X:
-				m_sides[i] = m_mood_sides_X[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_X)];
+				m_sides[i] = c_mood_sides_X[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_X)];
 				break;
 			case BME_SWING_V:
-				m_sides[i] = m_mood_sides_V[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_V)];
+				m_sides[i] = c_mood_sides_V[g_rng.GetRand(BMD_MOOD_SIDES_RANGE_V)];
 				break;
 			default:
 				// some BM use MOOD SWING on other than X and V
-				delta = g_swing_sides_range[swing][1] - g_swing_sides_range[swing][0];
-				m_sides[i] = g_rng.GetRand(delta+1)+ g_swing_sides_range[swing][0];
+				delta = c_swing_sides_range[swing][1] - c_swing_sides_range[swing][0];
+				m_sides[i] = g_rng.GetRand(delta+1)+ c_swing_sides_range[swing][0];
 				break;
 			}
 			m_sides_max += m_sides[i];

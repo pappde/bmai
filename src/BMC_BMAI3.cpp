@@ -19,7 +19,8 @@
 #include "BMC_Stats.h"
 
 
-BMC_BMAI3::BMC_BMAI3(BMC_AI * _ai): BMC_BMAI(_ai) {
+BMC_BMAI3::BMC_BMAI3(BMC_AI * _ai): BMC_BMAI(_ai)
+{
 	// SETTINGS
 	m_sims_per_check = m_min_sims;
 	m_min_best_score_threshold = 0.25f;
@@ -265,11 +266,11 @@ void BMC_BMAI3::RandomlySelectMoves(BMC_MoveList &_list, int _max)
 		swing_dice = 0;	// TODO: don't recompute every time
 		for (i=0; i<BME_SWING_MAX; i++)
 		{
-			if (pl->GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+			if (pl->GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 			{
 				swing_dice++;
-				if (move->m_swing_value[i]==g_swing_sides_range[i][0]
-					|| move->m_swing_value[i]==g_swing_sides_range[i][1])
+				if (move->m_swing_value[i]==c_swing_sides_range[i][0]
+					|| move->m_swing_value[i]==c_swing_sides_range[i][1])
 				{
 					move->m_extreme_settings++;
 				}

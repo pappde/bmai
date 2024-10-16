@@ -14,10 +14,10 @@
 
 
 float s_ply_decay = 0.5f;
-float g_turbo_accuracy = 1;	// 0 is worst, 1 is best
+float s_turbo_accuracy = 1;	// 0 is worst, 1 is best
 
 // global definitions
-BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX] =
+BME_ATTACK_TYPE	c_attack_type[BME_ATTACK_MAX] =
 {
 	BME_ATTACK_TYPE_1_1,  // FIRST & POWER 1:1
 	BME_ATTACK_TYPE_N_1,  // SKILL N:1
@@ -29,7 +29,7 @@ BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX] =
 };
 
 // SWING dice - from spindisc's page
-INT g_swing_sides_range[BME_SWING_MAX][2] =
+INT c_swing_sides_range[BME_SWING_MAX][2] =
 {
 	{ 0, 0 },
 	{ 1, 30 },	// P
@@ -46,7 +46,7 @@ INT g_swing_sides_range[BME_SWING_MAX][2] =
 };
 
 // ATTACK names
-const char *g_attack_name[BME_ATTACK_MAX] =
+const char *c_attack_name[BME_ATTACK_MAX] =
 {
 	"power",
 	"skill",

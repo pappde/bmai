@@ -67,7 +67,7 @@ typedef std::vector<float>	BMC_FloatVector;
 #define BMD_MOOD_SIDES_RANGE_V	4
 
 extern float s_ply_decay;
-extern float g_turbo_accuracy;
+extern float s_turbo_accuracy;
 
 // debug categories
 enum BME_DEBUG
@@ -213,8 +213,8 @@ enum BME_ATTACK_TYPE
 	BME_ATTACK_TYPE_MAX
 };
 
-extern BME_ATTACK_TYPE	g_attack_type[BME_ATTACK_MAX];
+extern BME_ATTACK_TYPE	c_attack_type[BME_ATTACK_MAX];
 
-extern INT g_swing_sides_range[BME_SWING_MAX][2];
+extern INT c_swing_sides_range[BME_SWING_MAX][2];
 
-extern const char *g_attack_name[BME_ATTACK_MAX];
+extern const char *c_attack_name[BME_ATTACK_MAX];
