@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// parser.h
+// BMC_Parser.h
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
@@ -8,9 +8,18 @@
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
+// dbl100524 - further split out of individual headers
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include <cstdio>
+#include "BMC_AI.h"
+#include "BMC_BMAI.h"
+#include "BMC_BMAI3.h"
+#include "BMC_Die.h"
+#include "BMC_QAI.h"
+
 
 class BMC_Parser
 {
@@ -54,8 +63,16 @@ private:
 	INT				ParseDieDefinedSides(INT _pos);
 
 	// state for dice parsing
-	BMC_Player *p;
-	BMC_Die *d;
+	BMC_Player		*p;
+	BMC_Die			*d;
 	char			line[BMD_MAX_STRING];
-	FILE *file;
+	FILE			*file;
+
+	BMC_Game		m_game;
 };
+
+extern BMC_QAI		g_qai;
+extern BMC_BMAI3	g_ai;
+extern BMC_QAI		g_qai2;
+extern BMC_BMAI		g_bmai;
+extern BMC_BMAI3	g_bmai3;

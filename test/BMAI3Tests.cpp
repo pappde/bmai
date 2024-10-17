@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
-#include "../src/bmai_ai.h"
-#include "../src/parser.h"
-#include <cstdarg>  // for va_start() va_end()
+#include "../src/BMC_Parser.h"
+#include <cstdio>
+#include <cstdarg> // for va_start() va_end()
 #include <filesystem>
+#include <gtest/gtest.h>
 namespace fs = std::filesystem;
 
 // a path util, if useful consider creaking out into generic utility

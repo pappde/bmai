@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// player.h
+// BMC_Player.h
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
@@ -8,13 +8,15 @@
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
+// dbl100524 - further split out of individual headers
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 // TODO_HEADERS: drp030321 - clean up headers
-#include "bmai.h"
-#include "man.h"
+#include "BMC_Die.h"
+#include "BMC_Man.h"
+
 
 class BMC_Player	// 204b
 {

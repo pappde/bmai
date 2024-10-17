@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// stats.h
+// BMC_Stats.h
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
@@ -11,6 +11,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include <ctime>
+#include "bmai_lib.h"
+
 
 class BMC_Stats
 {
@@ -35,3 +39,6 @@ private:
 	int				m_total_samples[BMD_MAX_PLY];
 
 };
+
+// global
+extern BMC_Stats  g_stats;

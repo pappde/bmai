@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-// bmai_player.cpp
+// BMC_Player.cpp
 // Copyright (c) 2001-2024 Denis Papp. All rights reserved.
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
@@ -7,19 +7,16 @@
 // DESC: BMAI code for managing the BMC_Player class
 //
 // REVISION HISTORY:
-//
+// dbl100524 - broke this logic out into its own class file
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // includes
-#include "bmai.h"
-#include "player.h"
-#include "logger.h"
-#include <cassert>
-#include <climits> // for INT_MAX
+#include "BMC_Player.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////
-// BMC_Player methods
-///////////////////////////////////////////////////////////////////////////////////////////
+#include <cstdio>
+#include <climits>
+#include "BMC_Logger.h"
+
 
 BMC_Player::BMC_Player() 
 {
@@ -337,7 +334,7 @@ bool BMC_Player::NeedsSetSwing()
 
 	for (i=0; i<BME_SWING_MAX; i++)
 	{
-		if (GetTotalSwingDice(i)>0 && g_swing_sides_range[i][0]>0)
+		if (GetTotalSwingDice(i)>0 && c_swing_sides_range[i][0]>0)
 			return true;
 	}
 
