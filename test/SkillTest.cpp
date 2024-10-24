@@ -16,3 +16,18 @@ TEST(SkillTests, MaximumSkill) {
         EXPECT_EQ(die.GetValueTotal(), 6);
     }
 }
+
+TEST(SkillTests, InsultSkill) {
+    // Arrange: Given a 6 sided Maximum die
+    BMC_Die die = TestUtils::createTestDie(6, BME_PROPERTY_INSULT);
+    die.Roll(); // triggers a Recompute.
+
+    BMC_Move power = BMC_Move();
+    power.m_attack = BME_ATTACK_POWER;
+    EXPECT_TRUE(die.CanBeAttacked(power));
+
+    BMC_Move skill = BMC_Move();
+    skill.m_attack = BME_ATTACK_SKILL;
+    EXPECT_FALSE(die.CanBeAttacked(skill));
+
+}

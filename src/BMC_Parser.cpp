@@ -158,6 +158,7 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 			DEFINE_PROPERTY('G', BME_PROPERTY_RAGE)
 			DEFINE_PROPERTY('k', BME_PROPERTY_KONSTANT)
 			DEFINE_PROPERTY('M', BME_PROPERTY_MAXIMUM)
+			DEFINE_PROPERTY('I', BME_PROPERTY_INSULT)
 		default:
 			BMF_Error("error parsing die %s (pre-fix property at %c)", line, ch);
 		}
