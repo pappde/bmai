@@ -75,6 +75,10 @@ void BMC_Die::RecomputeAttacks()
 	if (HasProperty(BME_PROPERTY_KONSTANT))
 		m_attacks.Clear(BME_ATTACK_POWER);
 
+	// INSULT
+	if (HasProperty(BME_PROPERTY_INSULT))
+		m_vulnerabilities.Clear(BME_ATTACK_SKILL);
+
 	// BERSERK
 	if (HasProperty(BME_PROPERTY_BERSERK))
 	{
@@ -118,6 +122,9 @@ void BMC_Die::RecomputeAttacks()
 
 	// MORPHING shouldn't be allowed to SPEED
 	BM_ERROR( !HasProperty(BME_PROPERTY_MORPHING) || !m_attacks.IsSet(BME_ATTACK_SPEED) );
+
+	// INSULT shouldn't be vulnerable to SKILL
+	BM_ERROR( !HasProperty(BME_PROPERTY_INSULT) || !m_vulnerabilities.IsSet(BME_ATTACK_SKILL) );
 
 	// MORPHING shouldn't be paired with TURBO
 	BM_ERROR( (m_properties & (BME_PROPERTY_MORPHING|BME_PROPERTY_TURBO)) != (BME_PROPERTY_MORPHING|BME_PROPERTY_TURBO) );

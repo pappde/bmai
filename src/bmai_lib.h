@@ -20,6 +20,7 @@
 
 // i like that this include is VERY small and include no BMC_ classes
 #include <vector>
+#include <cstdint>
 
 
 // version number
@@ -33,6 +34,7 @@
 // and to clean up some circular/referential dependency issues bmai_ai.h holds some AI globals
 
 // typedefs
+typedef uint64_t		U64;
 typedef unsigned long	U32;
 typedef unsigned char	U8;
 typedef signed char		S8;
@@ -103,38 +105,39 @@ enum BME_ACTION
 // N = apply nature attack stage
 enum BME_PROPERTY
 {
-	BME_PROPERTY_TIME_AND_SPACE	=	 0x0001, // (N) post-attack effect
-	BME_PROPERTY_AUXILIARY		=	 0x0002, // pre-game action
-	BME_PROPERTY_QUEER			=	 0x0004, // attacks
-	BME_PROPERTY_TRIP			=	 0x0008, // (N) attacks, special attack, initiative effect
-	BME_PROPERTY_SPEED			=	 0x0010, // attacks
-	BME_PROPERTY_SHADOW			=	 0x0020, // attacks
-	BME_PROPERTY_BERSERK		=	 0x0040, // attacks
-	BME_PROPERTY_STEALTH		=	 0x0080, // attacks
-	BME_PROPERTY_POISON			=	 0x0100, // score modifier
-	BME_PROPERTY_NULL			=	 0x0200,	// (N) capture modifier
-	BME_PROPERTY_MOOD			=	 0x0400,	// (N) post-attack effect
-	BME_PROPERTY_TURBO			=	 0x0800,	// (DP) post-attack action
-	BME_PROPERTY_OPTION			=	 0x1000,	// swing, uses two dice
-	BME_PROPERTY_TWIN			=	 0x2000,	// uses two dice
-	BME_PROPERTY_FOCUS			=	 0x4000,	// initiative action
-	BME_PROPERTY_VALID			=	 0x8000,	// without this, it isn't a valid die!
-	BME_PROPERTY_MIGHTY			=   0x10000,	// (P) pre-roll effect
-	BME_PROPERTY_WEAK			=   0x20000,	// (P) pre-roll effect
-	BME_PROPERTY_RESERVE		=   0x40000,	// preround (after a loss)
-	BME_PROPERTY_ORNERY			=   0x80000,	// (N) post-attack effect on all dice
-	BME_PROPERTY_DOPPLEGANGER	=  0x100000,	// (P) post-attack effect
-	BME_PROPERTY_CHANCE			=  0x200000,	// initiative action
-	BME_PROPERTY_MORPHING		=  0x400000,	// (P) post-attack effect
-	BME_PROPERTY_RADIOACTIVE	=  0x800000,	// (P) post-attack effect
-	BME_PROPERTY_WARRIOR		= 0x1000000,	// attacks
-	BME_PROPERTY_SLOW			= 0x2000000,	// initiative effect
-	BME_PROPERTY_UNIQUE			= 0x4000000,	// (D) swing rule
-	BME_PROPERTY_UNSKILLED		= 0x8000000,	// attacks [The Flying Squirrel]	// TODO: implement as BM property?
-	BME_PROPERTY_STINGER		=0x10000000,	// initiative effect, (D) skill attacks
-	BME_PROPERTY_RAGE			=0x20000000,	// TODO
-	BME_PROPERTY_KONSTANT		=0x40000000,
-	BME_PROPERTY_MAXIMUM		=0x80000000,
+	BME_PROPERTY_TIME_AND_SPACE	=	  0x0001,	// (N) post-attack effect
+	BME_PROPERTY_AUXILIARY		=	  0x0002,	// pre-game action
+	BME_PROPERTY_QUEER			=	  0x0004,	// attacks
+	BME_PROPERTY_TRIP			=	  0x0008,	// (N) attacks, special attack, initiative effect
+	BME_PROPERTY_SPEED			=	  0x0010,	// attacks
+	BME_PROPERTY_SHADOW			=	  0x0020,	// attacks
+	BME_PROPERTY_BERSERK		=	  0x0040,	// attacks
+	BME_PROPERTY_STEALTH		=	  0x0080,	// attacks
+	BME_PROPERTY_POISON			=	  0x0100,	// score modifier
+	BME_PROPERTY_NULL			=	  0x0200,	// (N) capture modifier
+	BME_PROPERTY_MOOD			=	  0x0400,	// (N) post-attack effect
+	BME_PROPERTY_TURBO			=	  0x0800,	// (DP) post-attack action
+	BME_PROPERTY_OPTION			=	  0x1000,	// swing, uses two dice
+	BME_PROPERTY_TWIN			=	  0x2000,	// uses two dice
+	BME_PROPERTY_FOCUS			=	  0x4000,	// initiative action
+	BME_PROPERTY_VALID			=	  0x8000,	// without this, it isn't a valid die!
+	BME_PROPERTY_MIGHTY			=    0x10000,	// (P) pre-roll effect
+	BME_PROPERTY_WEAK			=    0x20000,	// (P) pre-roll effect
+	BME_PROPERTY_RESERVE		=    0x40000,	// preround (after a loss)
+	BME_PROPERTY_ORNERY			=    0x80000,	// (N) post-attack effect on all dice
+	BME_PROPERTY_DOPPLEGANGER	=   0x100000,	// (P) post-attack effect
+	BME_PROPERTY_CHANCE			=   0x200000,	// initiative action
+	BME_PROPERTY_MORPHING		=   0x400000,	// (P) post-attack effect
+	BME_PROPERTY_RADIOACTIVE	=   0x800000,	// (P) post-attack effect
+	BME_PROPERTY_WARRIOR		=  0x1000000,	// attacks
+	BME_PROPERTY_SLOW			=  0x2000000,	// initiative effect
+	BME_PROPERTY_UNIQUE			=  0x4000000,	// (D) swing rule
+	BME_PROPERTY_UNSKILLED		=  0x8000000,	// attacks [The Flying Squirrel]	// TODO: implement as BM property?
+	BME_PROPERTY_STINGER		= 0x10000000,	// initiative effect, (D) skill attacks
+	BME_PROPERTY_RAGE			= 0x20000000,	// TODO
+	BME_PROPERTY_KONSTANT		= 0x40000000,
+	BME_PROPERTY_MAXIMUM		= 0x80000000,
+	BME_PROPERTY_INSULT			=0x100000000,
 	BME_PROPERTY_MAX
 };
 

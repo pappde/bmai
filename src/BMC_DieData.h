@@ -28,7 +28,7 @@ public:
     void		Debug(BME_DEBUG _cat = BME_DEBUG_ALWAYS);
 
     // accessors
-    bool		HasProperty(INT _p) { return m_properties & _p; }
+    bool		HasProperty(U64 _p) { return m_properties & _p; }
     BME_SWING	GetSwingType(INT _d) { return (BME_SWING)m_swing_type[_d]; }
     bool		Valid() { return (m_properties & BME_PROPERTY_VALID); }
     // drp022521 - fixed to return INT instead of bool
@@ -36,7 +36,7 @@ public:
     INT			GetSides(INT _t) { return m_sides[_t]; }
 
 protected:
-    U32			m_properties;
+    U64			m_properties;
     U8			m_sides[BMD_MAX_TWINS];			// number of sides if not a swing die, or current number of sides
 
 private:
