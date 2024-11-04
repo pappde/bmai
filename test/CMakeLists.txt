@@ -30,6 +30,7 @@ FetchContent_MakeAvailable(googletest)
 set(TEST_SOURCES
         BMAI3Tests.cpp
         LegacyFunctions.cpp
+        ParserTest.cpp
         PlayerTest.cpp
         SkillTest.cpp
         testutils.h

@@ -25,9 +25,9 @@ class BMC_Parser
 {
 public:
 	BMC_Parser();
-	void	ParseGame();
-	void	Parse();
-	void	Parse(FILE *_fp) { file = _fp; Parse(); }
+	void	ParseStdIn() { file = stdin; Parse(); }
+	void	ParseFile(FILE *_fp) { file = _fp; Parse(); }
+	void	ParseString(const char*  _data);
 
 protected:
 	void			GetAction();
@@ -35,6 +35,7 @@ protected:
 	void			CompareAI(INT _games);
 	void			PlayFairGames(INT _games, INT _mode, F32 _p);
 	void			ParseDie(INT _p, INT _dice);
+	void			ParseGame();
 	void			ParsePlayer(INT _p, INT _dice);
 	bool			Read(bool _fatal = true);
 
@@ -57,6 +58,8 @@ protected:
 	bool			DieIsOption(char _c) { return _c == '/'; }
 
 private:
+	void			Parse();
+
 	// parsing dice methods (uses 'line')
 	INT				ParseDieNumber(INT & _pos);
 	void			ParseDieSides(INT & _pos, INT _die);
@@ -69,6 +72,11 @@ private:
 	FILE			*file;
 
 	BMC_Game		m_game;
+
+	// support reading strings in addition to files
+	const char* stringBuffer = nullptr;
+	size_t stringBufferPos = 0;
+	size_t stringBufferLen = 0;
 };
 
 extern BMC_QAI		g_qai;

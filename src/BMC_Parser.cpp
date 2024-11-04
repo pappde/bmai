@@ -336,21 +336,58 @@ BMC_Parser::BMC_Parser() : m_game(false) {
 	file = stdin;
 }
 
+void BMC_Parser::ParseString(const char *_data) {
+	stringBuffer = _data;
+	stringBufferPos = 0;
+	stringBufferLen = strlen(_data);
+	Parse();
+}
+
 bool BMC_Parser::Read(bool _fatal)
 {
-	if (!fgets(line, BMD_MAX_STRING, file))
+	if (stringBuffer)
 	{
-		if (_fatal)
-			BMF_Error( "missing input" );
-		return false;
+		if (stringBufferPos >= stringBufferLen)
+		{
+			if (_fatal)
+				BMF_Error("missing input");
+			return false;
+		}
+
+		// Find the next newline or end of string
+		size_t startPos = stringBufferPos;
+		while (stringBufferPos < stringBufferLen && stringBuffer[stringBufferPos] != '\n')
+			stringBufferPos++;
+
+		// Copy the line to the `line` buffer
+		size_t len = stringBufferPos - startPos;
+		if (len >= BMD_MAX_STRING)
+			len = BMD_MAX_STRING - 1;
+		std::strncpy(line, stringBuffer + startPos, len);
+		line[len] = '\0';
+
+		// Skip the newline character
+		if (stringBufferPos < stringBufferLen && stringBuffer[stringBufferPos] == '\n')
+			stringBufferPos++;
+
+		return true;
 	}
+	else
+	{
+		if (!fgets(line, BMD_MAX_STRING, file))
+		{
+			if (_fatal)
+				BMF_Error( "missing input" );
+			return false;
+		}
 
-	// remove EOL
-	INT len = (INT)std::strlen(line);
-	if (len>0 && line[len-1]=='\n')
-		line[len-1] = 0;
+		// remove EOL
+		INT len = (INT)std::strlen(line);
+		if (len>0 && line[len-1]=='\n')
+			line[len-1] = 0;
 
-	return true;
+		return true;
+	}
 }
 
 void BMC_Parser::Send( const char *_fmt, ... )
@@ -654,6 +691,7 @@ void BMC_Parser::PlayGame(INT _games)
 
 	BMF_Log(BME_DEBUG_ALWAYS, "matches over %d - %d\n", wins[0], wins[1]);
 }
+
 
 void BMC_Parser::CompareAI(INT _games)
 {
