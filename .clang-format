@@ -1,0 +1,30 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Always
+TabWidth: 4
+BreakBeforeBraces: Allman
+AllowShortBlocksOnASingleLine: Always
+
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+
+Language: Cpp
+
+## Naming conventions
+#
+#Cpp:
+#  Naming:
+#    ClassCase: PascalCase
+#    MethodCase: PascalCase
+#    VariableCase: lower_case
+#    ParameterCase: lower_case
+#    MemberCase: m_lower_case
+#    ConstantCase: UPPER_CASE
+#    EnumCase: UPPER_CASE
+#
+## Custom prefixes
+#PrefixClasses: BMC_
+#PrefixStructs: BMC_
+#PrefixEnums: BMC_
+#PrefixUnions: BMC_
+#PrefixInterfaces: BMC_

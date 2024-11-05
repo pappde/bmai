@@ -27,9 +27,9 @@ class BMC_Parser
 {
 public:
 	BMC_Parser();
-	void	ParseStdIn() { file = stdin; Parse(); }
-	void	ParseFile(FILE *_fp) { file = _fp; Parse(); }
-	void	ParseString(const std::string  _data);
+	void	ParseStdIn() { m_inputFile = stdin; Parse(); }
+	void	ParseFile(FILE *_fp) { m_inputFile = _fp; Parse(); }
+	void	ParseString(std::string  _data);
 
 protected:
 	void			GetAction();
@@ -39,7 +39,7 @@ protected:
 	void			ParseDie(INT _p, INT _dice);
 	void			ParseGame();
 	void			ParsePlayer(INT _p, INT _dice);
-	bool			Read(bool _fatal = true);
+	bool			ReadNextInputToLine(bool _fatal = true);
 
 	// output
 
@@ -68,15 +68,15 @@ private:
 	INT				ParseDieDefinedSides(INT _pos);
 
 	// state for dice parsing
-	BMC_Player		*p;
-	BMC_Die			*d;
-	char			line[BMD_MAX_STRING];
-	FILE			*file;
+	BMC_Player		*m_player;
+	BMC_Die			*m_die;
+	char			m_line[BMD_MAX_STRING];
+	FILE			*m_inputFile;
 
 	BMC_Game		m_game;
 
 	// support reading strings in addition to files
-	std::stringstream ss;
+	std::stringstream m_inputStream;
 };
 
 extern BMC_QAI		g_qai;
