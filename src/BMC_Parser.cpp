@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cstdarg>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 #include "BMC_AI_Maximize.h"
@@ -55,8 +56,8 @@ BMC_AI * c_ai_type[BMD_AI_TYPES] = { &g_bmai, &g_qai2, &g_bmai3 };
 
 INT BMC_Parser::ParseDieNumber(INT & _pos)
 {
-	INT value = atoi(line + _pos);
-	while (DieIsValue(line[++_pos]))	// skip past number
+	INT value = atoi(m_line + _pos);
+	while (DieIsValue(m_line[++_pos]))	// skip past number
 	{
 	}
 	return value;
@@ -64,10 +65,10 @@ INT BMC_Parser::ParseDieNumber(INT & _pos)
 
 INT BMC_Parser::ParseDieDefinedSides(INT _pos)
 {
-	while (_pos < (INT)std::strlen(line) && line[_pos] != '-')
+	while (_pos < (INT)std::strlen(m_line) && m_line[_pos] != '-')
 		_pos++;
 
-	if (line[_pos]=='-')
+	if (m_line[_pos]=='-')
 		return ParseDieNumber(++_pos);
 
 	return 0;
@@ -79,29 +80,29 @@ INT BMC_Parser::ParseDieDefinedSides(INT _pos)
 // POST: sets m_swing_type[], m_sides[], m_sides_max, and m_swing_set
 void BMC_Parser::ParseDieSides(INT & _pos, INT _die)
 {
-	if (DieIsSwing(line[_pos]))
+	if (DieIsSwing(m_line[_pos]))
 	{
-		BME_SWING	swing_type = (BME_SWING)(BME_SWING_FIRST + (line[_pos] - BMD_FIRST_SWING_CHAR));
-		d->m_swing_type[_die] =  swing_type;
-		d->m_sides[_die] = 0;
-		p->m_swing_set = BMC_Player::SWING_SET_NOT;
+		BME_SWING	swing_type = (BME_SWING)(BME_SWING_FIRST + (m_line[_pos] - BMD_FIRST_SWING_CHAR));
+		m_die->m_swing_type[_die] =  swing_type;
+		m_die->m_sides[_die] = 0;
+		m_player->m_swing_set = BMC_Player::SWING_SET_NOT;
 		_pos++;
 
 		// check if swing sides have been defined - NOTE this does not move _pos
 		INT sides = ParseDieDefinedSides(_pos);
 		if (sides>0)
 		{
-			d->m_sides[_die] = sides;
-			d->m_sides_max += sides;
-			p->m_swing_value[swing_type] = sides;
-			p->m_swing_set = BMC_Player::SWING_SET_LOCKED;
+			m_die->m_sides[_die] = sides;
+			m_die->m_sides_max += sides;
+			m_player->m_swing_value[swing_type] = sides;
+			m_player->m_swing_set = BMC_Player::SWING_SET_LOCKED;
 		}
 	}
 	else
 	{
-		d->m_swing_type[_die] = BME_SWING_NOT;
-		d->m_sides[_die] = ParseDieNumber(_pos);
-		d->m_sides_max += d->m_sides[_die];
+		m_die->m_swing_type[_die] = BME_SWING_NOT;
+		m_die->m_sides[_die] = ParseDieNumber(_pos);
+		m_die->m_sides_max += m_die->m_sides[_die];
 	}
 }
 
@@ -111,22 +112,22 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 {
 	BM_ERROR(_die<BMD_MAX_DICE);
 
-	p = m_game.GetPlayer(_p);
-	d = p->GetDie(_die);
+	m_player = m_game.GetPlayer(_p);
+	m_die = m_player->GetDie(_die);
 
 	// save original index
-	d->m_original_index = _die;
+	m_die->m_original_index = _die;
 
 	// DIE DEFINITION:
 	// - m_sides[2], m_properties, m_swing_type[2]
 
 	// prefix properties
 	INT pos = 0;
-	d->m_properties = BME_PROPERTY_VALID;
-	while (!DieIsValue(line[pos]) && !DieIsTwin(line[pos]))
+	m_die->m_properties = BME_PROPERTY_VALID;
+	while (!DieIsValue(m_line[pos]) && !DieIsTwin(m_line[pos]))
 	{
-		U8 ch = line[pos++];
-		#define	DEFINE_PROPERTY(_s, _v)	case _s: d->m_properties |= _v; break;
+		U8 ch = m_line[pos++];
+		#define	DEFINE_PROPERTY(_s, _v)	case _s: m_die->m_properties |= _v; break;
 
 		// WARNING: don't use SWING dice here (PQRSTUVWXYZ)
 		switch (ch)
@@ -159,23 +160,24 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 			DEFINE_PROPERTY('k', BME_PROPERTY_KONSTANT)
 			DEFINE_PROPERTY('M', BME_PROPERTY_MAXIMUM)
 			DEFINE_PROPERTY('I', BME_PROPERTY_INSULT)
+			DEFINE_PROPERTY('v', BME_PROPERTY_VALUE)
 		default:
-			BMF_Error("error parsing die %s (pre-fix property at %c)", line, ch);
+			BMF_Error("error parsing die %s (pre-fix property at %c)", m_line, ch);
 		}
 	}
 
 	// parse sides
 	// TWIN dice
-	d->m_sides_max = 0;
-	if (DieIsTwin(line[pos]))
+	m_die->m_sides_max = 0;
+	if (DieIsTwin(m_line[pos]))
 	{
 		pos++;
-		d->m_properties |= BME_PROPERTY_TWIN;
+		m_die->m_properties |= BME_PROPERTY_TWIN;
 		ParseDieSides(pos, 0);
-		if (line[pos++]!=',')
+		if (m_line[pos++]!=',')
 			BMF_Error("Error parsing twin die");
 		ParseDieSides(pos, 1);
-		if (line[pos++]!=')')
+		if (m_line[pos++]!=')')
 			BMF_Error("Error parsing twin die");
 	}
 	else
@@ -183,33 +185,33 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 		ParseDieSides(pos, 0);
 
 		// OPTION dice
-		if (DieIsOption(line[pos]))
+		if (DieIsOption(m_line[pos]))
 		{
 			pos++;
-			d->m_properties |= BME_PROPERTY_OPTION;
-			p->m_swing_set = BMC_Player::SWING_SET_NOT;
+			m_die->m_properties |= BME_PROPERTY_OPTION;
+			m_player->m_swing_set = BMC_Player::SWING_SET_NOT;
 			ParseDieSides(pos, 1);
 			// the previous call added to m_sides_max, so correct m_sides_max back to the # on the first die (by default)
-			d->m_sides_max = d->m_sides[0];
+			m_die->m_sides_max = m_die->m_sides[0];
 			// check for defined sides - NOTE this does not move pos
 			INT sides = ParseDieDefinedSides(pos);
 			if (sides>0)
 			{
-				BM_ASSERT(sides==d->m_sides[0] || sides==d->m_sides[1]);
-				if (sides==d->m_sides[1])
+				BM_ASSERT(sides==m_die->m_sides[0] || sides==m_die->m_sides[1]);
+				if (sides==m_die->m_sides[1])
 				{
-					d->SetOption(1);
+					m_die->SetOption(1);
 				}
-				p->m_swing_set = BMC_Player::SWING_SET_LOCKED;
+				m_player->m_swing_set = BMC_Player::SWING_SET_LOCKED;
 			} // end if sides are defined for OPTION
 		} // end if OPTION die
 	}
 
 	// postfix properties
-	while (pos < (INT)std::strlen(line) && line[pos] != ':')
+	while (pos < (INT)std::strlen(m_line) && m_line[pos] != ':')
 	{
-		U8 ch = line[pos++];
-		#define	DEFINE_POST_PROPERTY(_s, _v)	case _s: d->m_properties |= _v; break;
+		U8 ch = m_line[pos++];
+		#define	DEFINE_POST_PROPERTY(_s, _v)	case _s: m_die->m_properties |= _v; break;
 
 		switch (ch)
 		{
@@ -221,45 +223,45 @@ void BMC_Parser::ParseDie(INT _p, INT _die)
 			ParseDieNumber(pos);
 			break;
 		default:
-			BMF_Error("error parsing die %s (post-fix property at %c)", line, ch);
+			BMF_Error("error parsing die %s (post-fix property at %c)", m_line, ch);
 		}
 	}
 
 	// state
-	if (d->HasProperty(BME_PROPERTY_RESERVE))
-		d->m_state = BME_STATE_RESERVE;
+	if (m_die->HasProperty(BME_PROPERTY_RESERVE))
+		m_die->m_state = BME_STATE_RESERVE;
 	else
-		d->m_state = BME_STATE_NOTSET;
+		m_die->m_state = BME_STATE_NOTSET;
 
 	// actual value
-	if (line[pos]==':')
+	if (m_line[pos]==':')
 	{
 		pos++;
-		if (!DieIsNumeric(line[pos]))
-			BMF_Error("error parsing die %s (expecting current value at %c)", line, line[pos]);
+		if (!DieIsNumeric(m_line[pos]))
+			BMF_Error("error parsing die %s (expecting current value at %c)", m_line, m_line[pos]);
 
-		BM_ASSERT(d->m_state == BME_STATE_NOTSET);	// die marked as RESERVE shouldn't be in play
-		d->m_state = BME_STATE_READY;
-		d->m_value_total = atoi(line + pos);
-		while (DieIsValue(line[++pos]))	// skip past number
+		BM_ASSERT(m_die->m_state == BME_STATE_NOTSET);	// die marked as RESERVE shouldn't be in play
+		m_die->m_state = BME_STATE_READY;
+		m_die->m_value_total = atoi(m_line + pos);
+		while (DieIsValue(m_line[++pos]))	// skip past number
 		{
 		}
 
 		// FOCUS: dizzy?
-		if (line[pos]=='d')
+		if (m_line[pos]=='d')
 		{
 			pos++;
-			d->m_state = BME_STATE_DIZZY;
+			m_die->m_state = BME_STATE_DIZZY;
 		}
 	}
 
 	// did we successfully determine what this die is?
-	if (pos != std::strlen(line))
-		BMF_Error( "Could not successfully parse die: %s (broken at '%c')", line, line[pos]);
+	if (pos != std::strlen(m_line))
+		BMF_Error( "Could not successfully parse die: %s (broken at '%c')", m_line, m_line[pos]);
 
 	// set up attacks/vulnerabilities
-	if (d->m_state==BME_STATE_READY)
-		d->RecomputeAttacks();
+	if (m_die->m_state==BME_STATE_READY)
+		m_die->RecomputeAttacks();
 }
 
 void BMC_Parser::ParsePlayer(INT _p, INT _dice)
@@ -273,7 +275,7 @@ void BMC_Parser::ParsePlayer(INT _p, INT _dice)
 	INT i;
 	for (i=0; i<_dice; i++)
 	{
-		Read();
+		ReadNextInputToLine();
 		ParseDie(_p,i);
 	}
 
@@ -287,7 +289,7 @@ void BMC_Parser::ParseGame()
 	INT wlt,i;
 
 	// parse wins required
-	if (sscanf(line, "game %d", &i)==1)
+	if (sscanf(m_line, "game %d", &i)==1)
 	{
 		BMF_Log(BME_DEBUG_ALWAYS, "target wins set to %d\n", i);
 		m_game.m_target_wins = i;
@@ -298,11 +300,11 @@ void BMC_Parser::ParseGame()
 		m_game.m_standing[wlt] = 0;
 
 	// parse phase
-	Read();
+	ReadNextInputToLine();
 	m_game.m_phase = BME_PHASE_MAX;
 	for (i=0; i<BME_PHASE_MAX; i++)
 	{
-		if (!std::strcmp(c_phase_name[i], line))
+		if (!std::strcmp(c_phase_name[i], m_line))
 			m_game.m_phase = (BME_PHASE)i;
 	}
 	if (m_game.m_phase == BME_PHASE_MAX)
@@ -311,11 +313,11 @@ void BMC_Parser::ParseGame()
 	// parse players
 	for (i=0; i<BMD_MAX_PLAYERS; i++)
 	{
-		Read();
+		ReadNextInputToLine();
 		INT p, dice;
 		F32	score;
-		if (sscanf(line, "player %d %d %f", &p, &dice, &score)<3 || p!=i)
-			BMF_Error( "missing player: %s", line );
+		if (sscanf(m_line, "player %d %d %f", &p, &dice, &score)<3 || p!=i)
+			BMF_Error( "missing player: %s", m_line );
 		ParsePlayer(p, dice);
 		// don't clobber score in INITIATIVE phases
 		if (m_game.GetPhase()!=BME_PHASE_INITIATIVE && m_game.GetPhase()!=BME_PHASE_INITIATIVE_CHANCE && m_game.GetPhase()!=BME_PHASE_INITIATIVE_FOCUS)
@@ -333,24 +335,47 @@ void BMC_Parser::ParseGame()
 }
 
 BMC_Parser::BMC_Parser() : m_game(false) {
-	file = stdin;
 }
 
-bool BMC_Parser::Read(bool _fatal)
+void BMC_Parser::ParseString(const std::string _data) {
+	m_inputStream = std::stringstream(_data);
+	Parse();
+}
+
+bool BMC_Parser::ReadNextInputToLine(bool _fatal)
 {
-	if (!fgets(line, BMD_MAX_STRING, file))
+	if (!m_inputStream.str().empty())
 	{
-		if (_fatal)
-			BMF_Error( "missing input" );
-		return false;
+		// a string was provided for input. read it line-by-line
+
+		std::string temp;
+		if (getline(m_inputStream, temp))
+		{
+			std::strncpy(m_line, temp.c_str(), sizeof(m_line) - 1);
+			m_line[sizeof(m_line) - 1] = '\0';
+			return true;
+		}
+		else
+			return false;
 	}
+	else
+	{
+		// a file (possibly stdin) is being used for input
 
-	// remove EOL
-	INT len = (INT)std::strlen(line);
-	if (len>0 && line[len-1]=='\n')
-		line[len-1] = 0;
+		if (!fgets(m_line, BMD_MAX_STRING, m_inputFile))
+		{
+			if (_fatal)
+				BMF_Error( "missing input" );
+			return false;
+		}
 
-	return true;
+		// remove EOL
+		INT len = (INT)std::strlen(m_line);
+		if (len>0 && m_line[len-1]=='\n')
+			m_line[len-1] = 0;
+
+		return true;
+	}
 }
 
 void BMC_Parser::Send( const char *_fmt, ... )
@@ -655,6 +680,7 @@ void BMC_Parser::PlayGame(INT _games)
 	BMF_Log(BME_DEBUG_ALWAYS, "matches over %d - %d\n", wins[0], wins[1]);
 }
 
+
 void BMC_Parser::CompareAI(INT _games)
 {
 	if (m_game.GetPhase()!=BME_PHASE_PREROUND)
@@ -797,28 +823,28 @@ void BMC_Parser::Parse()
 	INT	param, param2;
 	F32	fparam;
 	char sparam[BMD_MAX_STRING+1];
-	while (Read(false))	// non-fatal Read()
+	while (ReadNextInputToLine(false))	// non-fatal Read()
 	{
 		// game [wins]
-		if (!std::strncmp(line, "game", 4))
+		if (!std::strncmp(m_line, "game", 4))
 		{
 			ParseGame();
 		}
-		else if (sscanf(line, "playgame %d", &param)==1)
+		else if (sscanf(m_line, "playgame %d", &param)==1)
 		{
 			PlayGame(param);
 		}
-		else if (sscanf(line, "compare %d", &param)==1)
+		else if (sscanf(m_line, "compare %d", &param)==1)
 		{
 			CompareAI(param);
 		}
 		// playfair [games] [mode] [p]
-		else if (sscanf(line, "playfair %d %d %f", &param, &param2, &fparam)==3)
+		else if (sscanf(m_line, "playfair %d %d %f", &param, &param2, &fparam)==3)
 		{
 			PlayFairGames(param, param2, fparam);
 		}
 		// ai [player] [type]
-		else if (sscanf(line, "ai %d %d", &param, &param2)==2)
+		else if (sscanf(m_line, "ai %d %d", &param, &param2)==2)
 		{
 			if (param2<0 || param2>=BMD_AI_TYPES)
 				BMF_Error("invalid setting for ai type: %d", param2);
@@ -827,7 +853,7 @@ void BMC_Parser::Parse()
 			m_game.SetAI(param, c_ai_type[param2]);
 			printf("Setting AI for player %d to type %d\n", param, param2);
 		}
-		else if (sscanf(line, "max_sims %d %d", &param, &param2)==2)
+		else if (sscanf(m_line, "max_sims %d %d", &param, &param2)==2)
 		{
 			BMC_AI * ai = m_game.GetAI(param);
 			if (ai->IsBMAI())
@@ -836,12 +862,12 @@ void BMC_Parser::Parse()
 				printf("Setting max sims for player %d to %d\n", param, param2);
 			}
 		}
-		else if (sscanf(line, "max_sims %d", &param)==1)
+		else if (sscanf(m_line, "max_sims %d", &param)==1)
 		{
 			g_ai.SetMaxSims(param);
 			printf("Setting max # simulations to %d\n", param);
 		}
-		else if (sscanf(line, "min_sims %d %d", &param, &param2)==2)
+		else if (sscanf(m_line, "min_sims %d %d", &param, &param2)==2)
 		{
 			BMC_AI * ai = m_game.GetAI(param);
 			if (ai->IsBMAI())
@@ -850,17 +876,17 @@ void BMC_Parser::Parse()
 				printf("Setting min sims for player %d to %d\n", param, param2);
 			}
 		}
-		else if (sscanf(line, "min_sims %d", &param)==1)
+		else if (sscanf(m_line, "min_sims %d", &param)==1)
 		{
 			g_ai.SetMinSims(param);
 			printf("Setting min # simulations to %d\n", param);
 		}
-		else if (sscanf(line, "turbo_accuracy %f", &fparam)==1)
+		else if (sscanf(m_line, "turbo_accuracy %f", &fparam)==1)
 		{
 			s_turbo_accuracy = fparam;
 			printf("Setting turbo accuracy to %f\n", s_turbo_accuracy);
 		}
-		else if (sscanf(line, "ply %d %d", &param, &param2)==2)
+		else if (sscanf(m_line, "ply %d %d", &param, &param2)==2)
 		{
 			BMC_AI * ai = m_game.GetAI(param);
 			if (ai->IsBMAI())
@@ -869,17 +895,17 @@ void BMC_Parser::Parse()
 				printf("Setting max ply for player %d to %d\n", param, param2);
 			}
 		}
-		else if (sscanf(line, "ply %d", &param)==1)
+		else if (sscanf(m_line, "ply %d", &param)==1)
 		{
 			g_ai.SetMaxPly(param);
 			printf("Setting max ply to %d\n", param);
 		}
-		else if (sscanf(line, "debugply %d", &param)==1)
+		else if (sscanf(m_line, "debugply %d", &param)==1)
 		{
 			BMC_BMAI::SetDebugLevel(param);
 			printf("Setting debug ply to %d\n", param);
 		}
-		else if (sscanf(line, "maxbranch %d %d", &param, &param2)==2)
+		else if (sscanf(m_line, "maxbranch %d %d", &param, &param2)==2)
 		{
 			BMC_AI * ai = m_game.GetAI(param);
 			if (param>=0 && param<BMD_AI_TYPES && ai->IsBMAI())
@@ -888,40 +914,40 @@ void BMC_Parser::Parse()
 				printf("Setting max branch for player %d to %d\n", param, param2);
 			}
 		}
-		else if (sscanf(line, "maxbranch %d", &param)==1)
+		else if (sscanf(m_line, "maxbranch %d", &param)==1)
 		{
 			g_ai.SetMaxBranch(param);
 			printf("Setting max branch to %d\n", param);
 		}
-		else if (!std::strcmp(line, "getaction"))
+		else if (!std::strcmp(m_line, "getaction"))
 		{
 			GetAction();
 		}
 		// PRE: magic # (32) must be < BMD_MAX_STRING and >= largest g_debug_name[] name
-		else if (sscanf(line, "debug %32s %d" ,&sparam,&param)==2)
+		else if (sscanf(m_line, "debug %32s %d" ,&sparam,&param)==2)
 		{
 			g_logger.SetLogging(sparam,param);
 		}
-		else if (sscanf(line, "seed %d", &param)==1)
+		else if (sscanf(m_line, "seed %d", &param)==1)
 		{
 			g_rng.SRand(param);
 			printf("Seeding with %d\n", param);
 		}
-        else if (sscanf(line, "surrender %32s", &sparam)==1)
+        else if (sscanf(m_line, "surrender %32s", &sparam)==1)
         {
             m_game.SetSurrenderAllowed(std::string(sparam)=="on");
         }
-		else if (!std::strcmp(line, "quit"))
+		else if (!std::strcmp(m_line, "quit"))
 		{
 			return;
 		}
-		else if (line[0]==0)
+		else if (m_line[0]==0)
 		{
 			;	// blank line
 		}
 		else
 		{
-			BMF_Error("unrecognized command: %s\n", line);
+			BMF_Error("unrecognized command: %s\n", m_line);
 		}
 	}
 }

@@ -98,6 +98,9 @@
 //				  and the other classes can be linked for testing
 //				- created many BMC_ .cpp/.h files
 //				- adjusted many globals which helped narrow down the #include dependency tree
+// dbl102424	- Implemented Insult skill
+// dbl110424	- Parser can now parse passed in String
+//				- Implemented Value skill
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // TODO:
@@ -298,12 +301,12 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		printf("Reading from %s\n", argv[1]); 
-		parser.Parse(fp);
+		parser.ParseFile(fp);
 		fclose(fp);
 	}
 	else
 	{
-		parser.Parse();
+		parser.ParseStdIn();
 	}
 
 	//g_stats.DisplayStats();

@@ -14,6 +14,8 @@
 #pragma once
 
 #include <cstdio>
+#include <sstream>
+
 #include "BMC_AI.h"
 #include "BMC_BMAI.h"
 #include "BMC_BMAI3.h"
@@ -25,9 +27,9 @@ class BMC_Parser
 {
 public:
 	BMC_Parser();
-	void	ParseGame();
-	void	Parse();
-	void	Parse(FILE *_fp) { file = _fp; Parse(); }
+	void	ParseStdIn() { m_inputFile = stdin; Parse(); }
+	void	ParseFile(FILE *_fp) { m_inputFile = _fp; Parse(); }
+	void	ParseString(std::string  _data);
 
 protected:
 	void			GetAction();
@@ -35,8 +37,9 @@ protected:
 	void			CompareAI(INT _games);
 	void			PlayFairGames(INT _games, INT _mode, F32 _p);
 	void			ParseDie(INT _p, INT _dice);
+	void			ParseGame();
 	void			ParsePlayer(INT _p, INT _dice);
-	bool			Read(bool _fatal = true);
+	bool			ReadNextInputToLine(bool _fatal = true);
 
 	// output
 
@@ -57,18 +60,23 @@ protected:
 	bool			DieIsOption(char _c) { return _c == '/'; }
 
 private:
+	void			Parse();
+
 	// parsing dice methods (uses 'line')
 	INT				ParseDieNumber(INT & _pos);
 	void			ParseDieSides(INT & _pos, INT _die);
 	INT				ParseDieDefinedSides(INT _pos);
 
 	// state for dice parsing
-	BMC_Player		*p;
-	BMC_Die			*d;
-	char			line[BMD_MAX_STRING];
-	FILE			*file;
+	BMC_Player		*m_player;
+	BMC_Die			*m_die;
+	char			m_line[BMD_MAX_STRING];
+	FILE			*m_inputFile;
 
 	BMC_Game		m_game;
+
+	// support reading strings in addition to files
+	std::stringstream m_inputStream;
 };
 
 extern BMC_QAI		g_qai;

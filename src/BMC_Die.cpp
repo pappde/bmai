@@ -256,19 +256,31 @@ float BMC_Die::GetScore(bool _own)
 	{
 		return 0;
 	}
-
+	else if (HasProperty(BME_PROPERTY_POISON) && HasProperty(BME_PROPERTY_VALUE))
+	{
+		if (_own)
+			return -m_value_total;
+		else
+			return -m_value_total * BMD_VALUE_OWN_DICE;
+	}
 	else if (HasProperty(BME_PROPERTY_POISON))
 	{
 		if (_own)
-			return -m_sides_max * 1.0f;
+			return -m_sides_max;
 		else
-			return -m_sides_max * 0.5f;	// this is not an optional rule
+			return -m_sides_max * BMD_VALUE_OWN_DICE;
 	}
-
+	else if (HasProperty(BME_PROPERTY_VALUE))
+	{
+		if (_own)
+			return m_value_total * BMD_VALUE_OWN_DICE;
+		else
+			return m_value_total;
+	}
 	else
 	{
 		if (_own)
-			return m_sides_max * BMD_VALUE_OWN_DICE;	// scoring owned dice is optional
+			return m_sides_max * BMD_VALUE_OWN_DICE;
 		else
 			return m_sides_max;
 	}
