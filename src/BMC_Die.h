@@ -49,6 +49,7 @@ public:
 	// mutators
 	void		SetState(BME_STATE _state) { m_state = _state; }
 	void		CheatSetValueTotal(INT _v) { m_value_total = _v; }	// used for some functions
+	void		AddProperty(BME_PROPERTY _prop) { m_properties |= _prop; }
 
 	// events
 	void		OnDieChanged();

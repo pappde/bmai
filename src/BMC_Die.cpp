@@ -256,7 +256,13 @@ float BMC_Die::GetScore(bool _own)
 	{
 		return 0;
 	}
-
+	else if (HasProperty(BME_PROPERTY_POISON) && HasProperty(BME_PROPERTY_VALUE))
+	{
+		if (_own)
+			return -m_value_total * 1.0f;
+		else
+			return -m_value_total * 0.5f;	// this is not an optional rule
+	}
 	else if (HasProperty(BME_PROPERTY_POISON))
 	{
 		if (_own)
@@ -264,7 +270,13 @@ float BMC_Die::GetScore(bool _own)
 		else
 			return -m_sides_max * 0.5f;	// this is not an optional rule
 	}
-
+	else if (HasProperty(BME_PROPERTY_VALUE))
+	{
+		if (_own)
+			return m_value_total * BMD_VALUE_OWN_DICE;
+		else
+			return m_value_total;
+	}
 	else
 	{
 		if (_own)

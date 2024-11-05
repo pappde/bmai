@@ -1517,7 +1517,7 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 }
 
 // DESC: handle non-deterministic and capture-specific effects.  This includes
-// TIME_AND_SPACE, TRIP, NULL
+// TIME_AND_SPACE, TRIP, NULL, VALUE
 // PRE: all dice that needed to be rerolled have been rerolled
 void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 {
@@ -1532,6 +1532,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 	BMC_Player *target = &(m_player[m_target_player]);
 	BMC_Die		*att_die, *tgt_die;
 	bool		null_attacker = false;
+	bool		value_attacker = false;
 	INT i;
 
 	// capture - attacker effects
@@ -1542,6 +1543,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 		{
 			att_die = attacker->GetDie(_move.m_attacker);
 			null_attacker = att_die->HasProperty(BME_PROPERTY_NULL);
+			value_attacker = att_die->HasProperty(BME_PROPERTY_VALUE);
 
 			// TIME AND SPACE
 			if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
@@ -1556,6 +1558,7 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 					continue;
 				att_die = attacker->GetDie(i);
 				null_attacker = null_attacker || att_die->HasProperty(BME_PROPERTY_NULL);
+				value_attacker = value_attacker || att_die->HasProperty(BME_PROPERTY_VALUE);
 
 				// TIME AND SPACE
 				if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
@@ -1590,14 +1593,12 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 			{
 				tgt_die = target->OnDieLost(_move.m_target);
 				if (null_attacker)
-				{
-					tgt_die->SetState(BME_STATE_NULLIFIED);
-				}
-				else
-				{
-					tgt_die->SetState(BME_STATE_CAPTURED);
-					attacker->OnDieCaptured(tgt_die);
-				}
+					tgt_die->AddProperty(BME_PROPERTY_NULL);
+				if (value_attacker)
+					tgt_die->AddProperty(BME_PROPERTY_VALUE);
+				tgt_die->SetState(BME_STATE_CAPTURED);
+				attacker->OnDieCaptured(tgt_die);
+
 				break;
 			}
 		case BME_ATTACK_TYPE_1_N:
@@ -1612,14 +1613,12 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 					i2 = i - removed++;	// determine true index
 					tgt_die = target->OnDieLost(i2);
 					if (null_attacker)
-					{
-						tgt_die->SetState(BME_STATE_NULLIFIED);
-					}
-					else
-					{
-						tgt_die->SetState(BME_STATE_CAPTURED);
-						attacker->OnDieCaptured(tgt_die);
-					}
+						tgt_die->AddProperty(BME_PROPERTY_NULL);
+					if (value_attacker)
+						tgt_die->AddProperty(BME_PROPERTY_VALUE);
+					tgt_die->SetState(BME_STATE_CAPTURED);
+					attacker->OnDieCaptured(tgt_die);
+
 				}
 				break;
 			}

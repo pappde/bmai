@@ -72,6 +72,8 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_tuple("test/SurrenderOn-Pass-in.txt", "action\nsurrender\n"),
 
             std::make_tuple("test/Insult_in.txt", "power\n1\n1\n"),
+            std::make_tuple("test/Value1_in.txt", "skill\n0 1\n1\n"),
+            std::make_tuple("test/Value2_in.txt", "power\n1\n0\n"),
 
             std::make_tuple("test/bug55_a_in.txt", "skill\n2 0\n0\n"),
             std::make_tuple("test/bug55_b_in.txt", "skill\n3 0 1\n2\n")
@@ -99,7 +101,7 @@ TEST_P(BMAIActionTests, CheckSurrenderAction){
 
     // Act
     // When calculating the best move
-    parser.Parse(in);
+    parser.ParseFile(in);
 
     // Assert
     // Then the move selected should match our expectations
