@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cstdarg>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 #include "BMC_AI_Maximize.h"
@@ -333,46 +334,16 @@ void BMC_Parser::ParseGame()
 }
 
 BMC_Parser::BMC_Parser() : m_game(false) {
-	file = stdin;
 }
 
-void BMC_Parser::ParseString(const char *_data) {
-	stringBuffer = _data;
-	stringBufferPos = 0;
-	stringBufferLen = strlen(_data);
+void BMC_Parser::ParseString(const std::string _data) {
+	ss = std::stringstream(_data);
 	Parse();
 }
 
 bool BMC_Parser::Read(bool _fatal)
 {
-	if (stringBuffer)
-	{
-		if (stringBufferPos >= stringBufferLen)
-		{
-			if (_fatal)
-				BMF_Error("missing input");
-			return false;
-		}
-
-		// Find the next newline or end of string
-		size_t startPos = stringBufferPos;
-		while (stringBufferPos < stringBufferLen && stringBuffer[stringBufferPos] != '\n')
-			stringBufferPos++;
-
-		// Copy the line to the `line` buffer
-		size_t len = stringBufferPos - startPos;
-		if (len >= BMD_MAX_STRING)
-			len = BMD_MAX_STRING - 1;
-		std::strncpy(line, stringBuffer + startPos, len);
-		line[len] = '\0';
-
-		// Skip the newline character
-		if (stringBufferPos < stringBufferLen && stringBuffer[stringBufferPos] == '\n')
-			stringBufferPos++;
-
-		return true;
-	}
-	else
+	if (ss.str().empty())
 	{
 		if (!fgets(line, BMD_MAX_STRING, file))
 		{
@@ -387,6 +358,18 @@ bool BMC_Parser::Read(bool _fatal)
 			line[len-1] = 0;
 
 		return true;
+	}
+	else
+	{
+		std::string temp;
+		if (getline(ss, temp))
+		{
+			std::strncpy(line, temp.c_str(), sizeof(line) - 1);
+			line[sizeof(line) - 1] = '\0';
+			return true;
+		}
+		else
+			return false;
 	}
 }
 

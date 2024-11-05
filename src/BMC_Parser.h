@@ -14,6 +14,8 @@
 #pragma once
 
 #include <cstdio>
+#include <sstream>
+
 #include "BMC_AI.h"
 #include "BMC_BMAI.h"
 #include "BMC_BMAI3.h"
@@ -27,7 +29,7 @@ public:
 	BMC_Parser();
 	void	ParseStdIn() { file = stdin; Parse(); }
 	void	ParseFile(FILE *_fp) { file = _fp; Parse(); }
-	void	ParseString(const char*  _data);
+	void	ParseString(const std::string  _data);
 
 protected:
 	void			GetAction();
@@ -74,9 +76,7 @@ private:
 	BMC_Game		m_game;
 
 	// support reading strings in addition to files
-	const char* stringBuffer = nullptr;
-	size_t stringBufferPos = 0;
-	size_t stringBufferLen = 0;
+	std::stringstream ss;
 };
 
 extern BMC_QAI		g_qai;
