@@ -1,6 +1,13 @@
+#pragma once
+
+#include <cstdarg>
+#include <cstdio>
+#include <iostream>
+
 #include "../src/BMC_Die.h"
 #include "../src/BMC_Game.h"
 #include "../src/BMC_Parser.h"
+
 
 // until the objects are better suited for testing
 // it may be necessary to use a couple hacks to access members
@@ -24,17 +31,56 @@ public:
     void FinishPreround(){BMC_Game::FinishPreround();}
 };
 
-class TEST_Parser : public BMC_Parser
-{
+// lets us collect what is being sent to Send for inspection during tests
+class TEST_Parser : public BMC_Parser {
 public:
-    TEST_Parser() : m_game(false) {}
-    TEST_Game GetGame() { return TEST_Game(m_game); }
-protected:
-    BMC_Game m_game;
+
+	std::string tm_third_to_last_fmt;
+	std::string tm_next_to_last_fmt;
+	std::string tm_last_fmt;
+	std::string tm_current_fmt;
+	void Send(const char *_fmt, ...) override {
+		char buff[BMD_MAX_STRING];
+		va_list ap;
+		va_start (ap, _fmt);
+		vsnprintf(buff, BMD_MAX_STRING, _fmt, ap);
+		va_end (ap);
+
+		tm_current_fmt = tm_current_fmt + std::string(buff);
+		if (tm_current_fmt.back()=='\n') {
+			tm_third_to_last_fmt = tm_next_to_last_fmt;
+			tm_next_to_last_fmt = tm_last_fmt;
+			tm_last_fmt = tm_current_fmt;
+			tm_current_fmt = "";
+			BMC_Parser::Send(tm_last_fmt.c_str());
+		}
+	}
+
+	BMC_Move last_attack;
+	void SendAttack(BMC_Move &_move) override
+	{
+		last_attack = _move;
+		BMC_Parser::SendAttack(_move);
+	}
+
 };
 
-class TestUtils {
+class TEST_Util
+{
 public:
+	TEST_Parser parser;
+
+	BMC_Move ParseFightGetAttack(std::string d0, std::string d1)
+	{
+		std::stringstream ss;
+		ss << "game\nfight\n";
+		ss << "player 0 1 0\n" << d0 << "\n";
+		ss << "player 1 1 0\n" << d1 << "\n";
+		ss << "ply 1\nsurrender off\ngetaction\n";
+		parser.ParseString(ss.str());
+		return parser.last_attack;
+	}
+
     static BMC_Die createTestDie(U8 sides, U64 properties) {
         return createTestDie(sides, properties, BME_SWING_NOT);
     }
@@ -51,40 +97,4 @@ public:
         return die;
     }
 
-    static TEST_Parser createTestParser(const std::string& phase, const std::vector<std::string>& player1Dice, const std::vector<std::string>& player2Dice) {
-
-        TEST_Parser parser;
-        std::stringstream ss;
-
-        // Set up the game phase
-        ss << "game\n" << phase << "\n";
-
-        // Set up player 1
-        ss << "player 0 " << player1Dice.size() << " 0\n";
-        for (const auto& die : player1Dice) {
-            ss << die << "\n";
-        }
-
-        // Set up player 2
-        ss << "player 1 " << player2Dice.size() << " 0\n";
-        for (const auto& die : player2Dice) {
-            ss << die << "\n";
-        }
-
-        ss << "ply 1\n";
-        if (phase == "preround")
-        {
-            ss << "playgame 1\n";
-        } else if (phase=="fight")
-        {
-            ss << "getaction\n";
-        }
-
-
-        // Initialize the parser with the constructed string
-        parser.ParseString(ss.str());
-
-        return parser;
-
-    }
 };
