@@ -177,8 +177,42 @@ TEST(SkillTests, MorphingSkill) {
 	_move.m_game->ApplyAttackPlayer(_move);
 	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(),7);
 	// YES!!! successfully tested the ability to morph
+}
 
+ // Morphing Twin, Turbo, and Speed
 
+TEST(SkillTests, MorphingTwinSkill) {
+	TEST_Util test;
+
+	BMC_Move _move;
+	EXPECT_NO_THROW({
+		_move = test.ParseFightGetAttack("m(5,5):8","m7:6");
+	});
+	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
+
+	auto a1_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a1_dice[0]->GetScore(true), 5);
+	auto t1_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t1_dice[0]->GetScore(false), 7);
+
+	// now some morphing stuff
+	EXPECT_EQ(a1_dice[0]->GetSidesMax(), 10);
+	_move.m_game->ApplyAttackPlayer(_move);
+	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(), 7);
+
+	EXPECT_NO_THROW({
+		_move = test.ParseFightGetAttack("m7:6", "m(10,11):3");
+	});
+
+	auto a2_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a2_dice[0]->GetScore(true), 3.5);
+	auto t2_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t2_dice[0]->GetScore(false), 21);
+
+	EXPECT_EQ(a2_dice[0]->GetSidesMax(), 7);
+	_move.m_game->ApplyAttackPlayer(_move);
+	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(), 21);
+	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->Dice(), 2);
 }
 
 TEST(SkillTests, PoisonSkill) {

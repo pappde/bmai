@@ -118,19 +118,6 @@ void BMC_Die::RecomputeAttacks()
 	if (m_state == BME_STATE_DIZZY)
 		m_attacks.Clear();
 
-	// verification
-
-	// MORPHING shouldn't be allowed to SPEED
-	BM_ERROR( !HasProperty(BME_PROPERTY_MORPHING) || !m_attacks.IsSet(BME_ATTACK_SPEED) );
-
-	// INSULT shouldn't be vulnerable to SKILL
-	BM_ERROR( !HasProperty(BME_PROPERTY_INSULT) || !m_vulnerabilities.IsSet(BME_ATTACK_SKILL) );
-
-	// MORPHING shouldn't be paired with TURBO
-	BM_ERROR( (m_properties & (BME_PROPERTY_MORPHING|BME_PROPERTY_TURBO)) != (BME_PROPERTY_MORPHING|BME_PROPERTY_TURBO) );
-
-	// MORPHING shouldn't be paired with TWIN
-	BM_ERROR( (m_properties & (BME_PROPERTY_MORPHING|BME_PROPERTY_TWIN)) != (BME_PROPERTY_MORPHING|BME_PROPERTY_TWIN) );
 }
 
 // POST: all data related to current value have not been set up
@@ -321,10 +308,19 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1 || c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1);
 		BMC_Player *target = _move.m_game->GetPlayer(_move.m_target_player);
 
-		BM_ASSERT(Dice()==1);
-
 		_owner->OnDieSidesChanging(this);
-		m_sides_max = m_sides[0] = target->GetDie(_move.m_target)->GetSidesMax();
+		if (target->GetDie(_move.m_target)->HasProperty(BME_PROPERTY_TWIN) )
+		{
+			AddProperty(BME_PROPERTY_TWIN);
+			m_sides_max = target->GetDie(_move.m_target)->GetSidesMax();
+			for (int i = 0; i<target->GetDie(_move.m_target)->Dice(); i++)
+				m_sides[i] = target->GetDie(_move.m_target)->GetSides(i);
+		}
+		else
+		{
+			RemoveProperty(BME_PROPERTY_TWIN);
+			m_sides_max = m_sides[0] = target->GetDie(_move.m_target)->GetSidesMax();
+		}
 		_owner->OnDieSidesChanged(this);
 	}
 
