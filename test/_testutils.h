@@ -39,7 +39,8 @@ public:
 	std::string tm_next_to_last_fmt;
 	std::string tm_last_fmt;
 	std::string tm_current_fmt;
-	void Send(const char *_fmt, ...) override {
+	void Send(const char *_fmt, ...) override
+	{
 		char buff[BMD_MAX_STRING];
 		va_list ap;
 		va_start (ap, _fmt);
@@ -81,11 +82,34 @@ public:
 		return parser.last_attack;
 	}
 
-    static BMC_Die createTestDie(U8 sides, U64 properties) {
+	static std::vector<BMC_Die*> extractAttackerDice(BMC_Move move)
+	{
+		return extractDice(move.m_game->GetPlayer(move.m_attacker_player));
+	}
+
+	static std::vector<BMC_Die*> extractTargetDice(BMC_Move move)
+	{
+		return extractDice(move.m_game->GetPlayer(move.m_target_player));
+	}
+
+	static std::vector<BMC_Die*> extractDice(BMC_Player *player)
+	{
+		std::vector<BMC_Die*> dice;
+		for (int i=0; i<player->GetAvailableDice(); i++)
+		{
+			dice.push_back(player->GetDie(i));
+		}
+		return dice;
+	}
+
+
+    static BMC_Die createTestDie(U8 sides, U64 properties)
+	{
         return createTestDie(sides, properties, BME_SWING_NOT);
     }
 
-    static BMC_Die createTestDie(U8 sides, U64 properties, U8 swing_type) {
+    static BMC_Die createTestDie(U8 sides, U64 properties, U8 swing_type)
+	{
         TEST_DieData die_data;
         die_data.setSides(sides);
         die_data.setProperties(BME_PROPERTY_VALID | properties);

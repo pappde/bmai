@@ -14,7 +14,11 @@ TEST(SkillTests, NoSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// test other behavior
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 4.5);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 7);
+
     BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_VALID);
     die.Roll(); // triggers a Recompute
     EXPECT_EQ(die.GetScore(false), 30);
@@ -29,6 +33,11 @@ TEST(SkillTests, MaximumSkill) {
 		_move = test.ParseFightGetAttack("M9:8","M7:6");
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
+
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 4.5);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 7);
 
 	// test other behavior
     // Arrange: Given a 6 sided Maximum die
@@ -54,6 +63,11 @@ TEST(SkillTests, InsultSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 4.5);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 7);
+
 	// test other behavior
     // Arrange: Given a 6 sided Maximum die
     BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_INSULT);
@@ -78,10 +92,13 @@ TEST(SkillTests, NullSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// test other behavior
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 0);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 0);
+
     BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_NULL);
     die.Roll(); // triggers a Recompute
-
     EXPECT_EQ(die.GetScore(false), 0);
     EXPECT_EQ(die.GetScore(true), 0);
 
@@ -105,7 +122,11 @@ TEST(SkillTests, ValueSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// test other behavior
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 4);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 6);
+
     BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_VALUE);
     die.Roll(); // triggers a Recompute
     EXPECT_EQ(die.GetScore(false), die.GetValueTotal());
@@ -121,7 +142,11 @@ TEST(SkillTests, NullValueSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// test other behavior
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 0);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 0);
+
     BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_NULL|BME_PROPERTY_VALUE);
     die.Roll(); // triggers a Recompute
     EXPECT_EQ(die.GetScore(false), 0);
@@ -151,7 +176,11 @@ TEST(SkillTests, PoisonSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// test other behavior
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), -9);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), -3.5);
+
     BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_POISON);
     die.Roll(); // triggers a Recompute
     EXPECT_EQ(die.GetScore(false), -15);
@@ -167,7 +196,11 @@ TEST(SkillTests, PoisonValueSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// test other behavior
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), -8);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), -3);
+
     BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_POISON|BME_PROPERTY_VALUE);
     die.Roll(); // triggers a Recompute
     EXPECT_EQ(die.GetScore(false), die.GetValueTotal()*-1/2.0f);
@@ -183,7 +216,11 @@ TEST(SkillTests, PoisonNullSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// test other behavior
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 0);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 0);
+
     BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_POISON|BME_PROPERTY_NULL);
     die.Roll(); // triggers a Recompute
     EXPECT_EQ(die.GetScore(false), 0);
