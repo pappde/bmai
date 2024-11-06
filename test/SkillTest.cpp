@@ -162,9 +162,23 @@ TEST(SkillTests, MorphingSkill) {
 	});
 	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0));
 
-	// // test other behavior
-	// TEST_ParserZ parser = TestUtils::takeOneStep("m30:15","4:4");
-	// EXPECT_EQ(parser.GetGame().GetPlayer(0)->GetDie(0)->GetSides(0), 4);
+	auto a_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a_dice[0]->GetScore(true), 4.5);
+	auto t_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t_dice[0]->GetScore(false), 7);
+
+	BMC_Die die = TEST_Util::createTestDie(30, BME_PROPERTY_MORPHING);
+	die.Roll(); // triggers a Recompute
+	EXPECT_EQ(die.GetScore(false), 30);
+	EXPECT_EQ(die.GetScore(true), 15);
+
+	// now some morphing stuff
+	EXPECT_EQ(a_dice[0]->GetSidesMax(), 9);
+	_move.m_game->ApplyAttackPlayer(_move);
+	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(),7);
+	// YES!!! successfully tested the ability to morph
+
+
 }
 
 TEST(SkillTests, PoisonSkill) {
