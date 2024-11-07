@@ -102,15 +102,6 @@ TEST(SkillTests, NullSkill) {
     EXPECT_EQ(die.GetScore(false), 0);
     EXPECT_EQ(die.GetScore(true), 0);
 
-    // TEST_Parser parser = TestUtils::createTestParser("fight", {"n9:9"},{"2:2"});
-    //
-    // TEST_Game game = parser.GetGame();
-    // BMC_Player* p0 = game.GetPlayer(0);
-    // BMC_Player* p1 = game.GetPlayer(1);
-    //
-    // EXPECT_EQ(p0->GetScore(), 0);
-    // EXPECT_EQ(p1->GetScore(), 1);
-
 }
 
 TEST(SkillTests, ValueSkill) {
@@ -151,6 +142,23 @@ TEST(SkillTests, NullValueSkill) {
     die.Roll(); // triggers a Recompute
     EXPECT_EQ(die.GetScore(false), 0);
     EXPECT_EQ(die.GetScore(true), 0);
+}
+
+TEST(SkillTests, SpeedSkill) {
+	TEST_Util test;
+
+	BMC_Move _move;
+	EXPECT_NO_THROW({
+		_move = test.ParseFightGetAttack("z10:8","4:3 6:5");
+	});
+	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_N, "speed", 0, {0,1}));
+
+	auto a1_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a1_dice[0]->GetScore(true), 5);
+	auto t1_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t1_dice[0]->GetScore(false), 6);
+	EXPECT_EQ(t1_dice[1]->GetScore(false), 4);
+
 }
 
 TEST(SkillTests, MorphingSkill) {
@@ -213,6 +221,31 @@ TEST(SkillTests, MorphingTwinSkill) {
 	_move.m_game->ApplyAttackPlayer(_move);
 	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(), 21);
 	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->Dice(), 2);
+	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSides(0), 10);
+	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSides(1), 11);
+	// ^ morphed into twin
+}
+
+TEST(SkillTests, MorphingSpeedSkill) {
+	TEST_Util test;
+
+	BMC_Move _move;
+	EXPECT_NO_THROW({
+		_move = test.ParseFightGetAttack("mz(5,5):8","4:3 6:5");
+	});
+	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_N, "speed", 0, {0,1}));
+
+	auto a1_dice = TEST_Util::extractAttackerDice(_move);
+	EXPECT_EQ(a1_dice[0]->GetScore(true), 5);
+	auto t1_dice = TEST_Util::extractTargetDice(_move);
+	EXPECT_EQ(t1_dice[0]->GetScore(false), 6);
+	EXPECT_EQ(t1_dice[1]->GetScore(false), 4);
+
+	// now some morphing stuff
+	EXPECT_EQ(a1_dice[0]->GetSidesMax(), 10);
+	_move.m_game->ApplyAttackPlayer(_move);
+	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(), 10);
+	// ^^ did NOT morph size
 }
 
 TEST(SkillTests, PoisonSkill) {

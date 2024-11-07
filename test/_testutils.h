@@ -73,13 +73,31 @@ public:
 
 	BMC_Move ParseFightGetAttack(std::string d0, std::string d1)
 	{
+		auto dice0 = split(d0, ' ');
+		auto dice1 = split(d1, ' ');
+
 		std::stringstream ss;
 		ss << "game\nfight\n";
-		ss << "player 0 1 0\n" << d0 << "\n";
-		ss << "player 1 1 0\n" << d1 << "\n";
+		ss << "player 0 " << dice0.size() << " 0\n";
+		for (int i=0; i<dice0.size(); i++)
+			ss << dice0[i] << "\n";
+		ss << "player 1 " << dice1.size() << " 0\n";
+		for (int i=0; i<dice1.size(); i++)
+			ss << dice1[i] << "\n";
 		ss << "ply 1\nsurrender off\ngetaction\n";
 		parser.ParseString(ss.str());
 		return parser.last_attack;
+	}
+
+	static std::vector<std::string> split(std::string &str, char delimiter)
+	{
+		std::vector<std::string> result;
+		std::string token;
+		std::istringstream tokenStream(str);
+		while (std::getline(tokenStream, token, delimiter)) {
+			result.push_back(token);
+		}
+		return result;
 	}
 
 	static std::vector<BMC_Die*> extractAttackerDice(BMC_Move move)

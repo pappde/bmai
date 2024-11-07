@@ -305,23 +305,25 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 	// drp022521 - this rule only applies if actually going to capture a die
 	if (HasProperty(BME_PROPERTY_MORPHING) && _move.m_attack != BME_ATTACK_INVALID)
 	{
-		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1 || c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1);
-		BMC_Player *target = _move.m_game->GetPlayer(_move.m_target_player);
+		if (c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1 || c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1)
+		{
+			BMC_Player *target = _move.m_game->GetPlayer(_move.m_target_player);
 
-		_owner->OnDieSidesChanging(this);
-		if (target->GetDie(_move.m_target)->HasProperty(BME_PROPERTY_TWIN) )
-		{
-			AddProperty(BME_PROPERTY_TWIN);
-			m_sides_max = target->GetDie(_move.m_target)->GetSidesMax();
-			for (int i = 0; i<target->GetDie(_move.m_target)->Dice(); i++)
-				m_sides[i] = target->GetDie(_move.m_target)->GetSides(i);
+			_owner->OnDieSidesChanging(this);
+			if (target->GetDie(_move.m_target)->HasProperty(BME_PROPERTY_TWIN) )
+			{
+				AddProperty(BME_PROPERTY_TWIN);
+				m_sides_max = target->GetDie(_move.m_target)->GetSidesMax();
+				for (int i = 0; i<target->GetDie(_move.m_target)->Dice(); i++)
+					m_sides[i] = target->GetDie(_move.m_target)->GetSides(i);
+			}
+			else
+			{
+				RemoveProperty(BME_PROPERTY_TWIN);
+				m_sides_max = m_sides[0] = target->GetDie(_move.m_target)->GetSidesMax();
+			}
+			_owner->OnDieSidesChanged(this);
 		}
-		else
-		{
-			RemoveProperty(BME_PROPERTY_TWIN);
-			m_sides_max = m_sides[0] = target->GetDie(_move.m_target)->GetSidesMax();
-		}
-		_owner->OnDieSidesChanged(this);
 	}
 
 	// TURBO dice
