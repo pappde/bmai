@@ -1,6 +1,7 @@
 name: Generate SLN Files
 
-on: 
+on:
+  push:
   workflow_dispatch:
 
 
