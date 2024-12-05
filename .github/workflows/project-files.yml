@@ -1,0 +1,25 @@
+name: Generate SLN Files
+
+on: 
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up CMake
+      uses: lukka/get-cmake@v3
+
+    - name: Configure CMake
+      run: cmake -G "Visual Studio 17 2022" .
+
+    - name: Upload SLN files
+      uses: actions/upload-artifact@v2
+      with:
+        name: sln-files
+        path: '*.sln'
