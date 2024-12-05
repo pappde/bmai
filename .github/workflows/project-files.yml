@@ -22,5 +22,7 @@ jobs:
     - name: Upload SLN files
       uses: actions/upload-artifact@v4
       with:
-        name: sln-files
-        path: '*.sln'
+        name: sln-and-vcxproj-files
+        path: |
+          *.sln
+          *.vcxproj
