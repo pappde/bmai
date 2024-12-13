@@ -305,6 +305,9 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 	// drp022521 - this rule only applies if actually going to capture a die
 	if (HasProperty(BME_PROPERTY_MORPHING) && _move.m_attack != BME_ATTACK_INVALID)
 	{
+		// specifically only morphing in the single-die-captured scenario
+		// "When a Morphing Die is used in any attack against a single target die, it changes size, becoming the same size as the die that was captured."" -buttonweavers.com
+		// TODO also support 1_N attacks that are only targettting 1 die like speed or skill attack
 		if (c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1 || c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1)
 		{
 			BMC_Player *target = _move.m_game->GetPlayer(_move.m_target_player);
