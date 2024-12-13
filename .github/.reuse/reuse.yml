@@ -1,0 +1,9 @@
+project_name: BMAI
+project_homepage: https://github.com/pappder/bmai
+license: MIT
+copyright: 2001-2024 Denis Papp
+spdx_excluded:  # List of files or directories to exclude from REUSE compliance checks
+  - .git/
+  - .github/
+  - .reuse/
+  
