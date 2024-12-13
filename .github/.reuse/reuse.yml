@@ -4,6 +4,7 @@ license: MIT
 copyright: 2001-2024 Denis Papp
 spdx_excluded:  # List of files or directories to exclude from REUSE compliance checks
   - .git/
+  - .gitignore
   - .github/
   - .reuse/
-  
+  - web/
