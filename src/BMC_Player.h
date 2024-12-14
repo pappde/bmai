@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_Player.h
+// SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: Copyright © 2021 Denis Papp
 // denis@accessdenied.net
 // https://github.com/pappde/bmai

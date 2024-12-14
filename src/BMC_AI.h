@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_AI.h
+// SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: Copyright © 2008 Denis Papp
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
