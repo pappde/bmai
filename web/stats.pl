@@ -1,8 +1,7 @@
 ##################################################################
 # stats.pl
 #
-# Copyright © 2001 Denis Papp
-# denis@accessdenied.net
+# Copyright © 2001 Denis Papp <denis@accessdenied.net>
 # https://github.com/pappde/bmai
 #
 # DESCRIPTION: read in a history file (BMAI games completed) and

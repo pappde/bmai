@@ -1,8 +1,7 @@
 ##################################################################
 # dp_lib.pl
 #
-# Copyright © 2001 Denis Papp
-# denis@accessdenied.net
+# Copyright © 2001 Denis Papp <denis@accessdenied.net>
 # https://github.com/pappde/bmai
 #
 # DESCRIPTION: useful functions library
