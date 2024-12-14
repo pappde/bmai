@@ -1,7 +1,7 @@
 ##################################################################
 # dp_lib.pl
 #
-# Copyright (c) 2001-2020 Denis Papp. All rights reserved.
+# Copyright © 2001 Denis Papp
 # denis@accessdenied.net
 # https://github.com/pappde/bmai
 #

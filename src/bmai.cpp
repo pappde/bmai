@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai.cpp
-// Copyright (c) 2001-2024 Denis Papp. All rights reserved.
+// SPDX-FileCopyrightText: Copyright © 2001 Denis Papp
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
 // 
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
 	//g_ai.SetQAI(&g_ai_mode0);
 
 	// banner
-	printf("BMAI: the Button Men AI\nCopyright (c) 2001-2024, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\nVersion: %s\n", GIT_DESCRIBE);
+	printf("BMAI: the Button Men AI\nCopyright © 2001-2024, Denis Papp.\nFor information, contact Denis Papp, denis@accessdenied.net\nVersion: %s\n", GIT_DESCRIBE);
 
 	BMC_Parser	parser;
 

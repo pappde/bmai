@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_AI_Maximize.h
-// Copyright (c) 2001-2024 Denis Papp. All rights reserved.
+// SPDX-FileCopyrightText: Copyright © 2021 Denis Papp
 // denis@accessdenied.net
 // https://github.com/pappde/bmai
 //
