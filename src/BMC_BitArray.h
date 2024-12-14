@@ -1,9 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_BitArray.h
+//
 // SPDX-License-Identifier: MIT
-// SPDX-FileCopyrightText: Copyright © 2024 Denis Papp
-// denis@accessdenied.net
-// https://github.com/pappde/bmai
+// SPDX-FileCopyrightText: Copyright © 2024 Denis Papp <denis@accessdenied.net>
 //
 // REVISION HISTORY:
 // dbl100824 - migrated this logic into own class file

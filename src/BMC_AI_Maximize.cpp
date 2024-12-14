@@ -1,9 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_AI_MaximizeOrRandom.cpp
+//
 // SPDX-License-Identifier: MIT
-// SPDX-FileCopyrightText: Copyright © 2024 Denis Papp
-// denis@accessdenied.net
-// https://github.com/pappde/bmai
+// SPDX-FileCopyrightText: Copyright © 2024 Denis Papp <denis@accessdenied.net>
 //
 // DESC:
 //

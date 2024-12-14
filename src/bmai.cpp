@@ -1,9 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // bmai.cpp
+//
 // SPDX-License-Identifier: MIT
-// SPDX-FileCopyrightText: Copyright © 2001 Denis Papp
-// denis@accessdenied.net
-// https://github.com/pappde/bmai
+// SPDX-FileCopyrightText: Copyright © 2001 Denis Papp <denis@accessdenied.net>
 // 
 // DESC: BMAI main code and main game rules
 //

@@ -3,8 +3,5 @@ project_homepage: https://github.com/pappde/bmai
 license: MIT
 copyright: 2001 Denis Papp
 spdx_excluded:  # List of files or directories to exclude from REUSE compliance checks
-  - .git/
-  - .gitignore
-  - .github/
-  - .reuse/
+  - .* # Exclude all dot-files and directories which are generally config and not new "works"
   - web/
