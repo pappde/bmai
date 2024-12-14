@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright © 2023 Denis Papp <denis@accessdenied.net>
+
 #include "../src/BMC_Game.h"
 #include "../src/BMC_RNG.h"
 #include "../src/BMC_QAI.h"

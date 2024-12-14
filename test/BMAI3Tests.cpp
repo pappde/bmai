@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright © 2023 Denis Papp <denis@accessdenied.net>
+
 #include "../src/BMC_Parser.h"
 #include <cstdio>
 #include <cstdarg> // for va_start() va_end()

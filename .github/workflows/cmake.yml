@@ -1,10 +1,13 @@
-name: CMake
-
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright © 2020 Denis Papp <denis@accessdenied.net>
+#
 # when developing on another branch 
 # if you want GHActions to auto build the branch
 # add the branch name to the `push` section below
 # you only need to make that change ON THE BRANCH to be built
 # please remove it when merging into `main`
+name: CMake
+
 on:
   push:
     branches: [ main ]
