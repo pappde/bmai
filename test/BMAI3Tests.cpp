@@ -2,21 +2,20 @@
 // SPDX-FileCopyrightText: Copyright © 2023 Denis Papp <denis@accessdenied.net>
 // SPDX-FileComment: https://github.com/pappde/bmai
 
-#include "../src/BMC_Parser.h"
+#include "_testutils.h"
 #include <cstdio>
-#include <cstdarg> // for va_start() va_end()
 #include <filesystem>
 #include <gtest/gtest.h>
-namespace fs = std::filesystem;
 
-// a path util, if useful consider creaking out into generic utility
+
+// a path util, if useful consider breaking out into generic utility
 inline std::string resolvePath(const std::string &relPath)
 {
-    auto baseDir = fs::current_path();
+    auto baseDir = std::filesystem::current_path();
     while (baseDir.has_parent_path())
     {
         auto combinePath = baseDir / relPath;
-        if (fs::exists(combinePath))
+        if (exists(combinePath))
         {
             return combinePath.string();
         }
@@ -29,30 +28,6 @@ inline std::string resolvePath(const std::string &relPath)
     }
     throw std::runtime_error("File not found!");
 }
-
-// lets us collect what is being sent to Send for inspection during tests
-class TEST_Parser : public BMC_Parser {
-public:
-    void Send(const char *_fmt, ...) override {
-        char buff[BMD_MAX_STRING];
-        va_list ap;
-        va_start (ap, _fmt);
-        vsnprintf(buff, BMD_MAX_STRING, _fmt, ap);
-        va_end (ap);
-
-        tm_current_fmt = tm_current_fmt + std::string(buff);
-        if (tm_current_fmt.back()=='\n') {
-            tm_third_to_last_fmt = tm_next_to_last_fmt;
-            tm_next_to_last_fmt = tm_last_fmt;
-            tm_last_fmt = tm_current_fmt;
-            tm_current_fmt = "";
-        }
-    }
-    std::string tm_third_to_last_fmt;
-    std::string tm_next_to_last_fmt;
-    std::string tm_last_fmt;
-    std::string tm_current_fmt;
-};
 
 class BMAIActionTests :public ::testing::TestWithParam<std::tuple<std::string, std::string>> {
 protected:
@@ -83,7 +58,7 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_tuple("test/bug55_b_in.txt", "skill\n3 0 1\n2\n")
 
             // LONG RUNNING! use for MANUAL REGRESSION
-            // TODO create better regression patterns that can be triggered from some builds
+            // TODO create better regression patterns that can be triggered from select builds
             // , std::make_tuple("test/bug11_in.txt", "action\nswing T 4\nswing W 4\n")
             // , std::make_tuple("test/bug16_in.txt", "action\nreserve 6\n")
         ));

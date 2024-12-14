@@ -28,21 +28,22 @@ FetchContent_MakeAvailable(googletest)
 
 # Explicitly list the test source files
 set(TEST_SOURCES
+        _testutils.h
+        _matchers.h
         BMAI3Tests.cpp
         LegacyFunctions.cpp
         ParserTest.cpp
         PlayerTest.cpp
         SkillTest.cpp
-        testutils.h
         DemoTest.cpp
 )
 
 add_executable(bmai_tests ${TEST_SOURCES})
 
 if(APPLE)
-    target_link_libraries(bmai_tests PRIVATE bmai_lib GTest::gtest_main)
+    target_link_libraries(bmai_tests PRIVATE bmai_lib GTest::gtest_main GTest::gmock)
 else()
-    target_link_libraries(bmai_tests PRIVATE bmai_lib GTest::gtest_main -static)
+    target_link_libraries(bmai_tests PRIVATE bmai_lib GTest::gtest_main GTest::gmock -static)
 endif()
 
 ##

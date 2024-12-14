@@ -49,7 +49,7 @@ protected:
 	void			SendStats();
 	void			SendSetSwing(BMC_Move &_move);
 	void			SendUseReserve(BMC_Move &_move);
-	void			SendAttack(BMC_Move &_move);
+	virtual void	SendAttack(BMC_Move &_move);
 	void			SendUseChance(BMC_Move &_move);
 	void			SendUseFocus(BMC_Move &_move);
 

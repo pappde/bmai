@@ -36,6 +36,11 @@ public:
     INT			Dice() { return (m_properties & BME_PROPERTY_TWIN) ? 2 : 1; }
     INT			GetSides(INT _t) { return m_sides[_t]; }
 
+	// mutators
+	void		AddProperty(BME_PROPERTY _p) { m_properties |= _p; }
+	void		RemoveProperty(BME_PROPERTY _p) { m_properties &= ~_p; }
+
+
 protected:
     U64			m_properties;
     U8			m_sides[BMD_MAX_TWINS];			// number of sides if not a swing die, or current number of sides

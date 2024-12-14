@@ -1459,7 +1459,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		tgt_die->OnBeforeRollInGame(target);
 	}
 
-	// ORNERY: all ornery dice on attacker must reroll (whether or not attacked)
+	// ORNERY: all ornery dice on attacker must reroll (whether attacked)
     // unless the player passed (there must be SOME attack involved)
     if (_move.m_attack != BME_ATTACK_INVALID)
     {
