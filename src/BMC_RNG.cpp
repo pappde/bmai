@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: Copyright © 2024 Denis Papp <denis@accessdenied.net>
+// SPDX-FileComment: https://github.com/pappde/bmai
 //
 // DESC: a good RNG, was better and faster than the old standard library random(), but
 // have not evaluated it against MSVC 6's standard library random.  This is taken

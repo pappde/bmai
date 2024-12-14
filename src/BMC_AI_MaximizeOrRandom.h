@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: Copyright © 2021 Denis Papp <denis@accessdenied.net>
+// SPDX-FileComment: https://github.com/pappde/bmai
 //
 // DESC:
 //
