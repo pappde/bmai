@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright © 2023 Denis Papp <denis@accessdenied.net>
+// SPDX-FileComment: https://github.com/pappde/bmai
+
 #include <gtest/gtest.h>
 
 int factorial( const int number ) {

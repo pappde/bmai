@@ -1,6 +1,10 @@
 # BMAI - the Button Men AI
 
-Copyright (c) 2001-2024 Denis Papp. All rights reserved.
+<!--
+SPDX-License-Identifier: MIT
+SPDX-FileCopyrightText: Copyright © 2001 Denis Papp
+-->
+Copyright © 2001 Denis Papp
 
 Author: Denis Papp (denis@accessdenied.net)
 

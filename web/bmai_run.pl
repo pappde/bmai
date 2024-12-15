@@ -1,4 +1,5 @@
 #!/usr/bin/perl --
+# Copyright © 2008 Denis Papp <denis@accessdenied.net>
 
 $BMAI = "bmai.pl";
 #$PERL = "\\bin\\perl\\bin\\perl";

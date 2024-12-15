@@ -1,8 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_Die.h
-// Copyright (c) 2001-2024 Denis Papp. All rights reserved.
-// denis@accessdenied.net
-// https://github.com/pappde/bmai
+//
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright © 2021 Denis Papp <denis@accessdenied.net>
+// SPDX-FileComment: https://github.com/pappde/bmai
 //
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers

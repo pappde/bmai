@@ -1,0 +1,12 @@
+version = 1
+
+# force the .cpp and .h files have their own license/copyright expressed in the files
+# the below config is to blanket license/copyright other files in the project
+[[annotations]]
+path = [
+    "*",
+    "test/*.txt",
+    "web/*",
+]
+SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "Copyright © Denis Papp <denis@accessdenied.net>"

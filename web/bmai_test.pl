@@ -1,4 +1,5 @@
 # test BMAI settings
+# Copyright © 2008 Denis Papp <denis@accessdenied.net>
 
 $GAMES = 100;
 $IN_FILE = "in.txt";

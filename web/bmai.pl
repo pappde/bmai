@@ -3,8 +3,7 @@
 ###################################################################################
 # bmai.pl
 #
-# Copyright (c) 2001-2020 Denis Papp. All rights reserved.
-# denis@accessdenied.net
+# Copyright © 2001 Denis Papp <denis@accessdenied.net>
 # https://github.com/pappde/bmai
 #
 # DESCRIPTION: this is the front-end to BMAI.  It serves as the interface between the AI and

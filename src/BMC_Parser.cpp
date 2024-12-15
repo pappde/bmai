@@ -1,8 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 // BMC_Parser.cpp
-// Copyright (c) 2001-2024 Denis Papp. All rights reserved.
-// denis@accessdenied.net
-// https://github.com/pappde/bmai
+//
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright © 2024 Denis Papp <denis@accessdenied.net>
+// SPDX-FileComment: https://github.com/pappde/bmai
 // 
 // DESC: main parsing class for setting up game state
 //
