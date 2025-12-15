@@ -80,7 +80,7 @@ jobs:
     # then the archive won't have a lit of different dirs in it
     # couldn't find an easier way to flatten
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: bmai-${{ runner.os }}-${{ env.BUILD_TYPE }}
         if-no-files-found: error
