@@ -24,6 +24,77 @@ TEST(SkillTests, NoSkill) {
     EXPECT_EQ(die.GetScore(true), 15);
 }
 
+TEST(SkillTests, MultiDieSkillAttack) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("6:5 6:1","20:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0,1}, 0)
+	));
+}
+
+TEST(SkillTests, SingleDieSkillAttack) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("6:6","20:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0),
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", 0, 0)
+	));
+}
+
+TEST(SkillTests, KonstantSingleDieSkillAttack) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("k6:6", "20:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, StealthSingleDieSkillAttack) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("d6:6", "20:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, StealthMultiDieSkillAttack) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("d6:5 20:1", "20:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+}
+
 TEST(SkillTests, MaximumSkill) {
 	TEST_Util test;
 
@@ -135,15 +206,21 @@ TEST(SkillTests, NullValueSkill) {
 TEST(SkillTests, SpeedSkill) {
 	TEST_Util test;
 
-	BMC_Move _move;
+	TEST_Util::FightContext context;
 	EXPECT_NO_THROW({
-		_move = test.ParseFightGetAttack("z10:8","4:3 6:5");
+		context = test.ParseFightContext("z10:8","4:3 6:5");
 	});
-	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_N, "speed", 0, {0,1}));
 
-	auto a1_dice = TEST_Util::extractAttackerDice(_move);
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 1),
+		IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0),
+		IsAttack(BME_ATTACK_TYPE_1_N, "speed", 0, {0,1})
+	));
+
+	auto a1_dice = TEST_Util::extractAttackerDice(context.chosen_move);
 	EXPECT_EQ(a1_dice[0]->GetScore(true), 5);
-	auto t1_dice = TEST_Util::extractTargetDice(_move);
+	auto t1_dice = TEST_Util::extractTargetDice(context.chosen_move);
 	EXPECT_EQ(t1_dice[0]->GetScore(false), 6);
 	EXPECT_EQ(t1_dice[1]->GetScore(false), 4);
 
@@ -216,22 +293,28 @@ TEST(SkillTests, MorphingTwinSkill) {
 TEST(SkillTests, MorphingSpeedSkill) {
 	TEST_Util test;
 
-	BMC_Move _move;
+	TEST_Util::FightContext context;
 	EXPECT_NO_THROW({
-		_move = test.ParseFightGetAttack("mz(5,5):8","4:3 6:5");
+		context = test.ParseFightContext("mz(5,5):8","4:3 6:5");
 	});
-	EXPECT_THAT(_move, IsAttack(BME_ATTACK_TYPE_1_N, "speed", 0, {0,1}));
 
-	auto a1_dice = TEST_Util::extractAttackerDice(_move);
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 1),
+		IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0),
+		IsAttack(BME_ATTACK_TYPE_1_N, "speed", 0, {0,1})
+	));
+
+	auto a1_dice = TEST_Util::extractAttackerDice(context.chosen_move);
 	EXPECT_EQ(a1_dice[0]->GetScore(true), 5);
-	auto t1_dice = TEST_Util::extractTargetDice(_move);
+	auto t1_dice = TEST_Util::extractTargetDice(context.chosen_move);
 	EXPECT_EQ(t1_dice[0]->GetScore(false), 6);
 	EXPECT_EQ(t1_dice[1]->GetScore(false), 4);
 
 	// now some morphing stuff
 	EXPECT_EQ(a1_dice[0]->GetSidesMax(), 10);
-	_move.m_game->ApplyAttackPlayer(_move);
-	EXPECT_EQ(_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(), 10);
+	context.chosen_move.m_game->ApplyAttackPlayer(context.chosen_move);
+	EXPECT_EQ(context.chosen_move.m_game->GetPlayer(0)->GetDie(0)->GetSidesMax(), 10);
 	// ^^ did NOT morph size
 }
 

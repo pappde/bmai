@@ -398,6 +398,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			INT i;
 			INT dice = 0;
 			bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
+			bool has_stealth = false;
 			INT stinger_att_value_minimum = 0;
 			INT konstants = 0;
 			for (i=0; i<BMD_MAX_DICE; i++)
@@ -422,23 +423,25 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 						warriors++;
 					}
 
-					if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
-						konstants++;
+						if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
+							konstants++;
 
-					if (att_die->HasProperty(BME_PROPERTY_STINGER))
-						stinger_att_value_minimum += 1;
-					else
-						stinger_att_value_minimum += att_die->GetValueTotal();
+						if (att_die->HasProperty(BME_PROPERTY_STEALTH))
+							has_stealth = true;
+
+						if (att_die->HasProperty(BME_PROPERTY_STINGER))
+							stinger_att_value_minimum += 1;
+						else
+							stinger_att_value_minimum += att_die->GetValueTotal();
+					}
 				}
-			}
-
-			// must be using more than one
-			// TODO: should allow this (important for FIRE)
-			if (dice<2)
-				return false;
-
-			// KONSTANT: cannot do with just one die
-			if (dice<2 && konstants>0)
+	
+				// Stealth dice can only participate in multi-die skill attacks.
+				if (dice<2 && has_stealth)
+					return false;
+	
+				// KONSTANT: cannot do with just one die
+				if (dice<2 && konstants>0)
 				return false;
 
 			// if match - success

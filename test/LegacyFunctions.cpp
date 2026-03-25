@@ -13,7 +13,7 @@
 // The functions were occasionally uncommented to test specific scenarios
 // Ideally by wrapping up these test scenarios into a "test" we gain a few benefits:
 //  - your IDE will help you kick off the test whenever you need to without changing primary source code
-//  - the build process can easily run the code to make usre it functions as needed
+//  - the build process can easily run the code to make sure it functions as needed
 //  - the task of unit testing will encourage more sound object design and pattern usage
 //
 // //
@@ -28,11 +28,11 @@ protected:
     BMC_RNG tg_rng;
 };
 
-TEST_F(LegacyMembers, SetupTestGame) {
+TEST_F(LegacyMembers, SetupDevGame) {
 
     // Comment out next line to be able to easily run this code from IDE
     // or to include this in the overall test execution
-    GTEST_SKIP() << "Skipping Setup Test Game";
+    GTEST_SKIP() << "Skipping Setup Dev Game";
 
     // until the objects are better suited for testing
     // it may be necessary to use a couple hacks to access members

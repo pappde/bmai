@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright © 2024 Denis Papp <denis@accessdenied.net>
+// SPDX-FileComment: https://github.com/pappde/bmai
+
 #pragma once
 
 #include <cstdarg>
@@ -34,7 +38,6 @@ public:
 // lets us collect what is being sent to Send for inspection during tests
 class TEST_Parser : public BMC_Parser {
 public:
-
 	std::string tm_third_to_last_fmt;
 	std::string tm_next_to_last_fmt;
 	std::string tm_last_fmt;
@@ -69,6 +72,28 @@ public:
 class TEST_Util
 {
 public:
+	struct FightContext
+	{
+		TEST_Parser parser;
+		BMC_Move chosen_move;
+
+		BMC_Game* Game() const
+		{
+			return chosen_move.m_game;
+		}
+
+		std::vector<BMC_Move> ValidAttacks() const
+		{
+			BMC_MoveList movelist;
+			Game()->GenerateValidAttacks(movelist);
+
+			std::vector<BMC_Move> moves;
+			for (int i = 0; i < movelist.Size(); ++i)
+				moves.push_back(*movelist.Get(i));
+			return moves;
+		}
+	};
+
 	TEST_Parser parser;
 
 	BMC_Move ParseFightGetAttack(std::string d0, std::string d1)
@@ -87,6 +112,26 @@ public:
 		ss << "ply 1\nsurrender off\ngetaction\n";
 		parser.ParseString(ss.str());
 		return parser.last_attack;
+	}
+
+	FightContext ParseFightContext(std::string d0, std::string d1)
+	{
+		FightContext context;
+		auto dice0 = split(d0, ' ');
+		auto dice1 = split(d1, ' ');
+
+		std::stringstream ss;
+		ss << "game\nfight\n";
+		ss << "player 0 " << dice0.size() << " 0\n";
+		for (int i=0; i<dice0.size(); i++)
+			ss << dice0[i] << "\n";
+		ss << "player 1 " << dice1.size() << " 0\n";
+		for (int i=0; i<dice1.size(); i++)
+			ss << dice1[i] << "\n";
+		ss << "ply 1\nsurrender off\ngetaction\n";
+		context.parser.ParseString(ss.str());
+		context.chosen_move = context.parser.last_attack;
+		return context;
 	}
 
 	static std::vector<std::string> split(std::string &str, char delimiter)
