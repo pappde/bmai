@@ -8,6 +8,7 @@
 // drp030321 - partial split out to individual headers
 // dbl100524 - further split out of individual headers
 // dbl021125 - CanDoAttack()/CanBeAttacked() now take a BME_ATTACK
+// dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -75,4 +76,3 @@ private:
 	BMC_BitArray<BME_ATTACK_MAX>	m_vulnerabilities;
 	//U8			m_value[BMD_MAX_TWINS];	// current value of dice, not really necessary (and often not known!)
 };
-

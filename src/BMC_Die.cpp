@@ -8,6 +8,7 @@
 // drp030321 - partial split out to individual headers
 // dbl100524 - broke this logic out into its own class file
 // dbl021125 - stealth dice can only interface with skill attacks
+// dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Die.h"
