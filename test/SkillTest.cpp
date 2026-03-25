@@ -389,3 +389,73 @@ TEST(SkillTests, StealthTrip) {
 	EXPECT_THAT(_move, IsAction(BME_ACTION_PASS));
 
 }
+
+TEST(SkillTests, StealthShadow) {
+	BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_STEALTH | BME_PROPERTY_SHADOW);
+	EXPECT_TRUE(die.CanDoAttack(BME_ATTACK_SKILL));
+	EXPECT_FALSE(die.CanDoAttack(BME_ATTACK_SHADOW));
+	EXPECT_FALSE(die.CanDoAttack(BME_ATTACK_POWER));
+}
+
+TEST(SkillTests, StealthBerserk) {
+	BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_STEALTH | BME_PROPERTY_BERSERK);
+	EXPECT_TRUE(die.CanDoAttack(BME_ATTACK_SKILL));
+	EXPECT_FALSE(die.CanDoAttack(BME_ATTACK_BERSERK));
+	EXPECT_FALSE(die.CanDoAttack(BME_ATTACK_POWER));
+}
+
+TEST(SkillTests, StealthCannotBePowerAttacked) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("20:6", "d6:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, StealthCannotBeTripAttacked) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("t10:8", "d20:9");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, StealthCanBeMultiDieSkillAttacked) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("6:5 6:1", "d20:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+}
+
+TEST(SkillTests, StealthSingleDieSkillCannotCaptureStealth) {
+	TEST_Util test;
+
+	TEST_Util::FightContext context;
+	EXPECT_NO_THROW({
+		context = test.ParseFightContext("6:6", "d20:6");
+	});
+
+	auto valid_attacks = context.ValidAttacks();
+	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}

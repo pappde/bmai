@@ -392,6 +392,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			tgt_die = target->GetDie(_move.m_target);
 			if (!tgt_die->CanBeAttacked(_move.m_attack))
 				return false;
+			bool target_has_stealth = tgt_die->HasProperty(BME_PROPERTY_STEALTH);
 
 			// iterate over attack dice
 			INT	att_value_total = 0;
@@ -436,8 +437,8 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					}
 				}
 	
-				// Stealth dice can only participate in multi-die skill attacks.
-				if (dice<2 && has_stealth)
+				// Stealth dice can only participate in, or be captured by, multi-die skill attacks.
+				if (dice<2 && (has_stealth || target_has_stealth))
 					return false;
 	
 				// KONSTANT: cannot do with just one die
