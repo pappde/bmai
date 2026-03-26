@@ -7,6 +7,8 @@
 //
 // REVISION HISTORY:
 // dbl100524 - further split out of individual headers
+// dbl021125 - extern c_action_name, makes unit tests more readable
+// dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -78,6 +80,8 @@ public:
 		};
 	};
 };
+
+extern const char *c_action_name[];
 
 #define	BMC_MoveAttack	BMC_Move
 

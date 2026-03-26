@@ -9,6 +9,8 @@
 //
 // REVISION HISTORY:
 // dbl100524 - broke this logic out into its own class file
+// dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
+// dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Game.h"
@@ -306,11 +308,11 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 		{
 			// is the attack type legal based on the given dice
 			att_die = attacker->GetDie(_move.m_attacker);
-			if (!att_die->CanDoAttack(_move))
+			if (!att_die->CanDoAttack(_move.m_attack))
 				return false;
 
 			tgt_die = target->GetDie(_move.m_target);
-			if (!tgt_die->CanBeAttacked(_move))
+			if (!tgt_die->CanBeAttacked(_move.m_attack))
 				return false;
 
 			// for POWER - check value >=
@@ -340,7 +342,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 		{
 			// is the attack type legal based on the given dice
 			att_die = attacker->GetDie(_move.m_attacker);
-			if (!att_die->CanDoAttack(_move))
+			if (!att_die->CanDoAttack(_move.m_attack))
 				return false;
 
 			// iterate over target dice
@@ -354,7 +356,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					dice++;
 					// can the target die be attacked?
 					tgt_die = target->GetDie(i);
-					if (!tgt_die->CanBeAttacked(_move))
+					if (!tgt_die->CanBeAttacked(_move.m_attack))
 						return false;
 					// count value of target die, and check if gone past limit
 					tgt_value_total += tgt_die->GetValueTotal();
@@ -390,14 +392,16 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 
 			// can the target die be attacked?
 			tgt_die = target->GetDie(_move.m_target);
-			if (!tgt_die->CanBeAttacked(_move))
+			if (!tgt_die->CanBeAttacked(_move.m_attack))
 				return false;
+			bool target_has_stealth = tgt_die->HasProperty(BME_PROPERTY_STEALTH);
 
 			// iterate over attack dice
 			INT	att_value_total = 0;
 			INT i;
 			INT dice = 0;
 			bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
+			bool has_stealth = false;
 			INT stinger_att_value_minimum = 0;
 			INT konstants = 0;
 			for (i=0; i<BMD_MAX_DICE; i++)
@@ -407,7 +411,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					dice++;
 					// is the attack type legal based on the given dice
 					att_die = attacker->GetDie(i);
-					if (!att_die->CanDoAttack(_move))
+					if (!att_die->CanDoAttack(_move.m_attack))
 						return false;
 
 					// count value of att die, and check if gone past limit
@@ -422,23 +426,25 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 						warriors++;
 					}
 
-					if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
-						konstants++;
+						if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
+							konstants++;
 
-					if (att_die->HasProperty(BME_PROPERTY_STINGER))
-						stinger_att_value_minimum += 1;
-					else
-						stinger_att_value_minimum += att_die->GetValueTotal();
+						if (att_die->HasProperty(BME_PROPERTY_STEALTH))
+							has_stealth = true;
+
+						if (att_die->HasProperty(BME_PROPERTY_STINGER))
+							stinger_att_value_minimum += 1;
+						else
+							stinger_att_value_minimum += att_die->GetValueTotal();
+					}
 				}
-			}
-
-			// must be using more than one
-			// TODO: should allow this (important for FIRE)
-			if (dice<2)
-				return false;
-
-			// KONSTANT: cannot do with just one die
-			if (dice<2 && konstants>0)
+	
+				// Stealth dice can only participate in, or be captured by, multi-die skill attacks.
+				if (dice<2 && (has_stealth || target_has_stealth))
+					return false;
+	
+				// KONSTANT: cannot do with just one die
+				if (dice<2 && konstants>0)
 				return false;
 
 			// if match - success
@@ -968,7 +974,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 		for (a=BME_ATTACK_FIRST; a<BME_ATTACK_MAX; a++)
 		{
 			move.m_attack = (BME_ATTACK)a;
-			if (!att_die->CanDoAttack(move))
+			if (!att_die->CanDoAttack(move.m_attack))
 				continue;
 
 			move.m_turbo_option = -1;
@@ -990,7 +996,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						else if (move.m_attack==BME_ATTACK_POWER && tgt_die->GetValueTotal()>att_die->GetValueTotal())
 							break;
 
-						if (!tgt_die->CanBeAttacked(move))
+						if (!tgt_die->CanBeAttacked(move.m_attack))
 							continue;
 
 						// is the move valid?

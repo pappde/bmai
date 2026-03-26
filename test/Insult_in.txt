@@ -1,10 +1,10 @@
 game
 fight
 player 0 2 0
-8:8
-7:7
+12:12
+4:3
 player 1 2 0
-I20:15
-4:1
+I15:15
+4:4
 getaction
 quit

@@ -8,6 +8,8 @@
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
 // dbl100524 - further split out of individual headers
+// dbl021125 - CanDoAttack()/CanBeAttacked() now take a BME_ATTACK
+// dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -36,8 +38,8 @@ public:
 	void		SetFocus(INT _v);
 
 	// accessors
-	bool		CanDoAttack(BMC_MoveAttack &_move) { return m_attacks.IsSet(_move.m_attack); }
-	bool		CanBeAttacked(BMC_MoveAttack &_move) { return m_vulnerabilities.IsSet(_move.m_attack); }
+	bool		CanDoAttack(BME_ATTACK _attack) { return m_attacks.IsSet(_attack); }
+	bool		CanBeAttacked(BME_ATTACK _attack) { return m_vulnerabilities.IsSet(_attack); }
 	INT			GetValueTotal() { return m_value_total; }
 	INT			GetSidesMax() { return m_sides_max; }
 	bool		IsAvailable() { return m_state == BME_STATE_READY || m_state == BME_STATE_DIZZY; }
@@ -75,4 +77,3 @@ private:
 	BMC_BitArray<BME_ATTACK_MAX>	m_vulnerabilities;
 	//U8			m_value[BMD_MAX_TWINS];	// current value of dice, not really necessary (and often not known!)
 };
-

@@ -50,7 +50,7 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_tuple("test/SurrenderOn-Attack-in.txt", "action\nsurrender\n"),
             std::make_tuple("test/SurrenderOn-Pass-in.txt", "action\nsurrender\n"),
 
-            std::make_tuple("test/Insult_in.txt", "power\n1\n1\n"),
+            std::make_tuple("test/Insult_in.txt", "power\n0\n1\n"),
             std::make_tuple("test/Value1_in.txt", "skill\n0 1\n1\n"),
             std::make_tuple("test/Value2_in.txt", "power\n1\n0\n"),
 
