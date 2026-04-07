@@ -144,7 +144,7 @@ TEST(SkillTests, MaximumSkill) {
 TEST(SkillTests, RollRequiresNotSetState) {
     BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID);
 
-	// Roll/BM_ASSERT should fail if state not set correctly
+    // This invariant is enforced only in debug builds, where assert() is active.
 #ifdef NDEBUG
     GTEST_SKIP() << "assert() is compiled out in release builds";
 #else
@@ -159,7 +159,7 @@ TEST(SkillTests, RollRequiresNotSetState) {
 TEST(SkillTests, SwingSetRequiresNotSetState) {
     BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID, BME_SWING_X);
 
-	// Roll/BM_ASSERT should fail if state not set correctly
+    // This invariant is enforced only in debug builds, where assert() is active.
 #ifdef NDEBUG
     GTEST_SKIP() << "assert() is compiled out in release builds";
 #else
