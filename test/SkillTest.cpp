@@ -145,22 +145,30 @@ TEST(SkillTests, RollRequiresNotSetState) {
     BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID);
 
 	// Roll/BM_ASSERT should fail if state not set correctly
+#ifdef NDEBUG
+    GTEST_SKIP() << "assert() is compiled out in release builds";
+#else
     EXPECT_DEATH(
         {
             die.Roll();
         },
         "");
+#endif
 }
 
 TEST(SkillTests, SwingSetRequiresNotSetState) {
     BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID, BME_SWING_X);
 
 	// Roll/BM_ASSERT should fail if state not set correctly
+#ifdef NDEBUG
+    GTEST_SKIP() << "assert() is compiled out in release builds";
+#else
     EXPECT_DEATH(
         {
             die.OnSwingSet(BME_SWING_X, 8);
         },
         "");
+#endif
 }
 
 TEST(SkillTests, KonstantRetainsValueWhenTripped) {
