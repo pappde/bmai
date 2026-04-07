@@ -7,6 +7,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <iostream>
+#include <memory>
 
 #include "../src/BMC_Die.h"
 #include "../src/BMC_Game.h"
@@ -72,14 +73,15 @@ public:
 class TEST_Util
 {
 public:
-	struct FightContext
+	struct PhaseContext
 	{
-		TEST_Parser parser;
+		std::unique_ptr<TEST_Parser> parser;
+		BMC_Game *game = nullptr;
 		BMC_Move chosen_move;
 
 		BMC_Game* Game() const
 		{
-			return chosen_move.m_game;
+			return game;
 		}
 
 		std::vector<BMC_Move> ValidAttacks() const
@@ -92,7 +94,19 @@ public:
 				moves.push_back(*movelist.Get(i));
 			return moves;
 		}
+
+		std::vector<BMC_Move> ValidChance() const
+		{
+			BMC_MoveList movelist;
+			Game()->GenerateValidChance(movelist);
+
+			std::vector<BMC_Move> moves;
+			for (int i = 0; i < movelist.Size(); ++i)
+				moves.push_back(*movelist.Get(i));
+			return moves;
+		}
 	};
+	using FightContext = PhaseContext;
 
 	TEST_Parser parser;
 
@@ -114,14 +128,15 @@ public:
 		return parser.last_attack;
 	}
 
-	FightContext ParseFightContext(std::string d0, std::string d1)
+	PhaseContext ParsePhaseContext(std::string phase, std::string d0, std::string d1)
 	{
-		FightContext context;
+		PhaseContext context;
+		context.parser = std::make_unique<TEST_Parser>();
 		auto dice0 = split(d0, ' ');
 		auto dice1 = split(d1, ' ');
 
 		std::stringstream ss;
-		ss << "game\nfight\n";
+		ss << "game\n" << phase << "\n";
 		ss << "player 0 " << dice0.size() << " 0\n";
 		for (int i=0; i<dice0.size(); i++)
 			ss << dice0[i] << "\n";
@@ -129,9 +144,20 @@ public:
 		for (int i=0; i<dice1.size(); i++)
 			ss << dice1[i] << "\n";
 		ss << "ply 1\nsurrender off\ngetaction\n";
-		context.parser.ParseString(ss.str());
-		context.chosen_move = context.parser.last_attack;
+		context.parser->ParseString(ss.str());
+		context.game = context.parser->Game();
+		context.chosen_move = context.parser->last_attack;
 		return context;
+	}
+
+	FightContext ParseFightContext(std::string d0, std::string d1)
+	{
+		return ParsePhaseContext("fight", d0, d1);
+	}
+
+	PhaseContext ParseChanceContext(std::string d0, std::string d1)
+	{
+		return ParsePhaseContext("chance", d0, d1);
 	}
 
 	static std::vector<std::string> split(std::string &str, char delimiter)

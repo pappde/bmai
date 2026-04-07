@@ -11,6 +11,7 @@
 // dbl100524 - broke this logic out into its own class file
 // dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
+// dbl040626 - schedule Chance and Trip rerolls only for dice that should actually reroll
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Game.h"
@@ -1280,9 +1281,11 @@ void BMC_Game::ApplyUseChance(BMC_Move &_move)
 			continue;
 		die = player->GetDie(i);
 
-		// ASSUME: just Roll() - no special effects, so not calling OnBeforeRollInGame()
-		die->SetState(BME_STATE_NOTSET);
-		die->Roll();
+		// CHANCE rerolls preserve Konstant values, so only schedule a reroll for dice that should change.
+		if (!die->HasProperty(BME_PROPERTY_KONSTANT))
+			die->SetState(BME_STATE_NOTSET);
+		if (die->GetState()==BME_STATE_NOTSET)
+			die->Roll();
 	}
 
 	// reoptimize dice
@@ -1452,7 +1455,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		}
 	}
 
-	// for TRIP, mark target as needing a reroll
+	// for TRIP, mark non-Konstant targets as needing a reroll
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
@@ -1461,8 +1464,11 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		BMC_Player *target = &(m_player[m_target_player]);
 
 		tgt_die = target->GetDie(_move.m_target);
-		tgt_die->SetState(BME_STATE_NOTSET);
-		tgt_die->OnBeforeRollInGame(target);
+		if (!tgt_die->HasProperty(BME_PROPERTY_KONSTANT))
+		{
+			tgt_die->SetState(BME_STATE_NOTSET);
+			tgt_die->OnBeforeRollInGame(target);
+		}
 	}
 
 	// ORNERY: all ornery dice on attacker must reroll (whether attacked)
@@ -1515,10 +1521,15 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 	// TRIP attack
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
-		// reroll target
+		// reroll target if the attack scheduled one
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
 
 		tgt_die = target->GetDie(_move.m_target);
+		if (!tgt_die->HasProperty(BME_PROPERTY_KONSTANT))
+		{
+			tgt_die->SetState(BME_STATE_NOTSET);
+			tgt_die->OnBeforeRollInGame(target);
+		}
 		tgt_die->OnApplyAttackNatureRollTripped();
 	}
 }

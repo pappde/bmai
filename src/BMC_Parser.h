@@ -10,6 +10,7 @@
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
 // dbl100524 - further split out of individual headers
+// dbl040626 - expose parser-owned game for parser-driven tests
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -31,6 +32,7 @@ public:
 	void	ParseStdIn() { m_inputFile = stdin; Parse(); }
 	void	ParseFile(FILE *_fp) { m_inputFile = _fp; Parse(); }
 	void	ParseString(std::string  _data);
+	BMC_Game *Game() { return &m_game; }
 
 protected:
 	void			GetAction();
