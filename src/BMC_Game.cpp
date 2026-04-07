@@ -12,11 +12,13 @@
 // dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
 // dbl040626 - schedule Chance and Trip rerolls only for dice that should actually reroll
+// dbl040626 - add signed Konstant skill handling and keep searching later targets after overshoot
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Game.h"
 
 #include <cstring>
+#include <vector>
 #include "BMC_AI.h"
 #include "BMC_BMAI3.h"
 #include "BMC_DieIndexStack.h"
@@ -405,6 +407,14 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			bool has_stealth = false;
 			INT stinger_att_value_minimum = 0;
 			INT konstants = 0;
+			bool selected_has_konstant = false;
+			struct KonstantTerm
+			{
+				INT value;
+				bool allow_subtraction;
+			};
+			INT konstant_base_total = 0;
+			std::vector<KonstantTerm> konstant_terms;
 			for (i=0; i<BMD_MAX_DICE; i++)
 			{
 				if (_move.m_attackers.IsSet(i))
@@ -415,10 +425,11 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					if (!att_die->CanDoAttack(_move.m_attack))
 						return false;
 
-					// count value of att die, and check if gone past limit
+					if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
+						selected_has_konstant = true;
+
+					// count value of att die
 					att_value_total += att_die->GetValueTotal();
-					if (!has_stinger && att_value_total > tgt_die->GetValueTotal())
-						return false;
 
 					if (att_die->HasProperty(BME_PROPERTY_WARRIOR))
 					{
@@ -428,7 +439,17 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					}
 
 						if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
+						{
 							konstants++;
+							konstant_terms.push_back({
+								att_die->GetValueTotal(),
+								!att_die->HasProperty(BME_PROPERTY_WARRIOR)
+							});
+						}
+						else
+						{
+							konstant_base_total += att_die->GetValueTotal();
+						}
 
 						if (att_die->HasProperty(BME_PROPERTY_STEALTH))
 							has_stealth = true;
@@ -447,6 +468,34 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 				// KONSTANT: cannot do with just one die
 				if (dice<2 && konstants>0)
 				return false;
+
+			if (konstants>0 && !has_stinger)
+			{
+				auto konstant_hits_target = [&](auto &&self, size_t idx, INT total) -> bool
+				{
+					if (idx >= konstant_terms.size())
+						return total == tgt_die->GetValueTotal();
+
+					const auto &term = konstant_terms[idx];
+					if (self(self, idx + 1, total + term.value))
+						return true;
+
+					if (term.allow_subtraction && self(self, idx + 1, total - term.value))
+						return true;
+
+					return false;
+				};
+
+				if (konstant_hits_target(konstant_hits_target, 0, konstant_base_total))
+					return true;
+			}
+
+			if (att_value_total > tgt_die->GetValueTotal()
+				&& !has_stinger
+				&& !selected_has_konstant)
+			{
+				return false;
+			}
 
 			// if match - success
 			if (att_value_total == tgt_die->GetValueTotal())
@@ -1069,11 +1118,11 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 								tgt_die = target->GetDie(move.m_target);
 
 								// if past our value, give up
-								if (tgt_die->GetValueTotal() < die_stack.GetValueTotal())
+								if (!has_konstant && tgt_die->GetValueTotal() < die_stack.GetValueTotal())
 									break;
 
-								// if match our value, check move
-								if (tgt_die->GetValueTotal() == die_stack.GetValueTotal())
+								// For Konstant dice, later targets may still match once +/- assignments are considered.
+								if (has_konstant || tgt_die->GetValueTotal() == die_stack.GetValueTotal())
 								{
 									// build m_attackers to check move validity
 									die_stack.SetBits(move.m_attackers);
@@ -1086,11 +1135,11 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// if full (using all target dice) and att value is <= tgt total value, give up since won't be able to do any other matches
 						// drp100224 - this check was wrong. We can abort if GetValueTotal() <= target->GetMinValue(), since that's the highest we can combine to,
 						//  but otherwise we should keep cycling since other combniations will have lower totals.
-						if (die_stack.ContainsAllDice() && die_stack.GetValueTotal()<=target->GetMinValue())
+						if (!has_konstant && die_stack.ContainsAllDice() && die_stack.GetValueTotal()<=target->GetMinValue())
 							break;
 
 						// if att_total matches or exceeds tgt_total, don't add a die
-						if (die_stack.GetValueTotal() >= target->GetMaxValue())
+						if (!has_konstant && die_stack.GetValueTotal() >= target->GetMaxValue())
 							finished = die_stack.Cycle(false);
 						else // otherwise standard cycle
 							finished = die_stack.Cycle();

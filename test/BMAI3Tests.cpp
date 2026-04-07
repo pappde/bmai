@@ -11,20 +11,10 @@
 // a path util, if useful consider breaking out into generic utility
 inline std::string resolvePath(const std::string &relPath)
 {
-    auto baseDir = std::filesystem::current_path();
-    while (baseDir.has_parent_path())
+    auto sourceDirPath = std::filesystem::path(__FILE__).parent_path().parent_path() / relPath;
+    if (exists(sourceDirPath))
     {
-        auto combinePath = baseDir / relPath;
-        if (exists(combinePath))
-        {
-            return combinePath.string();
-        }
-        if(baseDir==baseDir.parent_path()) {
-            break;
-        } else {
-            baseDir = baseDir.parent_path();
-        }
-
+        return sourceDirPath.string();
     }
     throw std::runtime_error("File not found!");
 }
@@ -55,7 +45,8 @@ INSTANTIATE_TEST_SUITE_P(
             std::make_tuple("test/Value2_in.txt", "power\n1\n0\n"),
 
             std::make_tuple("test/bug55_a_in.txt", "skill\n2 0\n0\n"),
-            std::make_tuple("test/bug55_b_in.txt", "skill\n3 0 1\n2\n")
+            std::make_tuple("test/bug55_b_in.txt", "skill\n3 0 1\n2\n"),
+            std::make_tuple("test/bug105372_in.txt", "skill\n2 1 0\n0\n")
 
             // LONG RUNNING! use for MANUAL REGRESSION
             // TODO create better regression patterns that can be triggered from select builds

@@ -23,6 +23,8 @@ BMC_Die *FindDieByOriginalIndex(BMC_Player *player, int original_index) {
 
 }  // namespace
 
+class KonstantSignedAssignmentTests : public ::testing::TestWithParam<std::string> {};
+
 TEST(SkillTests, NoSkill) {
 	TEST_Util test;
 
@@ -82,6 +84,132 @@ TEST(SkillTests, KonstantSingleDieSkillAttack) {
 	auto valid_attacks = context.ValidAttacks();
 	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
 		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, KonstantCannotPowerAttack) {
+	BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_KONSTANT);
+
+	EXPECT_FALSE(die.CanDoAttack(BME_ATTACK_POWER));
+	EXPECT_TRUE(die.CanDoAttack(BME_ATTACK_SKILL));
+}
+
+TEST(SkillTests, KonstantMultiDieSkillAttackWithSubtraction) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"Mk1:1 Mk1:1 Mk3:3",
+		"3:3"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1, 2}, 0)
+	));
+}
+
+TEST_P(KonstantSignedAssignmentTests, MultiDieSkillAttackAllowsSignedAssignments) {
+	TEST_Util test;
+
+	// KONSTANT allow + or -
+	// 5+2+3 10
+	// 5+2-3 4
+	// 5-2+3 6
+	// 5-2-3 0
+	auto context = test.ParseFightContext(
+		"41:5 Mk2:2 Mk3:3",
+		GetParam()
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1, 2}, 0)
+	));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+	SkillTests,
+	KonstantSignedAssignmentTests,
+	::testing::Values(
+		"d10:10",
+		"d4:4",
+		"d6:6",
+		"d0:0"
+	));
+
+TEST(SkillTests, KonstantMixedMultiDieSkillAttackWithSubtraction) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"8:8 Mk1:1",
+		"d7:7"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+}
+
+TEST(SkillTests, KonstantMultiDieSkillAttackNoMatchingAssignment) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"Mk1:1 Mk1:1 Mk3:3",
+		"6:6"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, KonstantWarriorCannotSubtractInSkillAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"`k3:3 Mk5:5",
+		"d2:2"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, OnlyOneWarriorMayParticipateInSkillAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"41:5 `k2:2 `k3:3",
+		"d10:10"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, KonstantMultiDieSkillAttackWithoutSubtraction) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"Mk1:1 Mk2:2",
+		"d3:3"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+}
+
+TEST(SkillTests, KonstantGenerationFindsLaterTargetAfterOvershoot) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"8:8 Mk1:1",
+		"d8:8 d7:7"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 1)
 	));
 }
 
