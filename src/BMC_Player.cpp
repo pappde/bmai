@@ -9,6 +9,7 @@
 //
 // REVISION HISTORY:
 // dbl100524 - broke this logic out into its own class file
+// dbl040626 - add property-change bookkeeping for warrior Konstant transitions
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // includes
@@ -223,14 +224,21 @@ void BMC_Player::OptimizeDice()
 	}
 }
 
+void BMC_Player::OnDiePropertiesChanging(BMC_Die *_die)
+{
+	m_score -= _die->GetScore(true);
+}
+
+void BMC_Player::OnDiePropertiesChanged(BMC_Die *_die)
+{
+	m_score += _die->GetScore(true);
+}
+
 void BMC_Player::OnDieSidesChanging(BMC_Die *_die)
 {
-	// KONSTANT: if die was set to not reroll, but we're about to change the number of sides, then force a reroll
+	// Side changes invalidate the current value, even for dice that otherwise preserve it between attacks.
 	if (_die->GetState()!=BME_STATE_NOTSET)
-	{
-		BM_ERROR(_die->HasProperty(BME_PROPERTY_KONSTANT));
 		_die->SetState(BME_STATE_NOTSET);
-	}
 	m_score -= _die->GetScore(true);
 }
 

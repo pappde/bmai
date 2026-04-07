@@ -8,6 +8,20 @@
 #include "./_matchers.h"
 #include "./_testutils.h"
 #include "../src/BMC_Parser.h"
+#include "../src/BMC_RNG.h"
+
+namespace {
+
+BMC_Die *FindDieByOriginalIndex(BMC_Player *player, int original_index) {
+	for (int i = 0; i < player->GetAvailableDice(); ++i) {
+		BMC_Die *die = player->GetDie(i);
+		if (die->GetOriginalIndex() == original_index)
+			return die;
+	}
+	return nullptr;
+}
+
+}  // namespace
 
 TEST(SkillTests, NoSkill) {
 	TEST_Util test;
@@ -119,11 +133,139 @@ TEST(SkillTests, MaximumSkill) {
 
     for (int i = 0; i < 10; ++i) {
         // Act: When the die is rolled 10 times
+        die.SetState(BME_STATE_NOTSET);
         die.Roll();
 
         // Assert: Then it always has the max value
         EXPECT_EQ(die.GetValueTotal(), 6);
     }
+}
+
+TEST(SkillTests, RollRequiresNotSetState) {
+    BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID);
+
+    // This invariant is enforced only in debug builds, where assert() is active.
+#ifdef NDEBUG
+    GTEST_SKIP() << "assert() is compiled out in release builds";
+#else
+    EXPECT_DEATH(
+        {
+            die.Roll();
+        },
+        "");
+#endif
+}
+
+TEST(SkillTests, SwingSetRequiresNotSetState) {
+    BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID, BME_SWING_X);
+
+    // This invariant is enforced only in debug builds, where assert() is active.
+#ifdef NDEBUG
+    GTEST_SKIP() << "assert() is compiled out in release builds";
+#else
+    EXPECT_DEATH(
+        {
+            die.OnSwingSet(BME_SWING_X, 8);
+        },
+        "");
+#endif
+}
+
+TEST(SkillTests, KonstantRetainsValueWhenTripped) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("tk8:8", "k100:7");
+	auto valid_attacks = context.ValidAttacks();
+	ASSERT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_1_1, "trip", 0, 0)
+	));
+
+	// Fix the RNG seed so a broken reroll path cannot randomly land back on 7 and mask the bug.
+	g_rng.SRand(1);
+
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(valid_attacks.front(), extra_turn);
+
+	BMC_Player *target_player = context.Game()->GetPlayer(1);
+	EXPECT_EQ(target_player->GetDie(0)->GetValueTotal(), 7);
+	EXPECT_EQ(target_player->GetAvailableDice(), 0);
+}
+
+TEST(SkillTests, KonstantRetainsValueWhenChanceRerolls) {
+	TEST_Util test;
+
+	auto context = test.ParseChanceContext("ck100:7", "20:20");
+	auto valid_chance = context.ValidChance();
+
+	auto chance_it = std::find_if(valid_chance.begin(), valid_chance.end(), [](const BMC_Move &move) {
+		return move.m_action == BME_ACTION_USE_CHANCE;
+	});
+	ASSERT_NE(chance_it, valid_chance.end());
+
+	// Fix the RNG seed so a broken reroll path cannot randomly land back on 7 and mask the bug.
+	g_rng.SRand(1);
+
+	context.Game()->ApplyUseChance(*chance_it);
+
+	BMC_Player *chance_player = context.Game()->GetPlayer(0);
+	// Die should not have re-rolled
+	EXPECT_EQ(chance_player->GetDie(0)->GetValueTotal(), 7);
+}
+
+TEST(SkillTests, KonstantAttackerRetainsValueAfterSkillAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("k20:13 7:7", "20:20");
+	auto valid_attacks = context.ValidAttacks();
+	ASSERT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+
+	BMC_Player *attacker = context.Game()->GetPlayer(0);
+	BMC_Die *konstant_die = attacker->GetDie(0);
+	ASSERT_NE(konstant_die, nullptr);
+	int original_index = konstant_die->GetOriginalIndex();
+	ASSERT_EQ(konstant_die->GetValueTotal(), 13);
+
+	g_rng.SRand(1);
+
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(valid_attacks.front(), extra_turn);
+
+	attacker = context.Game()->GetPlayer(0);
+	konstant_die = FindDieByOriginalIndex(attacker, original_index);
+	ASSERT_NE(konstant_die, nullptr);
+	// Die should not have re-rolled
+	EXPECT_EQ(konstant_die->GetValueTotal(), 13);
+}
+
+TEST(SkillTests, KonstantWarriorRetainsValueWhenUsedInSkillAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("`k41:17 11:11", "20:28");
+	auto valid_attacks = context.ValidAttacks();
+	ASSERT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+
+	BMC_Player *attacker = context.Game()->GetPlayer(0);
+	BMC_Die *warrior_die = attacker->GetDie(0);
+	ASSERT_NE(warrior_die, nullptr);
+	int original_index = warrior_die->GetOriginalIndex();
+	ASSERT_EQ(warrior_die->GetValueTotal(), 17);
+	ASSERT_TRUE(warrior_die->HasProperty(BME_PROPERTY_WARRIOR));
+
+	g_rng.SRand(1);
+
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(valid_attacks.front(), extra_turn);
+
+	attacker = context.Game()->GetPlayer(0);
+	warrior_die = FindDieByOriginalIndex(attacker, original_index);
+	ASSERT_NE(warrior_die, nullptr);
+	// Die should not have re-rolled
+	EXPECT_EQ(warrior_die->GetValueTotal(), 17);
+	EXPECT_FALSE(warrior_die->HasProperty(BME_PROPERTY_WARRIOR));
 }
 
 TEST(SkillTests, InsultSkill) {

@@ -10,6 +10,7 @@
 // dbl100524 - broke this logic out into its own class file
 // dbl021125 - stealth dice can only interface with skill attacks
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill
+// dbl040626 - fix NOTSET assert checks and make attacker/trip rerolls and warrior Konstant handling state-driven
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Die.h"
@@ -180,7 +181,7 @@ void BMC_Die::OnSwingSet(INT _swing, U8 _value)
 	if (!IsUsed())
 		return;
 
-	BM_ASSERT(m_state=BME_STATE_NOTSET);
+	BM_ASSERT(m_state==BME_STATE_NOTSET);
 
 	INT i;
 	m_sides_max = 0;
@@ -221,7 +222,7 @@ void BMC_Die::Roll()
 	if (!IsUsed())
 		return;
 
-	BM_ASSERT(m_state=BME_STATE_NOTSET);
+	BM_ASSERT(m_state==BME_STATE_NOTSET);
 
 	INT i;
 	m_value_total = 0;
@@ -286,8 +287,7 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
     // TODO determine how this may conflict with the design of `bool _actually_attacking`
     BM_ASSERT(c_attack_type[_move.m_attack]!=BME_ATTACK_TYPE_0_0);
 
-	// clear value
-	// KONSTANT: don't reroll
+	// clear value: Konstant attackers keep their current value and never enter the reroll state
 	if (!HasProperty(BME_PROPERTY_KONSTANT))
 		SetState(BME_STATE_NOTSET);
 
@@ -357,12 +357,13 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 
 
 	// WARRIOR: loses property
-	// TODO: KONSTANT will be forced to reroll but shouldn't (OnDieSidesChanging misinterpreting situation)
 	if (HasProperty(BME_PROPERTY_WARRIOR))
 	{
-		_owner->OnDieSidesChanging(this);
+		_owner->OnDiePropertiesChanging(this);
 		m_properties &= ~BME_PROPERTY_WARRIOR;
-		_owner->OnDieSidesChanged(this);
+		if (HasProperty(BME_PROPERTY_KONSTANT))
+			RecomputeAttacks();
+		_owner->OnDiePropertiesChanged(this);
 	}
 }
 
@@ -439,13 +440,15 @@ void BMC_Die::OnApplyAttackNatureRollAttacker(BMC_Move &_move, BMC_Player *_owne
 	}
 
 	// reroll
-	Roll();
+	if (GetState()==BME_STATE_NOTSET)
+		Roll();
 }
 
 void BMC_Die::OnApplyAttackNatureRollTripped()
 {
 	// reroll
-	Roll();
+	if (GetState()==BME_STATE_NOTSET)
+		Roll();
 }
 
 void BMC_Die::Debug(BME_DEBUG _cat)
