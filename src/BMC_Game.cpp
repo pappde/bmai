@@ -410,7 +410,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			INT	att_value_total = 0;
 			INT i;
 			INT dice = 0;
-			bool attack_has_stinger = false;
+			bool att_has_stinger = false;
 			bool has_stealth = false;
 			INT stinger_att_value_minimum = 0;
 			INT stinger_slack = 0;  // total (value - 1) for all Stinger dice in attack
@@ -457,7 +457,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 						&& !att_die->HasProperty(BME_PROPERTY_WARRIOR))
 					{
 						// Stinger can use any value from 1 to current
-						attack_has_stinger = true;
+						att_has_stinger = true;
 						stinger_att_value_minimum += 1;
 						stinger_slack += att_die->GetValueTotal() - 1;
 					}
@@ -469,7 +469,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 				}
 			}
 
-			bool attack_has_konstant = (konstants > 0);
+			bool att_has_konstant = (konstants > 0);
 
 			// Stealth dice can only participate in, or be captured by, multi-die skill attacks.
 			if (dice < 2 && (has_stealth || target_has_stealth))
@@ -507,8 +507,8 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			}
 
 			if (att_value_total > tgt_die->GetValueTotal()
-				&& !attack_has_stinger
-				&& !attack_has_konstant)
+				&& !att_has_stinger
+				&& !att_has_konstant)
 			{
 				return false;
 			}
@@ -518,7 +518,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 				return true;
 
 			// stinger - if within range - success
-			if (attack_has_stinger && tgt_die->GetValueTotal() >= stinger_att_value_minimum && tgt_die->GetValueTotal() <= att_value_total)
+			if (att_has_stinger && tgt_die->GetValueTotal() >= stinger_att_value_minimum && tgt_die->GetValueTotal() <= att_value_total)
 				return true;
 
 			return false;
