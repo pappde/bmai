@@ -1,0 +1,339 @@
+{
+  "description": "Helpful as a reference for Humans and AI. Not currently actually read or used by the BMAI code in this repo",
+  "fetched": "2026-04-07",
+  "source": "https://www.buttonweavers.com/ui/skills.html",
+  "api_endpoints": [
+    "POST https://www.buttonweavers.com/api/responder {\"type\":\"loadDieSkillsData\"}",
+    "POST https://www.buttonweavers.com/api/responder {\"type\":\"loadDieTypesData\"}"
+  ],
+  "dieSkills": {
+    "+": {
+      "name": "Auxiliary",
+      "description": "These are optional extra dice. Before each game, both players decide whether or not to play with their Auxiliary Dice. Only if both players choose to have them will they be in play.",
+      "interacts": []
+    },
+    "B": {
+      "name": "Berserk",
+      "description": "These dice cannot participate in Skill Attacks; instead they can make a Berserk Attack. These work exactly like Speed Attacks - one Berserk Die can capture any number of dice which add up exactly to its value. Once a Berserk Die performs a Berserk Attack, it is replaced with a non-berserk die with half the number of sides it previously had, rounding up.",
+      "interacts": {
+        "Mighty": "Dice with both Berserk and Mighty skills will first halve in size, and then grow",
+        "Radioactive": "Dice with both Radioactive and Berserk skills making a berserk attack targeting a SINGLE die are first replaced with non-berserk dice with half their previous number of sides, rounding up, and then decay",
+        "Speed": "Dice with both Berserk and Speed skills may choose to make either kind of attack",
+        "Turbo": "Dice with both Berserk and Turbo making a berserk attack will first halve in size and then change to the size specified by the Turbo skill",
+        "Weak": "Dice with both Berserk and Weak skills will first halve in size, and then shrink"
+      }
+    },
+    "b": {
+      "name": "Boom",
+      "description": "Boom Dice are like normal dice with an additional attack, the Boom attack. To make a Boom Attack, remove one of your Boom Dice from play (neither player will score it). Choose one of your opponent's dice, and reroll it. Note that the targeted die is never captured, just re-rolled.",
+      "interacts": {
+        "Stealth": "Stealth dice may be targeted by boom attacks"
+      }
+    },
+    "c": {
+      "name": "Chance",
+      "description": "If you do not have the initiative at the start of a round you may re-roll one of your Chance Dice. If this results in you gaining the initiative, your opponent may re-roll one of their Chance Dice. This can continue with each player re-rolling Chance Dice, even re-rolling the same die, until one person fails to gain the initiative or lets their opponent go first. Re-rolling Chance Dice is not only a way to gain the initiative; it can also be useful in protecting your larger dice, or otherwise improving your starting roll. Unlike Focus Dice, Chance Dice can be immediately re-used in an attack even if you do gain the initiative with them.",
+      "interacts": {
+        "Focus": "Dice with both Chance and Focus skills may choose either skill to gain initiative",
+        "Konstant": "Dice with both Chance and Konstant skills retain their current value when rerolled due to Chance",
+        "Mighty": "A reroll of a Chance Mighty die due to the Chance skill triggers the Mighty skill",
+        "Weak": "A reroll of a Chance Weak die due to the Chance skill triggers the Weak skill"
+      }
+    },
+    "D": {
+      "name": "Doppelganger",
+      "description": "When a Doppelganger Die performs a Power Attack on another die, the Doppelganger Die becomes an exact copy of the die it captured. The newly copied die is then rerolled, and has all the abilities of the captured die. For instance, if a Doppelganger Die copies a Turbo Swing Die, then it may change its size as per the rules of Turbo Swing Dice. Usually a Doppelganger Die will lose its Doppelganger ability when it copies another die, unless that die is itself a Doppelganger Die.",
+      "interacts": {
+        "Radioactive": "Dice with both Radioactive and Doppelganger first decay, then each of the \"decay products\" are replaced by exact copies of the die they captured",
+        "Rage": "A Doppelganger die that captures a Rage die with a Power attack will retain Rage after it transforms",
+        "Turbo": "A Doppelganger die that captures a Turbo die currently does not get the chance to perform an immediate turbo resize"
+      }
+    },
+    "F": {
+      "name": "Fire",
+      "description": "Fire Dice cannot make Power Attacks. Instead, they can assist other Dice in making Skill and Power Attacks. Before making a Skill or Power Attack, you may increase the value showing on any of the attacking dice, and decrease the values showing on one or more of your Fire Dice by the same amount. For example, if you wish to increase the value of an attacking die by 5 points, you can take 5 points away from one or more of your Fire Dice. Turn the Fire Dice to show the adjusted values, and then make the attack as normal. Dice can never be increased or decreased outside their normal range, i.e., a 10-sided die can never show a number lower than 1 or higher than 10. Also, Fire Dice cannot assist other dice in making attacks other than normal Skill and Power Attacks.",
+      "interacts": {
+        "Mighty": "Dice with both Fire and Mighty skills do not grow when firing, only when actually rolling",
+        "Weak": "Dice with both Fire and Weak skills do not shrink when firing, only when actually rolling"
+      }
+    },
+    "f": {
+      "name": "Focus",
+      "description": "If you do not have the initiative at the start of a round you may reduce the values showing on one or more of your Focus Dice. You may only do this if it results in your gaining the initiative. If your opponent has Focus Dice, they may now do the same, and each player may respond by turning down one or more Focus Dice until no further moves are legal, or until one player allows the other to take the first turn. IMPORTANT: If you go first, any Focus Dice you have reduced may not be used as part of your first attack. (The second player has no such restriction.)",
+      "interacts": {
+        "Chance": "Dice with both Chance and Focus skills may choose either skill to gain initiative",
+        "Konstant": "Dice with both Focus and Konstant skills may be turned down to gain initiative"
+      }
+    },
+    "I": {
+      "name": "Insult",
+      "description": "Cannot be attacked by skill attacks.",
+      "interacts": []
+    },
+    "J": {
+      "name": "Jolt",
+      "description": "If a Jolt Die participates in an attack, then the player will take another turn and the Jolt die loses the Jolt skill. If a Jolt die is captured, then the player who captured it takes another turn.",
+      "interacts": {
+        "TimeAndSpace": "If a die with both the Jolt and TimeAndSpace skills rerolls to an odd number, it still only gives one extra turn"
+      }
+    },
+    "k": {
+      "name": "Konstant",
+      "description": "These dice do not reroll after an attack; they keep their current value. Konstant dice can not Power Attack, and cannot perform a Skill Attack by themselves, but they can add OR subtract their value in a multi-dice Skill Attack. If another skill causes a Konstant die to reroll (e.g., Chance, Trip, Ornery), it continues to show the same value. If another skill causes the die to change its value without rerolling (e.g., Focus, Fire), the die's value does change and then continues to show that new value.",
+      "interacts": {
+        "Chance": "Dice with both Chance and Konstant skills retain their current value when rerolled due to Chance",
+        "Focus": "Dice with both Focus and Konstant skills may be turned down to gain initiative",
+        "Maximum": "Dice with both Konstant and Maximum retain their current value when rerolled",
+        "Ornery": "Dice with both Konstant and Ornery skills retain their current value when rerolled",
+        "TimeAndSpace": "Attacking Konstant TimeAndSpace dice do not trigger the TimeAndSpace skill because they do not reroll",
+        "Trip": "Dice with both Konstant and Trip skills retain their current value when rerolled",
+        "Warrior": "A Konstant Warrior die can only add a positive value to a skill attack"
+      }
+    },
+    "&": {
+      "name": "Mad",
+      "description": "These are a subcategory of Swing dice, whose size changes randomly when rerolled. At the very start of the game (and again after any round they lose, just as with normal Swing dice) the player sets the initial size of Mad Swing dice, but from then on whenever they are rolled their size is set randomly to any even-numbered legal size for that Swing type. The initial size of a Mad Swing die may be set to an odd number.",
+      "interacts": {
+        "Ornery": "Dice with both Ornery and Mad Swing have their sizes randomized during ornery rerolls",
+        "Radioactive": "Dice with the Mad skill lose Mad when they decay due to Radioactive"
+      }
+    },
+    "M": {
+      "name": "Maximum",
+      "description": "Maximum dice always roll their maximum value.",
+      "interacts": {
+        "Konstant": "Dice with both Konstant and Maximum retain their current value when rerolled"
+      }
+    },
+    "H": {
+      "name": "Mighty",
+      "description": "When a Mighty Die rerolls for any reason, it first grows from its current size to the next larger size in the list of \"standard\" die sizes (1, 2, 4, 6, 8, 10, 12, 16, 20, 30).",
+      "interacts": {
+        "Berserk": "Dice with both Berserk and Mighty skills will first halve in size, and then grow",
+        "Chance": "A reroll of a Chance Mighty die due to the Chance skill triggers the Mighty skill",
+        "Fire": "Dice with both Fire and Mighty skills do not grow when firing, only when actually rolling"
+      }
+    },
+    "?": {
+      "name": "Mood",
+      "description": "These are a subcategory of Swing dice, whose size changes randomly when rerolled. At the very start of the game (and again after any round they lose, just as with normal Swing dice) the player sets the initial size of Mood Swing dice, but from then on whenever they are rolled their size is set randomly to that of a \"real-world\" die (i.e. 1, 2, 4, 6, 8, 10, 12, 20, or 30 sides) within the range allowable for that Swing type.",
+      "interacts": {
+        "Ornery": "Dice with both Ornery and Mood Swing have their sizes randomized during ornery rerolls",
+        "Radioactive": "Dice with the Mood skill lose Mood when they decay due to Radioactive"
+      }
+    },
+    "m": {
+      "name": "Morphing",
+      "description": "When a Morphing Die is used in any attack against a single target die, it changes size, becoming the same size as the die that was captured. It is then re-rolled. Morphing Dice change size every time they capture another die. If a Morphing die is captured, its scoring value is based on its size at the time of capture; likewise, if it is not captured during a round, its scoring value is based on its size at the end of the round",
+      "interacts": {
+        "Radioactive": "Dice with both Radioactive and Morphing skills first morph into the size of the captured die, and then decay"
+      }
+    },
+    "n": {
+      "name": "Null",
+      "description": "When a Null Die participates in any attack, the dice that are captured are worth zero points. Null Dice themselves are worth zero points.",
+      "interacts": {
+        "Poison": "Dice with both Null and Poison skills are Null",
+        "Value": "Dice with both Null and Value skills are Null"
+      }
+    },
+    "o": {
+      "name": "Ornery",
+      "description": "Ornery dice reroll every time the player makes any attack - whether the Ornery dice participated in it or not. The only time they don't reroll is if the player passes, making no attack whatsoever.",
+      "interacts": {
+        "Konstant": "Dice with both Konstant and Ornery skills retain their current value when rerolled",
+        "Mad": "Dice with both Ornery and Mad Swing have their sizes randomized during ornery rerolls",
+        "Mood": "Dice with both Ornery and Mood Swing have their sizes randomized during ornery rerolls"
+      }
+    },
+    "p": {
+      "name": "Poison",
+      "description": "These dice are worth negative points. If you keep a Poison Die of your own at the end of a round, subtract its full value from your score. If you capture a Poison Die from someone else, subtract half its value from your score.",
+      "interacts": {
+        "Null": "Dice with both Null and Poison skills are Null",
+        "Value": "Dice with both Poison and Value skills are Poison dice that score based on the negative of their current value rather than on their number of sides"
+      }
+    },
+    "q": {
+      "name": "Queer",
+      "description": "These dice behave like normal dice when they show an even number, and like Shadow Dice when they show an odd number.",
+      "interacts": {
+        "Trip": "Dice with both Queer and Trip skills always determine their success or failure at Trip Attacking via a Power Attack"
+      }
+    },
+    "%": {
+      "name": "Radioactive",
+      "description": "If a radioactive die is either the attacking die or the target die in an attack with a single attacking die and a single target die, the attacking die splits, or \"decays\", into two as-close-to-equal-sized-as-possible dice that add up to its original size. If any die decays during an attack, all dice involved in the attack that remain in play lose Radioactive (%). All dice that decay lose the following skills: Turbo (!), Mad Swing (&), Mood Swing (?), Time and Space (^), and Jolt (J). For example, a s(X=15)! (Shadow Turbo X Swing with 15 sides) that shadow attacked a radioactive die would decay into a s(X=7) die and a s(X=8) die, losing the turbo skill. A %p(7,13) on a power attack would decay into a p(3,7) and a p(4,6), losing the radioactive skill.",
+      "interacts": {
+        "Berserk": "Dice with both Radioactive and Berserk skills making a berserk attack targeting a SINGLE die are first replaced with non-berserk dice with half their previous number of sides, rounding up, and then decay",
+        "Doppelganger": "Dice with both Radioactive and Doppelganger first decay, then each of the \"decay products\" are replaced by exact copies of the die they captured",
+        "Mad": "Dice with the Mad skill lose Mad when they decay due to Radioactive",
+        "Mood": "Dice with the Mood skill lose Mood when they decay due to Radioactive",
+        "Morphing": "Dice with both Radioactive and Morphing skills first morph into the size of the captured die, and then decay",
+        "TimeAndSpace": "Dice with the TimeAndSpace skill lose TimeAndSpace when they decay due to Radioactive",
+        "Turbo": "Dice with the Turbo skill lose Turbo when they decay due to Radioactive"
+      }
+    },
+    "G": {
+      "name": "Rage",
+      "description": "If a Rage die is captured, then the owner of the Rage Die adds a new die to their pool of the same size and ability of the Rage die that was taken, except that it loses the Rage ability. If a Rage Die participates in an Attack, it loses its Rage ability. IMPORTANT: Rage dice do not count for determining who goes first.",
+      "interacts": {
+        "Doppelganger": "A Doppelganger die that captures a Rage die with a Power attack will retain Rage after it transforms"
+      }
+    },
+    "r": {
+      "name": "Reserve",
+      "description": "These are extra dice which may be brought into play part way through a game. Each time you lose a round you may choose another of your Reserve Dice; it will then be in play for all future rounds.",
+      "interacts": []
+    },
+    "#": {
+      "name": "Rush",
+      "description": "A Rush Die can perform a Rush Attack, in which it can capture two enemy dice with values that add up exactly to its value. However, Rush Dice are also vulnerable to the same kind of attack. Any die can make a Rush Attack if the target dice include at least one Rush Die.",
+      "interacts": []
+    },
+    "s": {
+      "name": "Shadow",
+      "description": "These dice are normal in all respects, except that they cannot make Power Attacks. Instead, they make inverted Power Attacks, called \"Shadow Attacks.\" To make a Shadow Attack, use one of your Shadow Dice to capture one of your opponent's dice. The number showing on the die you capture must be greater than or equal to the number showing on your die, but no more than its maximum value. For example, a shadow 10-sided die showing a 2 can capture a die showing any number from 2 to 10.",
+      "interacts": {
+        "Stinger": "Dice with both Shadow and Stinger skills can singly attack with any value from the min to the max of the die (making a shadow attack against a die whose value is greater than or equal to their own, or a skill attack against a die whose value is lower than or equal to their own)",
+        "Trip": "Dice with both Shadow and Trip skills always determine their success or failure at Trip Attacking via a Power Attack"
+      }
+    },
+    "w": {
+      "name": "Slow",
+      "description": "These dice are not counted for the purposes of initiative.",
+      "interacts": []
+    },
+    "z": {
+      "name": "Speed",
+      "description": "These dice can also make Speed Attacks, which are the equivalent of inverted Skill Attacks. In a Speed Attack, one Speed Die can capture any number of dice which add up exactly to its value.",
+      "interacts": {
+        "Berserk": "Dice with both Berserk and Speed skills may choose to make either kind of attack"
+      }
+    },
+    "d": {
+      "name": "Stealth",
+      "description": "These dice cannot perform any type of attack other than Multi-die Skill Attacks, meaning two or more dice participating in a Skill Attack. In addition, Stealth Dice cannot be captured by any attack other than a Multi-die Skill Attack.",
+      "interacts": {
+        "Boom": "Stealth dice may be targeted by boom attacks"
+      }
+    },
+    "g": {
+      "name": "Stinger",
+      "description": "When a Stinger Die participates in a Skill Attack, it can be used as any number between its minimum possible value and the value it currently shows. Thus, a normal die showing 4 and a Stinger Die showing 6 can make a Skill Attack on any die showing 5 through 10. Two Stinger Dice showing 10 can Skill Attack any die between 2 and 20. IMPORTANT: Stinger Dice do not count for determining who goes first.",
+      "interacts": {
+        "Shadow": "Dice with both Shadow and Stinger skills can singly attack with any value from the min to the max of the die (making a shadow attack against a die whose value is greater than or equal to their own, or a skill attack against a die whose value is lower than or equal to their own)",
+        "Warrior": "A Warrior can't use the Stinger skill to add less than the full value of the die, because the die isn't in play yet"
+      }
+    },
+    "^": {
+      "name": "TimeAndSpace",
+      "description": "If a Time and Space Die participates in an attack and rerolls an odd number, then the player will take another turn. If multiple Time and Space dice are rerolled and show odd, only one extra turn is given per reroll.",
+      "interacts": {
+        "Jolt": "If a die with both the Jolt and TimeAndSpace skills rerolls to an odd number, it still only gives one extra turn",
+        "Radioactive": "Dice with the TimeAndSpace skill lose TimeAndSpace when they decay due to Radioactive",
+        "Konstant": "Attacking Konstant TimeAndSpace dice do not trigger the TimeAndSpace skill because they do not reroll"
+      }
+    },
+    "t": {
+      "name": "Trip",
+      "description": "These dice can also make Trip Attacks. To make a Trip Attack, choose any one opposing die as the Target. Roll both the Trip Die and the Target, then compare the numbers they show. If the Trip Die now shows an equal or greater number than the Target, the Target is captured. Otherwise, the attack merely has the effect of re-rolling both dice. A Trip Attack is illegal if it has no chance of capturing (this is possible in the case of a Trip-1 attacking a Twin Die). IMPORTANT: Trip Dice do not count for determining who goes first.",
+      "interacts": {
+        "Konstant": "Dice with both Konstant and Trip skills retain their current value when rerolled",
+        "Queer": "Dice with both Queer and Trip skills always determine their success or failure at Trip Attacking via a Power Attack",
+        "Shadow": "Dice with both Shadow and Trip skills always determine their success or failure at Trip Attacking via a Power Attack",
+        "Turbo": "If a Turbo Die is rerolled because it is the target of a Trip attack, then the size cannot be changed."
+      }
+    },
+    "!": {
+      "name": "Turbo",
+      "description": "After your starting roll, you may change the size of your own Turbo Swing or Option die every time you roll it as part of your attack. Decide on a size first that is valid for the Swing or Option type, then roll the new die as usual.",
+      "interacts": {
+        "Berserk": "Dice with both Berserk and Turbo making a berserk attack will first halve in size and then change to the size specified by the Turbo skill",
+        "Doppelganger": "A Doppelganger die that captures a Turbo die currently does not get the chance to perform an immediate turbo resize",
+        "Radioactive": "Dice with the Turbo skill lose Turbo when they decay due to Radioactive",
+        "Warrior": "A Warrior Turbo die can change size via Turbo after coming into play"
+      }
+    },
+    "v": {
+      "name": "Value",
+      "description": "These dice are not scored like normal dice. Instead, a Value Die is scored as if the number of sides it has is equal to the value that it is currently showing. If a Value Die is ever part of an attack, all dice that are captured become Value Dice (i.e. They are scored by the current value they are showing when they are captured, not by their size).",
+      "interacts": {
+        "Null": "Dice with both Null and Value skills are Null",
+        "Poison": "Dice with both Poison and Value skills are Poison dice that score based on the negative of their current value rather than on their number of sides"
+      }
+    },
+    "`": {
+      "name": "Warrior",
+      "description": "These are extra dice which may be brought into play during a round, by using one of them in a multi-die Skill Attack. Once a Warrior die is brought into play, it loses the Warrior skill for the rest of the round. After the round, the die regains the Warrior skill to start the next round. Dice with the Warrior skill are completely out of play: They aren't part of your starting dice, they don't count for initiative, they can't be attacked, none of their other skills can be used, they don't count for scoring purposes, etc. At the start of the round, each Warrior die shows its maximum value; when it's brought into play, it's rolled as usual. Only one Warrior Die may be used in any given Skill Attack. Adding a Warrior die to a Skill Attack is always optional; even if you have no other legal attack, you can choose to pass rather than using a Warrior die.",
+      "interacts": {
+        "Konstant": "A Konstant Warrior die can only add a positive value to a skill attack",
+        "Stinger": "A Warrior can't use the Stinger skill to add less than the full value of the die, because the die isn't in play yet",
+        "Turbo": "A Warrior Turbo die can change size via Turbo after coming into play"
+      }
+    },
+    "h": {
+      "name": "Weak",
+      "description": "When a Weak Die rerolls for any reason, it first shrinks from its current size to the next smaller size in the list of \"standard\" die sizes (1, 2, 4, 6, 8, 10, 12, 16, 20, 30).",
+      "interacts": {
+        "Berserk": "Dice with both Berserk and Weak skills will first halve in size, and then shrink",
+        "Chance": "A reroll of a Chance Weak die due to the Chance skill triggers the Weak skill",
+        "Fire": "Dice with both Fire and Weak skills do not shrink when firing, only when actually rolling"
+      }
+    }
+  },
+  "dieTypes": {
+    "(C)": {
+      "name": "Wildcard",
+      "description": "A Wildcard die is not rolled. Instead, a card is drawn from a deck of playing cards with two jokers. The value of the Wildcard die is the value of the card, where Jack, Queen, King, and Joker have a value of 11, 12, 13, and 20, respectively. A Wildcard die showing an Ace has a value of 1 except when the Wildcard die is performing a Power attack, when it can attack as if it had a value of 14. A Wildcard die is scored as if it were a 16-sided die. All active Wildcard dice owned by a player share the same deck. Cards are drawn without replacement, and the deck is only shuffled during a game if it is exhausted. Wildcard dice do not split, shrink, or grow."
+    },
+    "(P)": {
+      "name": "P Swing",
+      "description": "P Swing Dice can be any die between 1 and 30. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(R)": {
+      "name": "R Swing",
+      "description": "R Swing Dice can be any die between 2 and 16. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(S)": {
+      "name": "S Swing",
+      "description": "S Swing Dice can be any die between 6 and 20. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(T)": {
+      "name": "T Swing",
+      "description": "T Swing Dice can be any die between 2 and 12. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(U)": {
+      "name": "U Swing",
+      "description": "U Swing Dice can be any die between 8 and 30. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(V)": {
+      "name": "V Swing",
+      "description": "V Swing Dice can be any die between 6 and 12. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(W)": {
+      "name": "W Swing",
+      "description": "W Swing Dice can be any die between 4 and 12. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(X)": {
+      "name": "X Swing",
+      "description": "X Swing Dice can be any die between 4 and 20. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(Y)": {
+      "name": "Y Swing",
+      "description": "Y Swing Dice can be any die between 1 and 20. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "(Z)": {
+      "name": "Z Swing",
+      "description": "Z Swing Dice can be any die between 4 and 30. Swing Dice are allowed to be any integral size between their upper and lower limit, including both ends, and including nonstandard die sizes like 17 or 9. Each player chooses his or her Swing Die in secret at the beginning of the match, and thereafter the loser of each round may change their Swing Die between rounds. If a character has any two Swing Dice of the same letter, they must always be the same size."
+    },
+    "( , )": {
+      "name": "Twin",
+      "description": "Twin Dice appear as two numbers with a comma between them and are played as two dice that add together. For example, a twin 8 is represented as (8,8) and treated as a single die. The two 8's are rolled as one, captured as one, and scored as one die worth 16 points. Twin Dice may contain either standard dice or Swing Dice."
+    },
+    "( / )": {
+      "name": "Option",
+      "description": "Option Dice are represented as two numbers with a slash between them, resembling a fraction. They function like Swing Dice and can be changed at any time a Swing Die could be changed. However, Option Dice are restricted to only two values. For example, a 4/10 Option Die can be only a 4 or a 10."
+    }
+  }
+}

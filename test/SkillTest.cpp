@@ -23,6 +23,8 @@ BMC_Die *FindDieByOriginalIndex(BMC_Player *player, int original_index) {
 
 }  // namespace
 
+class KonstantSignedAssignmentTests : public ::testing::TestWithParam<std::string> {};
+
 TEST(SkillTests, NoSkill) {
 	TEST_Util test;
 
@@ -83,6 +85,362 @@ TEST(SkillTests, KonstantSingleDieSkillAttack) {
 	EXPECT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
 		IsAction(BME_ACTION_PASS)
 	));
+}
+
+TEST(SkillTests, KonstantCannotPowerAttack) {
+	BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_KONSTANT);
+
+	EXPECT_FALSE(die.CanDoAttack(BME_ATTACK_POWER));
+	EXPECT_TRUE(die.CanDoAttack(BME_ATTACK_SKILL));
+}
+
+TEST(SkillTests, KonstantMultiDieSkillAttackWithSubtraction) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"Mk1:1 Mk1:1 Mk3:3",
+		"3:3"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1, 2}, 0)
+	));
+}
+
+TEST_P(KonstantSignedAssignmentTests, MultiDieSkillAttackAllowsSignedAssignments) {
+	TEST_Util test;
+
+	// KONSTANT allow + or -
+	// 5+2+3 10
+	// 5+2-3 4
+	// 5-2+3 6
+	// 5-2-3 0
+	auto context = test.ParseFightContext(
+		"41:5 Mk2:2 Mk3:3",
+		GetParam()
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1, 2}, 0)
+	));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+	SkillTests,
+	KonstantSignedAssignmentTests,
+	::testing::Values(
+		"d10:10",
+		"d4:4",
+		"d6:6",
+		"d0:0"
+	));
+
+TEST(SkillTests, KonstantMixedMultiDieSkillAttackWithSubtraction) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"8:8 Mk1:1",
+		"d7:7"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+}
+
+TEST(SkillTests, KonstantMultiDieSkillAttackNoMatchingAssignment) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"Mk1:1 Mk1:1 Mk3:3",
+		"6:6"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, KonstantWarriorCannotSubtractInSkillAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"`k3:3 Mk5:5",
+		"d2:2"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, OnlyOneWarriorMayParticipateInSkillAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"41:5 `k2:2 `k3:3",
+		"d10:10"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAction(BME_ACTION_PASS)
+	));
+}
+
+TEST(SkillTests, KonstantMultiDieSkillAttackWithoutSubtraction) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"Mk1:1 Mk2:2",
+		"d3:3"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+}
+
+TEST(SkillTests, KonstantGenerationFindsLaterTargetAfterOvershoot) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"8:8 Mk1:1",
+		"d8:8 d7:7"
+	);
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 1)
+	));
+}
+
+TEST(SkillTests, KonstantSkillAttackWithUnusedStingerInPool)
+{
+	TEST_Util test;
+
+	// Attack with 5+2-3=4 to hit target 4, Stinger not involved
+	auto ctx = test.ParseFightContext(
+		"5:5 Mk2:2 Mk3:3 g6:6",
+		"4:4");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "5", "Mk2", "Mk3" }), ctx.t("4"))));
+}
+
+TEST(SkillTests, StingerAndKonstantBothInAttack)
+{
+	TEST_Util test;
+
+	// Stinger(6)+Konstant(3) can hit anything from (1+3) to (6+3) = 4-9
+	// Test hitting 7: Stinger uses 4, Konstant adds 3
+	auto context = test.ParseFightContext(
+		"g6:6 Mk3:3",
+		"7:7");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+TEST(SkillTests, StingerAndKonstantWithSubtraction)
+{
+	TEST_Util test;
+
+	// Stinger(8)+Konstant(5) can hit 3: Stinger=8, Konstant=-5
+	auto context = test.ParseFightContext(
+		"g8:8 Mk5:5",
+		"3:3");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+// === Pure Stinger Skill Attack Tests ===
+// Per rules: "When a Stinger Die participates in a Skill Attack, it can be used
+// as any number between its minimum possible value and the value it currently shows."
+
+TEST(SkillTests, StingerSkillAttackInRange)
+{
+	TEST_Util test;
+
+	// normal(4) + Stinger(6): skill range is [4+1, 4+6] = [5, 10]
+	// Target 7: Stinger uses 3
+	auto context = test.ParseFightContext(
+		"4:4 g6:6",
+		"7:7");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+TEST(SkillTests, StingerSkillAttackAtMinimumRange)
+{
+	TEST_Util test;
+
+	// normal(4) + Stinger(6): minimum is 4+1=5
+	// Stinger contributes exactly 1
+	auto context = test.ParseFightContext(
+		"4:4 g6:6",
+		"5:5");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+TEST(SkillTests, StingerSkillAttackAtMaximumRange)
+{
+	TEST_Util test;
+
+	// normal(4) + Stinger(6): maximum is 4+6=10
+	// Stinger contributes full value
+	auto context = test.ParseFightContext(
+		"4:4 g6:6",
+		"10:10");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+TEST(SkillTests, StingerSkillAttackBelowRange)
+{
+	TEST_Util test;
+
+	// normal(4) + Stinger(6): minimum is 4+1=5, so target 4 cannot be hit
+	// by a 2-die skill attack (Stinger minimum contribution is 1)
+	auto context = test.ParseFightContext(
+		"4:4 g6:6",
+		"4:4");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Not(::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0))));
+}
+
+TEST(SkillTests, TwoStingersSkillAttackRange)
+{
+	TEST_Util test;
+
+	// Per rules: "Two Stinger Dice showing 10 can Skill Attack any die between 2 and 20"
+	// Minimum: both Stingers contribute 1 each = 2
+	auto context = test.ParseFightContext(
+		"g10:10 g10:10",
+		"2:2");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+TEST(SkillTests, TwoStingersCannotHitBelowMinimum)
+{
+	TEST_Util test;
+
+	// Two Stingers: minimum is 1+1=2, so target 1 cannot be hit
+	auto context = test.ParseFightContext(
+		"g10:10 g10:10",
+		"1:1");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Not(::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0))));
+}
+
+// === Stinger + Konstant Combined Flexibility ===
+// No direct interaction documented. Each skill applies its own rules:
+// Stinger can use [1, current_value], Konstant can add or subtract.
+
+TEST(SkillTests, StingerAtValueOneHasNoFlexibility)
+{
+	TEST_Util test;
+
+	// Stinger showing 1: range is [1, 1], no flexibility (slack = 0)
+	// normal(4) + Stinger(showing 1): only total is 4+1=5
+	auto context = test.ParseFightContext(
+		"4:4 g6:1",
+		"5:5");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+TEST(SkillTests, StingerAtValueOneCannotHitLowerTarget)
+{
+	TEST_Util test;
+
+	// Stinger showing 1 has no slack, so normal(4) + Stinger(1) = 5 only
+	// Target 4 is NOT reachable
+	auto context = test.ParseFightContext(
+		"4:4 g6:1",
+		"4:4");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Not(::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0))));
+}
+
+TEST(SkillTests, NormalStingerKonstantThreeDieAttack)
+{
+	TEST_Util test;
+
+	// Target 5: 4+Stinger(4)+Konstant(-3) => 4+4-3=5
+	// Requires all three types working together
+	auto ctx = test.ParseFightContext(
+		"4:4 g6:6 Mk3:3",
+		"5:5");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "g6", "Mk3" }), ctx.t("5"))));
+}
+
+TEST(SkillTests, KonstantWarriorCanAddInSkillAttack)
+{
+	TEST_Util test;
+
+	// Warrior Konstant(3) + normal(5): 5+3=8, Warrior Konstant can add
+	auto ctx = test.ParseFightContext(
+		"5:5 `k3:3",
+		"8:8");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "5", "`k3" }), ctx.t("8"))));
+}
+
+// Per rules: "A Warrior can't use the Stinger skill to add less than the
+// full value of the die, because the die isn't in play yet"
+TEST(SkillTests, StingerWarriorMustUseFullValue)
+{
+	TEST_Util test;
+
+	// Warrior Stinger must use full value 6, so only total is 4+6=10
+	// Target 7 would require Stinger to use 3, which Warrior forbids
+	auto ctx = test.ParseFightContext(
+		"4:4 `g6:6",
+		"7:7");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`g6" }), ctx.t("7")))));
+}
+
+TEST(SkillTests, StingerWarriorAtFullValueIsValid)
+{
+	TEST_Util test;
+
+	// Warrior Stinger(6) + normal(4) at full value: 4+6=10
+	auto ctx = test.ParseFightContext(
+		"4:4 `g6:6",
+		"10:10");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`g6" }), ctx.t("10"))));
+}
+
+TEST(SkillTests, StingerAndKonstantCombinedFlexibility)
+{
+	TEST_Util test;
+
+	// Stinger(8) + Konstant(5): Stinger can use [1..8], Konstant can +5 or -5
+	// Target 2: Stinger=7, Konstant=-5 => 7-5=2
+	// This requires BOTH Stinger flexibility AND Konstant subtraction together
+	auto context = test.ParseFightContext(
+		"g8:8 Mk5:5",
+		"2:2");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
 }
 
 TEST(SkillTests, StealthSingleDieSkillAttack) {
