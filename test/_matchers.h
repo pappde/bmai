@@ -132,6 +132,15 @@ inline ::testing::Matcher<const BMC_Move&> IsAttack(BME_ATTACK_TYPE type, const 
 	return IsAttack(type, name, atk_idx, {tgt_idx});
 }
 
+inline ::testing::Matcher<const BMC_Move &> IsAttack(BME_ATTACK_TYPE type, const std::string &name, std::vector<int> atk_idx, int tgt_idx)
+{
+	return AttackMatcher(type, name, atk_idx, { tgt_idx });
+}
+inline ::testing::Matcher<const BMC_Move &> IsAttack(BME_ATTACK_TYPE type, const std::string &name, std::vector<int> atk_idx, std::vector<int> tgt_idx)
+{
+	return AttackMatcher(type, name, atk_idx, tgt_idx);
+}
+
 inline ::testing::Matcher<const BMC_Move&> IsAction(BME_ACTION action)
 {
 	return ActionMatcher(action);

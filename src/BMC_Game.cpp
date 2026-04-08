@@ -12,18 +12,25 @@
 // dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
 // dbl040626 - schedule Chance and Trip rerolls only for dice that should actually reroll
-// dbl040626 - add signed Konstant skill handling and keep searching later targets after overshoot
+// dbl040626 - Konstant skill: signed +/- handling, Stinger+Konstant combined flexibility,
+//             Warrior Stinger must use full value, attack-specific property checks in
+//             ValidAttack, stack-specific vs player-wide checks in GenerateValidAttacks,
+//             fix Stinger/Konstant stack cycling pruning, heap-to-stack KonstantTerm array
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Game.h"
 
 #include <cstring>
-#include <vector>
 #include "BMC_AI.h"
 #include "BMC_BMAI3.h"
 #include "BMC_DieIndexStack.h"
 #include "BMC_Logger.h"
 
+struct KonstantTerm
+{
+	INT value;
+	bool allow_subtraction;
+};
 
 BMC_Game::BMC_Game(bool _simulation)
 {
@@ -403,18 +410,13 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			INT	att_value_total = 0;
 			INT i;
 			INT dice = 0;
-			bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
+			bool attack_has_stinger = false;
 			bool has_stealth = false;
 			INT stinger_att_value_minimum = 0;
+			INT stinger_slack = 0;  // total (value - 1) for all Stinger dice in attack
 			INT konstants = 0;
-			bool selected_has_konstant = false;
-			struct KonstantTerm
-			{
-				INT value;
-				bool allow_subtraction;
-			};
-			INT konstant_base_total = 0;
-			std::vector<KonstantTerm> konstant_terms;
+			INT non_konstant_total = 0;
+			KonstantTerm konstant_terms[BMD_MAX_DICE];
 			for (i=0; i<BMD_MAX_DICE; i++)
 			{
 				if (_move.m_attackers.IsSet(i))
@@ -424,9 +426,6 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					att_die = attacker->GetDie(i);
 					if (!att_die->CanDoAttack(_move.m_attack))
 						return false;
-
-					if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
-						selected_has_konstant = true;
 
 					// count value of att die
 					att_value_total += att_die->GetValueTotal();
@@ -438,43 +437,60 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 						warriors++;
 					}
 
-						if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
-						{
-							konstants++;
-							konstant_terms.push_back({
-								att_die->GetValueTotal(),
-								!att_die->HasProperty(BME_PROPERTY_WARRIOR)
-							});
-						}
-						else
-						{
-							konstant_base_total += att_die->GetValueTotal();
-						}
+					if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
+					{
+						konstant_terms[konstants] = {
+							att_die->GetValueTotal(),
+							!att_die->HasProperty(BME_PROPERTY_WARRIOR)
+						};
+						konstants++;
+					}
+					else
+					{
+						non_konstant_total += att_die->GetValueTotal();
+					}
 
-						if (att_die->HasProperty(BME_PROPERTY_STEALTH))
-							has_stealth = true;
+					if (att_die->HasProperty(BME_PROPERTY_STEALTH))
+						has_stealth = true;
 
-						if (att_die->HasProperty(BME_PROPERTY_STINGER))
-							stinger_att_value_minimum += 1;
-						else
-							stinger_att_value_minimum += att_die->GetValueTotal();
+					if (att_die->HasProperty(BME_PROPERTY_STINGER)
+						&& !att_die->HasProperty(BME_PROPERTY_WARRIOR))
+					{
+						// Stinger can use any value from 1 to current
+						attack_has_stinger = true;
+						stinger_att_value_minimum += 1;
+						stinger_slack += att_die->GetValueTotal() - 1;
+					}
+					else
+					{
+						// Normal die, or Warrior Stinger (must use full value)
+						stinger_att_value_minimum += att_die->GetValueTotal();
 					}
 				}
-	
-				// Stealth dice can only participate in, or be captured by, multi-die skill attacks.
-				if (dice<2 && (has_stealth || target_has_stealth))
-					return false;
-	
-				// KONSTANT: cannot do with just one die
-				if (dice<2 && konstants>0)
+			}
+
+			bool attack_has_konstant = (konstants > 0);
+
+			// Stealth dice can only participate in, or be captured by, multi-die skill attacks.
+			if (dice < 2 && (has_stealth || target_has_stealth))
 				return false;
 
-			if (konstants>0 && !has_stinger)
+			// KONSTANT: cannot do with just one die
+			if (dice < 2 && konstants > 0)
+				return false;
+
+			// Recursively try all +/- combinations of Konstant dice to see if any sum to target value.
+			// Warrior+Konstant dice (allow_subtraction=false) can only add positive values.
+			// When Stinger dice are present, they contribute their full value to non_konstant_total
+			// but can actually use any value in [1, current]. stinger_slack is the total amount
+			// they can reduce, so we check if the target is in [total - stinger_slack, total].
+			if (konstants > 0)
 			{
-				auto konstant_hits_target = [&](auto &&self, size_t idx, INT total) -> bool
+				INT tgt = tgt_die->GetValueTotal();
+				auto konstant_hits_target = [&](auto &&self, INT idx, INT total) -> bool
 				{
-					if (idx >= konstant_terms.size())
-						return total == tgt_die->GetValueTotal();
+					if (idx >= konstants)
+						return total >= tgt && total <= tgt + stinger_slack;
 
 					const auto &term = konstant_terms[idx];
 					if (self(self, idx + 1, total + term.value))
@@ -486,13 +502,13 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					return false;
 				};
 
-				if (konstant_hits_target(konstant_hits_target, 0, konstant_base_total))
+				if (konstant_hits_target(konstant_hits_target, 0, non_konstant_total))
 					return true;
 			}
 
 			if (att_value_total > tgt_die->GetValueTotal()
-				&& !has_stinger
-				&& !selected_has_konstant)
+				&& !attack_has_stinger
+				&& !attack_has_konstant)
 			{
 				return false;
 			}
@@ -502,7 +518,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 				return true;
 
 			// stinger - if within range - success
-			if (has_stinger && tgt_die->GetValueTotal() >= stinger_att_value_minimum && tgt_die->GetValueTotal() <= att_value_total)
+			if (attack_has_stinger && tgt_die->GetValueTotal() >= stinger_att_value_minimum && tgt_die->GetValueTotal() <= att_value_total)
 				return true;
 
 			return false;
@@ -1064,8 +1080,8 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 					BMC_DieIndexStack	die_stack(attacker);
 					bool finished = false;
-					bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
-					bool has_konstant = attacker->HasDieWithProperty(BME_PROPERTY_KONSTANT);
+					bool player_has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
+					bool player_has_konstant = attacker->HasDieWithProperty(BME_PROPERTY_KONSTANT);
 
 					// add the first die (this one)
 					die_stack.Push(move.m_attacker);
@@ -1074,9 +1090,23 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 					{
 						//die_stack.Debug(BME_DEBUG_ALWAYS);
 
+						// Check if current stack contains Stinger or Konstant dice (single pass)
+						bool stack_has_stinger = false;
+						bool stack_has_konstant = false;
+						for (INT si = 0; si < die_stack.GetStackSize(); si++)
+						{
+							BMC_Die *sd = die_stack.GetDie(si);
+							if (sd->HasProperty(BME_PROPERTY_STINGER))
+								stack_has_stinger = true;
+							if (sd->HasProperty(BME_PROPERTY_KONSTANT))
+								stack_has_konstant = true;
+						}
+
 						// STINGER: if there are any stinger dice in the stack it gives us flexibility.
 						// The range is [non_stinger_total+stinger_dice, total]
-						if (has_stinger && die_stack.GetStackSize()>1)
+						// BUT: if Konstant dice are also present, skip this optimization since Konstant
+						// can subtract and makes the minimum value calculation complex.
+						if (stack_has_stinger && !stack_has_konstant && die_stack.GetStackSize() > 1)
 						{
 							INT i;
 							INT minimum_value = 0;
@@ -1117,12 +1147,12 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 							{
 								tgt_die = target->GetDie(move.m_target);
 
-								// if past our value, give up
-								if (!has_konstant && tgt_die->GetValueTotal() < die_stack.GetValueTotal())
+								// Konstant dice can add or subtract, so we can't prune based on simple value comparison
+								if (!stack_has_konstant && tgt_die->GetValueTotal() < die_stack.GetValueTotal())
 									break;
 
 								// For Konstant dice, later targets may still match once +/- assignments are considered.
-								if (has_konstant || tgt_die->GetValueTotal() == die_stack.GetValueTotal())
+								if (stack_has_konstant || tgt_die->GetValueTotal() == die_stack.GetValueTotal())
 								{
 									// build m_attackers to check move validity
 									die_stack.SetBits(move.m_attackers);
@@ -1135,11 +1165,16 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// if full (using all target dice) and att value is <= tgt total value, give up since won't be able to do any other matches
 						// drp100224 - this check was wrong. We can abort if GetValueTotal() <= target->GetMinValue(), since that's the highest we can combine to,
 						//  but otherwise we should keep cycling since other combniations will have lower totals.
-						if (!has_konstant && die_stack.ContainsAllDice() && die_stack.GetValueTotal()<=target->GetMinValue())
+						// Stack cycling decisions use player-wide checks because a Konstant
+						// or Stinger die not yet in the stack could be added in a future cycle.
+						// Konstant can subtract, reducing the total. Stinger can use a value
+						// as low as 1 instead of its full value, also reducing the effective total.
+						bool skip_cycle_pruning = player_has_konstant || player_has_stinger;
+						if (!skip_cycle_pruning && die_stack.ContainsAllDice() && die_stack.GetValueTotal() <= target->GetMinValue())
 							break;
 
 						// if att_total matches or exceeds tgt_total, don't add a die
-						if (!has_konstant && die_stack.GetValueTotal() >= target->GetMaxValue())
+						if (!skip_cycle_pruning && die_stack.GetValueTotal() >= target->GetMaxValue())
 							finished = die_stack.Cycle(false);
 						else // otherwise standard cycle
 							finished = die_stack.Cycle();
