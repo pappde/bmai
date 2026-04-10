@@ -388,6 +388,51 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			return false;
 		}
 
+	case BME_ATTACK_RUSH:	// 1 -> 2 (exactly 2, exact sum)
+		{
+			// is the attack type legal based on the given dice
+			att_die = attacker->GetDie(_move.m_attacker);
+			// RUSH: non-Rush dice can attempt Rush if target includes Rush die
+			// Only Rush dice are guaranteed to have Rush attack capability
+			// Non-Rush dice will be checked via the permission model below
+			if (att_die->HasProperty(BME_PROPERTY_RUSH) && !att_die->CanDoAttack(_move.m_attack))
+				return false;
+
+			// must capture exactly 2 dice
+			INT dice = 0;
+			INT tgt_value_total = 0;
+			bool target_has_rush = false;
+			for (INT i=0; i<BMD_MAX_DICE; i++)
+			{
+				if (_move.m_targets.IsSet(i))
+				{
+					dice++;
+					tgt_die = target->GetDie(i);
+					if (!tgt_die->CanBeAttacked(_move.m_attack))
+						return false;
+					if (tgt_die->HasProperty(BME_PROPERTY_RUSH))
+						target_has_rush = true;
+					tgt_value_total += tgt_die->GetValueTotal();
+				}
+			}
+
+			// must be exactly 2 target dice
+			if (dice != 2)
+				return false;
+
+			// values must sum exactly to attacker value
+			if (tgt_value_total != att_die->GetValueTotal())
+				return false;
+
+			// Permission model:
+			// - Any die can Rush attack if target includes a Rush die
+			// - Only Rush die can Rush attack non-Rush targets
+			if (!target_has_rush && !att_die->HasProperty(BME_PROPERTY_RUSH))
+				return false;
+
+			return true;
+		}
+
 	case BME_ATTACK_SKILL:	// N -> 1
 		{
 			// TODO: KONSTANT allow + or -
@@ -1040,8 +1085,16 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 		for (a=BME_ATTACK_FIRST; a<BME_ATTACK_MAX; a++)
 		{
 			move.m_attack = (BME_ATTACK)a;
-			if (!att_die->CanDoAttack(move.m_attack))
+
+			// RUSH: special case - non-Rush dice can attempt if target may have Rush die
+			// Otherwise, require that attacker has the attack capability
+			if (move.m_attack != BME_ATTACK_RUSH && !att_die->CanDoAttack(move.m_attack))
 				continue;
+			if (move.m_attack == BME_ATTACK_RUSH && !att_die->HasProperty(BME_PROPERTY_RUSH))
+			{
+				// For non-Rush dice attempting Rush, we still need to check targets
+				// This is handled by ValidAttack which enforces the permission model
+			}
 
 			move.m_turbo_option = -1;
 
@@ -1191,38 +1244,69 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 			case BME_ATTACK_TYPE_1_N:
 				{
-					BMC_DieIndexStack	die_stack(target);
-					INT att_total = att_die->GetValueTotal();
-					bool finished = false;
-
-					// add the first die
-					die_stack.Push(0);
-
-					while (!finished)
+					// RUSH: only consider exactly 2 target dice
+					if (move.m_attack == BME_ATTACK_RUSH)
 					{
-						// check move if at target value
-						if (att_total == die_stack.GetValueTotal())
+						BMC_DieIndexStack	die_stack(target);
+						INT att_total = att_die->GetValueTotal();
+						bool finished = false;
+
+						// add the first die
+						die_stack.Push(0);
+
+						while (!finished)
 						{
-							// build m_targets to check move validity
-							die_stack.SetBits(move.m_targets);
-							if (ValidAttack(move))
-								_movelist.Add(move);
-						}
+							// check move if exactly 2 dice at target value
+							if (die_stack.GetStackSize() == 2 && att_total == die_stack.GetValueTotal())
+							{
+								// build m_targets to check move validity
+								die_stack.SetBits(move.m_targets);
+								if (ValidAttack(move))
+									_movelist.Add(move);
+							}
 
-						// step
+							// step - stop cycling once we've tried all combinations of 2 dice
+							if (die_stack.ContainsLastDie() && die_stack.GetStackSize() == 2)
+								break;
 
-						// if full (using all target dice) and tgt tot value is <= att value, give up since won't be able to do any other matches
-						if (die_stack.ContainsAllDice() && att_total >= die_stack.GetValueTotal())
-							break;
-
-						// if tgt_total matches or exceeds att_total, don't add a die (no sense continuing on this line)
-						// Otherwise do a standard cycle
-						if (att_total <= die_stack.GetValueTotal())
-							finished = die_stack.Cycle(false);
-						else
 							finished = die_stack.Cycle();
+						}
+					}
+					else
+					{
+						BMC_DieIndexStack	die_stack(target);
+						INT att_total = att_die->GetValueTotal();
+						bool finished = false;
 
-					} // end while(!finished)
+						// add the first die
+						die_stack.Push(0);
+
+						while (!finished)
+						{
+							// check move if at target value
+							if (att_total == die_stack.GetValueTotal())
+							{
+								// build m_targets to check move validity
+								die_stack.SetBits(move.m_targets);
+								if (ValidAttack(move))
+									_movelist.Add(move);
+							}
+
+							// step
+
+							// if full (using all target dice) and tgt tot value is <= att value, give up since won't be able to do any other matches
+							if (die_stack.ContainsAllDice() && att_total >= die_stack.GetValueTotal())
+								break;
+
+							// if tgt_total matches or exceeds att_total, don't add a die (no sense continuing on this line)
+							// Otherwise do a standard cycle
+							if (att_total <= die_stack.GetValueTotal())
+								finished = die_stack.Cycle(false);
+							else
+								finished = die_stack.Cycle();
+
+						} // end while(!finished)
+					}
 
 					break;
 				}

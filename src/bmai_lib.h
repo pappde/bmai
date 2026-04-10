@@ -140,6 +140,7 @@ enum BME_PROPERTY
 	BME_PROPERTY_MAXIMUM		= 0x80000000,
 	BME_PROPERTY_INSULT			=0x100000000ULL, // its odd to me that this behaves differently then 1ULL<<32
 	BME_PROPERTY_VALUE			=0x200000000ULL,
+	BME_PROPERTY_RUSH			=0x400000000ULL,
 };
 
 enum BME_SWING
@@ -203,6 +204,7 @@ enum BME_ATTACK
 	BME_ATTACK_SPEED,						// 1 -> N
 	BME_ATTACK_TRIP,						// 1 -> 1
 	BME_ATTACK_SHADOW,						// 1 -> 1
+	BME_ATTACK_RUSH,						// 1 -> 2 (exactly 2, exact sum)
 	BME_ATTACK_INVALID,						// 0 -> 0 (like pass)
 	BME_ATTACK_MAX
 };

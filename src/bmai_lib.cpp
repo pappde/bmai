@@ -26,6 +26,7 @@ BME_ATTACK_TYPE	c_attack_type[BME_ATTACK_MAX] =
 	BME_ATTACK_TYPE_1_N,  // SPEED
 	BME_ATTACK_TYPE_1_1,  // TRIP
 	BME_ATTACK_TYPE_1_1,  // SHADOW
+	BME_ATTACK_TYPE_1_N,  // RUSH (1 -> 2 exactly)
 	BME_ATTACK_TYPE_0_0,  // INVALID
 };
 
@@ -55,5 +56,6 @@ const char *c_attack_name[BME_ATTACK_MAX] =
 	"speed",
 	"trip",
 	"shadow",
+	"rush",
 	"invalid",
 };
