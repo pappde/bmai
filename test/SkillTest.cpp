@@ -963,3 +963,37 @@ TEST(SkillTests, StealthSingleDieSkillCannotCaptureStealth) {
 		IsAction(BME_ACTION_PASS)
 	));
 }
+
+// Rage skill tests
+TEST(SkillTests, RageHasProperty) {
+	BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_RAGE);
+	EXPECT_TRUE(die.HasProperty(BME_PROPERTY_RAGE));
+}
+
+TEST(SkillTests, RageLostWhenAttacking) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("G6:5 4:4", "10:9");
+
+	BMC_Player *attacker = context.Game()->GetPlayer(0);
+	BMC_Die *rage_die = attacker->GetDie(0);
+	INT original_index = rage_die->GetOriginalIndex();
+
+	EXPECT_TRUE(rage_die->HasProperty(BME_PROPERTY_RAGE));
+
+	// Perform a skill attack with Rage die
+	auto valid_attacks = context.ValidAttacks();
+	// Find skill attack (6+4 = 10)
+	auto skill_attack = std::find_if(valid_attacks.begin(), valid_attacks.end(),
+		[](const BMC_Move &m) { return m.m_action == BME_ACTION_ATTACK && m.m_attack == BME_ATTACK_SKILL; });
+	EXPECT_NE(skill_attack, valid_attacks.end());
+
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*skill_attack, extra_turn);
+
+	// After attack, Rage die should no longer have Rage
+	attacker = context.Game()->GetPlayer(0);
+	rage_die = FindDieByOriginalIndex(attacker, original_index);
+	EXPECT_NE(rage_die, nullptr);
+	EXPECT_FALSE(rage_die->HasProperty(BME_PROPERTY_RAGE));
+}

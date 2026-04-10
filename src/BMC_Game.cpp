@@ -95,10 +95,10 @@ INT BMC_Game::CheckInitiative()
 
 	while (1)
 	{
-		// TRIP or SLOW or STINGER dice don't count for initiative
-		while (m_player[0].GetDie(i)->HasProperty(BME_PROPERTY_TRIP|BME_PROPERTY_SLOW|BME_PROPERTY_STINGER) && i>=0)
+		// TRIP or SLOW or STINGER or RAGE dice don't count for initiative
+		while (m_player[0].GetDie(i)->HasProperty(BME_PROPERTY_TRIP|BME_PROPERTY_SLOW|BME_PROPERTY_STINGER|BME_PROPERTY_RAGE) && i>=0)
 			i--;
-		while (m_player[1].GetDie(j)->HasProperty(BME_PROPERTY_TRIP|BME_PROPERTY_SLOW|BME_PROPERTY_STINGER) && j>=0)
+		while (m_player[1].GetDie(j)->HasProperty(BME_PROPERTY_TRIP|BME_PROPERTY_SLOW|BME_PROPERTY_STINGER|BME_PROPERTY_RAGE) && j>=0)
 			j--;
 
 		// if no dice remaining - is a tie
@@ -1693,6 +1693,16 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 		case BME_ATTACK_TYPE_N_1:
 		case BME_ATTACK_TYPE_1_1:
 			{
+				// RAGE: check if captured die has Rage BEFORE capture removes it
+				bool was_rage = false;
+				BMC_DieData rage_die_data;
+				BMC_Die *pre_capture_die = target->GetDie(_move.m_target);
+				if (pre_capture_die->HasProperty(BME_PROPERTY_RAGE))
+				{
+					was_rage = true;
+					rage_die_data = *pre_capture_die;
+				}
+
 				tgt_die = target->OnDieLost(_move.m_target);
 				if (null_attacker)
 					tgt_die->AddProperty(BME_PROPERTY_NULL);
@@ -1700,6 +1710,31 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 					tgt_die->AddProperty(BME_PROPERTY_VALUE);
 				tgt_die->SetState(BME_STATE_CAPTURED);
 				attacker->OnDieCaptured(tgt_die);
+
+				// RAGE: spawn replacement die
+				if (was_rage)
+				{
+					// Find empty slot in target player's die array
+					INT empty_slot = -1;
+					for (INT i = 0; i < BMD_MAX_DICE; i++)
+					{
+						if (target->GetDie(i)->GetState() == BME_STATE_NOTUSED)
+						{
+							empty_slot = i;
+							break;
+						}
+					}
+
+					if (empty_slot >= 0)
+					{
+						// Create die data without Rage
+						rage_die_data.RemoveProperty(BME_PROPERTY_RAGE);
+
+						// Set up new die
+						target->GetDie(empty_slot)->SetDie(&rage_die_data);
+						target->GetDie(empty_slot)->SetState(BME_STATE_NOTSET);
+					}
+				}
 
 				break;
 			}
@@ -1712,6 +1747,17 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 				{
 					if (!_move.m_targets.IsSet(i))
 						continue;
+
+					// RAGE: check if captured die has Rage BEFORE capture removes it
+					bool was_rage = false;
+					BMC_DieData rage_die_data;
+					BMC_Die *pre_capture_die = target->GetDie(i - removed);
+					if (pre_capture_die->HasProperty(BME_PROPERTY_RAGE))
+					{
+						was_rage = true;
+						rage_die_data = *pre_capture_die;
+					}
+
 					i2 = i - removed++;	// determine true index
 					tgt_die = target->OnDieLost(i2);
 					if (null_attacker)
@@ -1721,6 +1767,30 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 					tgt_die->SetState(BME_STATE_CAPTURED);
 					attacker->OnDieCaptured(tgt_die);
 
+					// RAGE: spawn replacement die
+					if (was_rage)
+					{
+						// Find empty slot in target player's die array
+						INT empty_slot = -1;
+						for (INT j = 0; j < BMD_MAX_DICE; j++)
+						{
+							if (target->GetDie(j)->GetState() == BME_STATE_NOTUSED)
+							{
+								empty_slot = j;
+								break;
+							}
+						}
+
+						if (empty_slot >= 0)
+						{
+							// Create die data without Rage
+							rage_die_data.RemoveProperty(BME_PROPERTY_RAGE);
+
+							// Set up new die
+							target->GetDie(empty_slot)->SetDie(&rage_die_data);
+							target->GetDie(empty_slot)->SetState(BME_STATE_NOTSET);
+						}
+					}
 				}
 				break;
 			}

@@ -365,6 +365,14 @@ void BMC_Die::OnApplyAttackPlayer(BMC_Move &_move, BMC_Player *_owner, bool _act
 			RecomputeAttacks();
 		_owner->OnDiePropertiesChanged(this);
 	}
+
+	// RAGE: loses property when participating in attack
+	if (_actually_attacking && HasProperty(BME_PROPERTY_RAGE))
+	{
+		_owner->OnDiePropertiesChanging(this);
+		m_properties &= ~BME_PROPERTY_RAGE;
+		_owner->OnDiePropertiesChanged(this);
+	}
 }
 
 // DESC: effects that happen whenever rerolling die (for whatever reason)
