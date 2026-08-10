@@ -691,6 +691,42 @@ TEST(SkillTests, KonstantMightyTripTargetRetainsValueAndGrows) {
 	EXPECT_EQ(target->GetSidesMax(), 8);
 }
 
+TEST(SkillTests, TripTargetWeakTriggersOnce) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("t6:6", "h6:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto trip_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_TRIP;
+	});
+	ASSERT_NE(trip_it, valid_attacks.end());
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*trip_it, extra_turn);
+
+	EXPECT_EQ(context.Game()->GetPlayer(1)->GetDie(0)->GetSidesMax(), 4);
+}
+
+TEST(SkillTests, KonstantWeakTripTargetRetainsValueAndShrinks) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("t6:6", "hk6:3");
+	auto valid_attacks = context.ValidAttacks();
+	auto trip_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_TRIP;
+	});
+	ASSERT_NE(trip_it, valid_attacks.end());
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*trip_it, extra_turn);
+
+	BMC_Die *target = context.Game()->GetPlayer(1)->GetDie(0);
+	EXPECT_EQ(target->GetValueTotal(), 3);
+	EXPECT_EQ(target->GetSidesMax(), 4);
+}
+
 TEST(SkillTests, KonstantRetainsValueWhenChanceRerolls) {
 	TEST_Util test;
 

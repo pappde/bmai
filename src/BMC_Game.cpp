@@ -1566,7 +1566,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		}
 	}
 
-	// for TRIP, mark non-Konstant targets as needing a reroll
+	// Konstant skips the reroll, but not Mighty or Weak effects.
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
@@ -1576,10 +1576,8 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 
 		tgt_die = target->GetDie(_move.m_target);
 		if (!tgt_die->HasProperty(BME_PROPERTY_KONSTANT))
-		{
 			tgt_die->SetState(BME_STATE_NOTSET);
-			tgt_die->OnBeforeRollInGame(target);
-		}
+		tgt_die->OnBeforeRollInGame(target);
 	}
 
 	// ORNERY: all ornery dice on attacker must reroll (whether attacked)
@@ -1632,15 +1630,9 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 	// TRIP attack
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
-		// reroll target if the attack scheduled one
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
 
 		tgt_die = target->GetDie(_move.m_target);
-		if (!tgt_die->HasProperty(BME_PROPERTY_KONSTANT))
-		{
-			tgt_die->SetState(BME_STATE_NOTSET);
-			tgt_die->OnBeforeRollInGame(target);
-		}
 		tgt_die->OnApplyAttackNatureRollTripped();
 	}
 }

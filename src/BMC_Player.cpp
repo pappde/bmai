@@ -236,9 +236,6 @@ void BMC_Player::OnDiePropertiesChanged(BMC_Die *_die)
 
 void BMC_Player::OnDieSidesChanging(BMC_Die *_die)
 {
-	// Side changes invalidate the current value, even for dice that otherwise preserve it between attacks.
-	if (_die->GetState()!=BME_STATE_NOTSET)
-		_die->SetState(BME_STATE_NOTSET);
 	m_score -= _die->GetScore(true);
 }
 
