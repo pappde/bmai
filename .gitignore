@@ -7,6 +7,28 @@
 # - comment out the .vscode folder exclusions
 # - comment out the .idea folder exclusions 
 
+# AI assistant state and instruction files
+**/.claude/
+**/.codex/
+**/.chatgpt/
+**/.cursor/
+**/.windsurf/
+**/CLAUDE.md
+**/CLAUDE.local.md
+**/AGENTS.md
+**/AGENTS.local.md
+**/AGENTS.override.md
+**/CODEX.md
+**/CODEX.local.md
+**/CHATGPT.md
+**/CHATGPT.local.md
+**/GEMINI.md
+**/GEMINI.local.md
+**/.cursorrules
+**/.windsurfrules
+**/.github/copilot-instructions.md
+**/.github/instructions/
+
 # SPDX-SnippetBegin
 # SPDX-License-Identifier: MIT
 # SPDX-SnippetCopyrightText: Contributors to gitignore.io <https://github.com/toptal/gitignore.io>
