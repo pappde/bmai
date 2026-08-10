@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-# SPDX-FileCopyrightText: Copyright (c) 2026 Daniel Langford
+# SPDX-FileCopyrightText: Copyright © 2026 Denis Papp <denis@accessdenied.net>
 
 import importlib.util
 import pathlib

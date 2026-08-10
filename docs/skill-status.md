@@ -1,6 +1,6 @@
 <!--
 SPDX-License-Identifier: MIT
-SPDX-FileCopyrightText: Copyright (c) 2026 Daniel Langford
+SPDX-FileCopyrightText: Copyright © 2026 Denis Papp <denis@accessdenied.net>
 -->
 
 # Skill Implementation Status
