@@ -5,6 +5,7 @@ version = 1
 [[annotations]]
 path = [
     "*",
+    "rules/*.json",
     "test/*.txt",
     "web/*",
 ]

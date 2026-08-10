@@ -748,6 +748,153 @@ TEST(SkillTests, KonstantRetainsValueWhenChanceRerolls) {
 	EXPECT_EQ(chance_player->GetDie(0)->GetValueTotal(), 7);
 }
 
+TEST(SkillTests, ChanceMightyGrowsBeforeReroll) {
+	TEST_Util test;
+
+	auto context = test.ParseChanceContext("cH6:1", "20:20");
+	auto valid_chance = context.ValidChance();
+	auto chance_it = std::find_if(valid_chance.begin(), valid_chance.end(), [](const BMC_Move &move) {
+		return move.m_action == BME_ACTION_USE_CHANCE;
+	});
+	ASSERT_NE(chance_it, valid_chance.end());
+
+	g_rng.SRand(1);
+	context.Game()->ApplyUseChance(*chance_it);
+
+	EXPECT_EQ(context.Game()->GetPlayer(0)->GetDie(0)->GetSidesMax(), 8);
+}
+
+TEST(SkillTests, KonstantChanceMightyRetainsValueAndGrows) {
+	TEST_Util test;
+
+	auto context = test.ParseChanceContext("cHk6:3", "20:20");
+	auto valid_chance = context.ValidChance();
+	auto chance_it = std::find_if(valid_chance.begin(), valid_chance.end(), [](const BMC_Move &move) {
+		return move.m_action == BME_ACTION_USE_CHANCE;
+	});
+	ASSERT_NE(chance_it, valid_chance.end());
+
+	g_rng.SRand(1);
+	context.Game()->ApplyUseChance(*chance_it);
+
+	BMC_Die *chance_die = context.Game()->GetPlayer(0)->GetDie(0);
+	EXPECT_EQ(chance_die->GetValueTotal(), 3);
+	EXPECT_EQ(chance_die->GetSidesMax(), 8);
+}
+
+TEST(SkillTests, ChanceWeakShrinksBeforeReroll) {
+	TEST_Util test;
+
+	auto context = test.ParseChanceContext("ch6:1", "20:20");
+	auto valid_chance = context.ValidChance();
+	auto chance_it = std::find_if(valid_chance.begin(), valid_chance.end(), [](const BMC_Move &move) {
+		return move.m_action == BME_ACTION_USE_CHANCE;
+	});
+	ASSERT_NE(chance_it, valid_chance.end());
+
+	g_rng.SRand(1);
+	context.Game()->ApplyUseChance(*chance_it);
+
+	EXPECT_EQ(context.Game()->GetPlayer(0)->GetDie(0)->GetSidesMax(), 4);
+}
+
+TEST(SkillTests, KonstantChanceWeakRetainsValueAndShrinks) {
+	TEST_Util test;
+
+	auto context = test.ParseChanceContext("chk6:3", "20:20");
+	auto valid_chance = context.ValidChance();
+	auto chance_it = std::find_if(valid_chance.begin(), valid_chance.end(), [](const BMC_Move &move) {
+		return move.m_action == BME_ACTION_USE_CHANCE;
+	});
+	ASSERT_NE(chance_it, valid_chance.end());
+
+	g_rng.SRand(1);
+	context.Game()->ApplyUseChance(*chance_it);
+
+	BMC_Die *chance_die = context.Game()->GetPlayer(0)->GetDie(0);
+	EXPECT_EQ(chance_die->GetValueTotal(), 3);
+	EXPECT_EQ(chance_die->GetSidesMax(), 4);
+}
+
+TEST(SkillTests, KonstantOrneryMightyRetainsValueAndGrows) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("6:6 oHk6:3", "1:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [&context](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.a("6");
+	});
+	ASSERT_NE(attack_it, valid_attacks.end());
+
+	int original_index = context.a("oHk6");
+	BMC_Die *ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(ornery_die, nullptr);
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*attack_it, extra_turn);
+
+	ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(ornery_die, nullptr);
+	EXPECT_EQ(ornery_die->GetValueTotal(), 3);
+	EXPECT_EQ(ornery_die->GetSidesMax(), 8);
+}
+
+TEST(SkillTests, KonstantOrneryWeakRetainsValueAndShrinks) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("6:6 ohk6:3", "1:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [&context](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.a("6");
+	});
+	ASSERT_NE(attack_it, valid_attacks.end());
+
+	int original_index = context.a("ohk6");
+	BMC_Die *ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(ornery_die, nullptr);
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*attack_it, extra_turn);
+
+	ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(ornery_die, nullptr);
+	EXPECT_EQ(ornery_die->GetValueTotal(), 3);
+	EXPECT_EQ(ornery_die->GetSidesMax(), 4);
+}
+
+TEST(SkillTests, KonstantTimeAndSpaceTripDoesNotGrantExtraTurn) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("t^k6:3", "1:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto trip_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_TRIP;
+	});
+	ASSERT_NE(trip_it, valid_attacks.end());
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*trip_it, extra_turn);
+
+	EXPECT_FALSE(extra_turn);
+}
+
+TEST(SkillTests, KonstantTimeAndSpaceSkillAttackDoesNotGrantExtraTurn) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("^k6:3 2:2", "5:5");
+	auto valid_attacks = context.ValidAttacks();
+	ASSERT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", {0, 1}, 0)
+	));
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(valid_attacks.front(), extra_turn);
+
+	EXPECT_FALSE(extra_turn);
+}
+
 TEST(SkillTests, KonstantAttackerRetainsValueAfterSkillAttack) {
 	TEST_Util test;
 
