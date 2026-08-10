@@ -102,6 +102,7 @@
 // dbl102424	- Implemented Insult skill
 // dbl110424	- Parser can now parse passed in String
 //				- Implemented Value skill
+// dbl081026 - remove completed Konstant TODOs
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // TODO:

@@ -9,6 +9,7 @@
 //
 // REVISION HISTORY:
 // dbl100524 - broke this logic out into its own class file
+// dbl081026 - track score across die property changes
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // includes
