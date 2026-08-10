@@ -28,8 +28,9 @@
 
 struct KonstantTerm
 {
-	INT value;
-	bool allow_subtraction;
+	INT min_value;  // 1 if Stinger, else full value
+	INT max_value;  // always full die value
+	bool allow_subtraction;  // false for Warrior+Konstant
 };
 
 BMC_Game::BMC_Game(bool _simulation)
@@ -415,6 +416,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			INT stinger_att_value_minimum = 0;
 			INT stinger_slack = 0;  // total (value - 1) for all Stinger dice in attack
 			INT konstants = 0;
+			INT subtractable_konstants = 0;
 			INT non_konstant_total = 0;
 			KonstantTerm konstant_terms[BMD_MAX_DICE];
 			for (i=0; i<BMD_MAX_DICE; i++)
@@ -437,12 +439,19 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 						warriors++;
 					}
 
-					if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
+					bool is_konstant = att_die->HasProperty(BME_PROPERTY_KONSTANT);
+					bool is_stinger = att_die->HasProperty(BME_PROPERTY_STINGER)
+						&& !att_die->HasProperty(BME_PROPERTY_WARRIOR);
+
+					if (is_konstant)
 					{
 						konstant_terms[konstants] = {
+							is_stinger ? att_die->Dice() : att_die->GetValueTotal(),
 							att_die->GetValueTotal(),
 							!att_die->HasProperty(BME_PROPERTY_WARRIOR)
 						};
+						if (konstant_terms[konstants].allow_subtraction)
+							subtractable_konstants++;
 						konstants++;
 					}
 					else
@@ -453,15 +462,14 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					if (att_die->HasProperty(BME_PROPERTY_STEALTH))
 						has_stealth = true;
 
-					if (att_die->HasProperty(BME_PROPERTY_STINGER)
-						&& !att_die->HasProperty(BME_PROPERTY_WARRIOR))
+					if (is_stinger && !is_konstant)
 					{
-						// Stinger can use any value from 1 to current
+						// Pure Stinger (not Konstant): track slack for range check
 						att_has_stinger = true;
-						stinger_att_value_minimum += 1;
-						stinger_slack += att_die->GetValueTotal() - 1;
+						stinger_att_value_minimum += att_die->Dice();  // min is 1 per sub-die (2 for twins)
+						stinger_slack += att_die->GetValueTotal() - att_die->Dice();
 					}
-					else
+					else if (!is_konstant)
 					{
 						// Normal die, or Warrior Stinger (must use full value)
 						stinger_att_value_minimum += att_die->GetValueTotal();
@@ -479,31 +487,40 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			if (dice < 2 && konstants > 0)
 				return false;
 
-			// Recursively try all +/- combinations of Konstant dice to see if any sum to target value.
-			// Warrior+Konstant dice (allow_subtraction=false) can only add positive values.
-			// When Stinger dice are present, they contribute their full value to non_konstant_total
-			// but can actually use any value in [1, current]. stinger_slack is the total amount
-			// they can reduce, so we check if the target is in [total - stinger_slack, total].
+			// Try each assignment of signs to subtractable Konstant dice. Stinger
+			// flexibility makes the reachable values for one sign assignment a
+			// continuous interval, so individual die values do not need enumeration.
 			if (konstants > 0)
 			{
 				INT tgt = tgt_die->GetValueTotal();
-				auto konstant_hits_target = [&](auto &&self, INT idx, INT total) -> bool
+				INT sign_combinations = 1 << subtractable_konstants;
+				for (INT signs = 0; signs < sign_combinations; signs++)
 				{
-					if (idx >= konstants)
-						return total >= tgt && total <= tgt + stinger_slack;
+					INT minimum = non_konstant_total - stinger_slack;
+					INT maximum = non_konstant_total;
+					INT sign_bit = 0;
+					for (INT k = 0; k < konstants; k++)
+					{
+						const KonstantTerm &term = konstant_terms[k];
+						bool subtract = term.allow_subtraction && (signs & (1 << sign_bit));
+						if (term.allow_subtraction)
+							sign_bit++;
 
-					const auto &term = konstant_terms[idx];
-					if (self(self, idx + 1, total + term.value))
+						if (subtract)
+						{
+							minimum -= term.max_value;
+							maximum -= term.min_value;
+						}
+						else
+						{
+							minimum += term.min_value;
+							maximum += term.max_value;
+						}
+					}
+
+					if (tgt >= minimum && tgt <= maximum)
 						return true;
-
-					if (term.allow_subtraction && self(self, idx + 1, total - term.value))
-						return true;
-
-					return false;
-				};
-
-				if (konstant_hits_target(konstant_hits_target, 0, non_konstant_total))
-					return true;
+				}
 			}
 
 			if (att_value_total > tgt_die->GetValueTotal()
@@ -1080,8 +1097,18 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 					BMC_DieIndexStack	die_stack(attacker);
 					bool finished = false;
-					bool player_has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
-					bool player_has_konstant = attacker->HasDieWithProperty(BME_PROPERTY_KONSTANT);
+					bool player_has_flexible_skill_die = false;
+					for (INT i = 0; i < attacker->GetAvailableDice(); i++)
+					{
+						BMC_Die *die = attacker->GetDie(i);
+						if (!die->HasProperty(BME_PROPERTY_WARRIOR)
+							&& (die->HasProperty(BME_PROPERTY_STINGER)
+								|| die->HasProperty(BME_PROPERTY_KONSTANT)))
+						{
+							player_has_flexible_skill_die = true;
+							break;
+						}
+					}
 
 					// add the first die (this one)
 					die_stack.Push(move.m_attacker);
@@ -1096,9 +1123,11 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						for (INT si = 0; si < die_stack.GetStackSize(); si++)
 						{
 							BMC_Die *sd = die_stack.GetDie(si);
-							if (sd->HasProperty(BME_PROPERTY_STINGER))
+							if (!sd->HasProperty(BME_PROPERTY_WARRIOR)
+								&& sd->HasProperty(BME_PROPERTY_STINGER))
 								stack_has_stinger = true;
-							if (sd->HasProperty(BME_PROPERTY_KONSTANT))
+							if (!sd->HasProperty(BME_PROPERTY_WARRIOR)
+								&& sd->HasProperty(BME_PROPERTY_KONSTANT))
 								stack_has_konstant = true;
 						}
 
@@ -1165,11 +1194,9 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// if full (using all target dice) and att value is <= tgt total value, give up since won't be able to do any other matches
 						// drp100224 - this check was wrong. We can abort if GetValueTotal() <= target->GetMinValue(), since that's the highest we can combine to,
 						//  but otherwise we should keep cycling since other combniations will have lower totals.
-						// Stack cycling decisions use player-wide checks because a Konstant
-						// or Stinger die not yet in the stack could be added in a future cycle.
-						// Konstant can subtract, reducing the total. Stinger can use a value
-						// as low as 1 instead of its full value, also reducing the effective total.
-						bool skip_cycle_pruning = player_has_konstant || player_has_stinger;
+						// A flexible die not yet in the stack could reduce a future total.
+						// Warrior dice have neither Stinger flexibility nor Konstant subtraction.
+						bool skip_cycle_pruning = player_has_flexible_skill_die;
 						if (!skip_cycle_pruning && die_stack.ContainsAllDice() && die_stack.GetValueTotal() <= target->GetMinValue())
 							break;
 

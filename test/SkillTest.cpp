@@ -443,6 +443,110 @@ TEST(SkillTests, StingerAndKonstantCombinedFlexibility)
 											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
 }
 
+TEST(SkillTests, StingerKonstantOnSameDieWithSubtraction)
+{
+	TEST_Util test;
+
+	// 4:4 (normal) + gk5:5 (Stinger+Konstant on SAME die, showing 5)
+	// Target: d2:2 (Stealth, so only capturable by multi-die skill attack)
+	// Valid capture: Stinger lets gk use value 2, Konstant lets it subtract: 4 + (-2) = 2
+	auto context = test.ParseFightContext(
+		"4:4 gk5:5",
+		"d2:2");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
+}
+
+TEST(SkillTests, StingerKonstantOnSameDieWithAddition)
+{
+	TEST_Util test;
+
+	// Stinger lets gk contribute 2, and Konstant adds it: 4 + 2 = 6.
+	auto ctx = test.ParseFightContext(
+		"4:4 gk5:5",
+		"d6:6");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "gk5" }), ctx.t("d6"))));
+}
+
+TEST(SkillTests, StingerKonstantOnSameDieCannotHitGapBetweenSigns)
+{
+	TEST_Util test;
+
+	// 4 + gk5 reaches [-1, 3] by subtraction or [5, 9] by addition, but not 4.
+	auto ctx = test.ParseFightContext(
+		"4:4 gk5:5",
+		"d4:4");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "gk5" }), ctx.t("d4")))));
+}
+
+TEST(SkillTests, StingerWithKonstantWarriorUsesStingerFlexibility)
+{
+	TEST_Util test;
+
+	// Warrior Konstant must add 3; Stinger can contribute 4: 4 + 3 = 7.
+	auto ctx = test.ParseFightContext(
+		"g6:6 `k3:3",
+		"d7:7");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "g6", "`k3" }), ctx.t("d7"))));
+}
+
+TEST(SkillTests, StingerWarriorWithKonstantUsesKonstantSubtraction)
+{
+	TEST_Util test;
+
+	// Warrior Stinger must contribute its full 6; Konstant can subtract 3.
+	auto ctx = test.ParseFightContext(
+		"`g6:6 Mk3:3",
+		"d3:3");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "`g6", "Mk3" }), ctx.t("d3"))));
+}
+
+TEST(SkillTests, StingerKonstantWarriorUsesFullPositiveValue)
+{
+	TEST_Util test;
+
+	// Warrior disables Stinger flexibility and Konstant subtraction: 4 + 5 = 9.
+	auto ctx = test.ParseFightContext(
+		"4:4 `gk5:5",
+		"d9:9");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`gk5" }), ctx.t("d9"))));
+}
+
+TEST(SkillTests, StingerKonstantWarriorCannotUsePartialValue)
+{
+	TEST_Util test;
+
+	auto ctx = test.ParseFightContext(
+		"4:4 `gk5:5",
+		"d6:6");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`gk5" }), ctx.t("d6")))));
+}
+
+TEST(SkillTests, StingerKonstantWarriorCannotSubtract)
+{
+	TEST_Util test;
+
+	auto ctx = test.ParseFightContext(
+		"4:4 `gk5:5",
+		"d2:2");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`gk5" }), ctx.t("d2")))));
+}
+
 TEST(SkillTests, StealthSingleDieSkillAttack) {
 	TEST_Util test;
 
@@ -547,6 +651,44 @@ TEST(SkillTests, KonstantRetainsValueWhenTripped) {
 	BMC_Player *target_player = context.Game()->GetPlayer(1);
 	EXPECT_EQ(target_player->GetDie(0)->GetValueTotal(), 7);
 	EXPECT_EQ(target_player->GetAvailableDice(), 0);
+}
+
+TEST(SkillTests, TripTargetMightyTriggersOnce) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("t6:6", "H6:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto trip_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_TRIP;
+	});
+	ASSERT_NE(trip_it, valid_attacks.end());
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*trip_it, extra_turn);
+
+	// A Mighty d6 grows once to d8 when Trip causes it to reroll.
+	EXPECT_EQ(context.Game()->GetPlayer(1)->GetDie(0)->GetSidesMax(), 8);
+}
+
+TEST(SkillTests, KonstantMightyTripTargetRetainsValueAndGrows) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("t6:6", "Hk6:5");
+	auto valid_attacks = context.ValidAttacks();
+	auto trip_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_TRIP;
+	});
+	ASSERT_NE(trip_it, valid_attacks.end());
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*trip_it, extra_turn);
+
+	BMC_Die *target = context.Game()->GetPlayer(1)->GetDie(0);
+	EXPECT_EQ(target->GetValueTotal(), 5);
+	// Konstant preserves the value, but Mighty still responds to the Trip reroll.
+	EXPECT_EQ(target->GetSidesMax(), 8);
 }
 
 TEST(SkillTests, KonstantRetainsValueWhenChanceRerolls) {
