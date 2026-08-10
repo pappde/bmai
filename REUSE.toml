@@ -5,9 +5,13 @@ version = 1
 [[annotations]]
 path = [
     "*",
-    "rules/*.json",
     "test/*.txt",
     "web/*",
 ]
 SPDX-License-Identifier = "MIT"
 SPDX-FileCopyrightText = "Copyright © Denis Papp <denis@accessdenied.net>"
+
+[[annotations]]
+path = ["rules/*.json"]
+SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "Copyright (c) 2026 Daniel Langford"

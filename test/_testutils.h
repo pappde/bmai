@@ -39,6 +39,7 @@ public:
 // lets us collect what is being sent to Send for inspection during tests
 class TEST_Parser : public BMC_Parser {
 public:
+	BMC_Game *Game() { return &m_game; }
 	std::string tm_third_to_last_fmt;
 	std::string tm_next_to_last_fmt;
 	std::string tm_last_fmt;
@@ -81,8 +82,6 @@ public:
 		std::vector<std::string> attacker_specs;
 		std::vector<std::string> target_specs;
 
-		// Look up attacker die original index by its spec (the part before ':')
-		// e.g. a("Mk2") returns the input position of the "Mk2:2" die
 		int a(const std::string &_spec) const
 		{
 			for (int i = 0; i < (int)attacker_specs.size(); i++)
@@ -99,7 +98,6 @@ public:
 			return result;
 		}
 
-		// Look up target die original index by its spec
 		int t(const std::string &_spec) const
 		{
 			for (int i = 0; i < (int)target_specs.size(); i++)
@@ -185,7 +183,6 @@ public:
 		context.game = context.parser->Game();
 		context.chosen_move = context.parser->last_attack;
 
-		// Store die specs (part before ':') for readable index lookups
 		for (auto &d : dice0)
 			context.attacker_specs.push_back(d.substr(0, d.find(':')));
 		for (auto &d : dice1)

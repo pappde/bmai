@@ -11,11 +11,6 @@
 // dbl100524 - broke this logic out into its own class file
 // dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
-// dbl040626 - schedule Chance and Trip rerolls only for dice that should actually reroll
-// dbl040626 - Konstant skill: signed +/- handling, Stinger+Konstant combined flexibility,
-//             Warrior Stinger must use full value, attack-specific property checks in
-//             ValidAttack, stack-specific vs player-wide checks in GenerateValidAttacks,
-//             fix Stinger/Konstant stack cycling pruning, heap-to-stack KonstantTerm array
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Game.h"
@@ -391,13 +386,6 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 
 	case BME_ATTACK_SKILL:	// N -> 1
 		{
-			// TODO: KONSTANT allow + or -
-				// 41 k2 k3
-				// 5+2+3 10
-				// 5+2-3 4
-				// 5-2+3 6
-				// 5-2-3 0
-
 			// WARRIOR: can only have one involved
 			INT warriors = 0;
 
@@ -414,7 +402,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			bool att_has_stinger = false;
 			bool has_stealth = false;
 			INT stinger_att_value_minimum = 0;
-			INT stinger_slack = 0;  // total (value - 1) for all Stinger dice in attack
+			INT stinger_slack = 0;
 			INT konstants = 0;
 			INT subtractable_konstants = 0;
 			INT non_konstant_total = 0;
@@ -429,7 +417,6 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					if (!att_die->CanDoAttack(_move.m_attack))
 						return false;
 
-					// count value of att die
 					att_value_total += att_die->GetValueTotal();
 
 					if (att_die->HasProperty(BME_PROPERTY_WARRIOR))
@@ -464,14 +451,12 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 
 					if (is_stinger && !is_konstant)
 					{
-						// Pure Stinger (not Konstant): track slack for range check
 						att_has_stinger = true;
 						stinger_att_value_minimum += att_die->Dice();  // min is 1 per sub-die (2 for twins)
 						stinger_slack += att_die->GetValueTotal() - att_die->Dice();
 					}
 					else if (!is_konstant)
 					{
-						// Normal die, or Warrior Stinger (must use full value)
 						stinger_att_value_minimum += att_die->GetValueTotal();
 					}
 				}
@@ -479,11 +464,9 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 
 			bool att_has_konstant = (konstants > 0);
 
-			// Stealth dice can only participate in, or be captured by, multi-die skill attacks.
 			if (dice < 2 && (has_stealth || target_has_stealth))
 				return false;
 
-			// KONSTANT: cannot do with just one die
 			if (dice < 2 && konstants > 0)
 				return false;
 
@@ -1091,10 +1074,6 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 			case BME_ATTACK_TYPE_N_1:
 				{
-					// TODO: KONSTANT: consider all combinations, don't break early due to total
-					// OPTIMIZATION: KONSTANT optimization - add one negative version of each constant die to the front
-					//  of the stack.
-
 					BMC_DieIndexStack	die_stack(attacker);
 					bool finished = false;
 					bool player_has_flexible_skill_die = false;
@@ -1117,7 +1096,6 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 					{
 						//die_stack.Debug(BME_DEBUG_ALWAYS);
 
-						// Check if current stack contains Stinger or Konstant dice (single pass)
 						bool stack_has_stinger = false;
 						bool stack_has_konstant = false;
 						for (INT si = 0; si < die_stack.GetStackSize(); si++)
@@ -1131,10 +1109,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 								stack_has_konstant = true;
 						}
 
-						// STINGER: if there are any stinger dice in the stack it gives us flexibility.
-						// The range is [non_stinger_total+stinger_dice, total]
-						// BUT: if Konstant dice are also present, skip this optimization since Konstant
-						// can subtract and makes the minimum value calculation complex.
+						// Konstant subtraction invalidates the Stinger range shortcut.
 						if (stack_has_stinger && !stack_has_konstant && die_stack.GetStackSize() > 1)
 						{
 							INT i;
@@ -1176,11 +1151,9 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 							{
 								tgt_die = target->GetDie(move.m_target);
 
-								// Konstant dice can add or subtract, so we can't prune based on simple value comparison
 								if (!stack_has_konstant && tgt_die->GetValueTotal() < die_stack.GetValueTotal())
 									break;
 
-								// For Konstant dice, later targets may still match once +/- assignments are considered.
 								if (stack_has_konstant || tgt_die->GetValueTotal() == die_stack.GetValueTotal())
 								{
 									// build m_attackers to check move validity
@@ -1194,8 +1167,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// if full (using all target dice) and att value is <= tgt total value, give up since won't be able to do any other matches
 						// drp100224 - this check was wrong. We can abort if GetValueTotal() <= target->GetMinValue(), since that's the highest we can combine to,
 						//  but otherwise we should keep cycling since other combniations will have lower totals.
-						// A flexible die not yet in the stack could reduce a future total.
-						// Warrior dice have neither Stinger flexibility nor Konstant subtraction.
+						// Unused flexible dice can reduce later stack totals.
 						bool skip_cycle_pruning = player_has_flexible_skill_die;
 						if (!skip_cycle_pruning && die_stack.ContainsAllDice() && die_stack.GetValueTotal() <= target->GetMinValue())
 							break;
@@ -1392,7 +1364,7 @@ void BMC_Game::ApplyUseChance(BMC_Move &_move)
 			continue;
 		die = player->GetDie(i);
 
-		// CHANCE rerolls preserve Konstant values, so only schedule a reroll for dice that should change.
+		die->OnBeforeRollInGame(player);
 		if (!die->HasProperty(BME_PROPERTY_KONSTANT))
 			die->SetState(BME_STATE_NOTSET);
 		if (die->GetState()==BME_STATE_NOTSET)
@@ -1566,7 +1538,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		}
 	}
 
-	// Konstant skips the reroll, but not Mighty or Weak effects.
+	// Konstant suppresses randomness, not reroll-triggered effects.
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
@@ -1580,17 +1552,19 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		tgt_die->OnBeforeRollInGame(target);
 	}
 
-	// ORNERY: all ornery dice on attacker must reroll (whether attacked)
-    // unless the player passed (there must be SOME attack involved)
-    if (_move.m_attack != BME_ATTACK_INVALID)
-    {
-        for (i=0; i<attacker->GetAvailableDice(); i++)
-        {
-            att_die = attacker->GetDie(i);
-            if (att_die->HasProperty(BME_PROPERTY_ORNERY))
-                att_die->OnApplyAttackPlayer(_move,attacker,false);	// false means not _actually_attacking
-        }
-    }
+	if (_move.m_attack != BME_ATTACK_INVALID)
+	{
+		for (i=0; i<attacker->GetAvailableDice(); i++)
+		{
+			att_die = attacker->GetDie(i);
+			if (!att_die->HasProperty(BME_PROPERTY_ORNERY)
+				|| att_die->GetState()==BME_STATE_NOTSET)
+				continue;
+			if (!att_die->HasProperty(BME_PROPERTY_KONSTANT))
+				att_die->SetState(BME_STATE_NOTSET);
+			att_die->OnBeforeRollInGame(attacker);
+		}
+	}
 }
 
 // DESC: simulate all random steps - reroll attackers, targets, MOOD
@@ -1625,6 +1599,19 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 			}
 			break;
 		}
+	}
+
+	for (i=0; i<attacker->GetAvailableDice(); i++)
+	{
+		att_die = attacker->GetDie(i);
+		if (!att_die->HasProperty(BME_PROPERTY_ORNERY))
+			continue;
+
+		bool participated = c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1
+			? _move.m_attackers.IsSet(i)
+			: i==_move.m_attacker;
+		if (!participated)
+			att_die->OnApplyAttackNatureRollAttacker(_move,attacker);
 	}
 
 	// TRIP attack
@@ -1666,8 +1653,9 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 			null_attacker = att_die->HasProperty(BME_PROPERTY_NULL);
 			value_attacker = att_die->HasProperty(BME_PROPERTY_VALUE);
 
-			// TIME AND SPACE
-			if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
+			if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE)
+				&& !att_die->HasProperty(BME_PROPERTY_KONSTANT)
+				&& att_die->GetValueTotal()%2==1)
 				_extra_turn = true;
 			break;
 		}
@@ -1681,8 +1669,9 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 				null_attacker = null_attacker || att_die->HasProperty(BME_PROPERTY_NULL);
 				value_attacker = value_attacker || att_die->HasProperty(BME_PROPERTY_VALUE);
 
-				// TIME AND SPACE
-				if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
+				if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE)
+					&& !att_die->HasProperty(BME_PROPERTY_KONSTANT)
+					&& att_die->GetValueTotal()%2==1)
 					_extra_turn = true;
 			}
 			break;

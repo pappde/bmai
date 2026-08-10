@@ -102,7 +102,6 @@
 // dbl102424	- Implemented Insult skill
 // dbl110424	- Parser can now parse passed in String
 //				- Implemented Value skill
-// dbl040626	- update Konstant notes for signed skill attacks, non-rerolling Trip/Chance, and Warrior interaction
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // TODO:
@@ -161,10 +160,6 @@
 // - unskilled
 
 // DICE REMAINING: (most worthwhile +FvGk) (+DC%GF@vk)
-// k KONSTANT:
-//	  done: cannot power attack, cannot perform 1 die skill attack, does not reroll,
-//	        can add or subtract in a multi-die skill attack, retains value on Trip/Chance
-//	  open: review move generation pruning for signed multi-die combinations
 // + AUX: if both players have one and agree, they use them.  If one player doesn't and both
 //   players agree, then you get the same die as the opponent.
 // D DOPPLEGANGER: if doing a power attack, att_die becomes exact copy of tgt_die (still rerolls)

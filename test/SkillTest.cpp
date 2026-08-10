@@ -110,11 +110,6 @@ TEST(SkillTests, KonstantMultiDieSkillAttackWithSubtraction) {
 TEST_P(KonstantSignedAssignmentTests, MultiDieSkillAttackAllowsSignedAssignments) {
 	TEST_Util test;
 
-	// KONSTANT allow + or -
-	// 5+2+3 10
-	// 5+2-3 4
-	// 5-2+3 6
-	// 5-2-3 0
 	auto context = test.ParseFightContext(
 		"41:5 Mk2:2 Mk3:3",
 		GetParam()
@@ -217,7 +212,6 @@ TEST(SkillTests, KonstantSkillAttackWithUnusedStingerInPool)
 {
 	TEST_Util test;
 
-	// Attack with 5+2-3=4 to hit target 4, Stinger not involved
 	auto ctx = test.ParseFightContext(
 		"5:5 Mk2:2 Mk3:3 g6:6",
 		"4:4");
@@ -230,8 +224,6 @@ TEST(SkillTests, StingerAndKonstantBothInAttack)
 {
 	TEST_Util test;
 
-	// Stinger(6)+Konstant(3) can hit anything from (1+3) to (6+3) = 4-9
-	// Test hitting 7: Stinger uses 4, Konstant adds 3
 	auto context = test.ParseFightContext(
 		"g6:6 Mk3:3",
 		"7:7");
@@ -244,7 +236,6 @@ TEST(SkillTests, StingerAndKonstantWithSubtraction)
 {
 	TEST_Util test;
 
-	// Stinger(8)+Konstant(5) can hit 3: Stinger=8, Konstant=-5
 	auto context = test.ParseFightContext(
 		"g8:8 Mk5:5",
 		"3:3");
@@ -253,16 +244,11 @@ TEST(SkillTests, StingerAndKonstantWithSubtraction)
 											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0)));
 }
 
-// === Pure Stinger Skill Attack Tests ===
-// Per rules: "When a Stinger Die participates in a Skill Attack, it can be used
-// as any number between its minimum possible value and the value it currently shows."
 
 TEST(SkillTests, StingerSkillAttackInRange)
 {
 	TEST_Util test;
 
-	// normal(4) + Stinger(6): skill range is [4+1, 4+6] = [5, 10]
-	// Target 7: Stinger uses 3
 	auto context = test.ParseFightContext(
 		"4:4 g6:6",
 		"7:7");
@@ -275,8 +261,6 @@ TEST(SkillTests, StingerSkillAttackAtMinimumRange)
 {
 	TEST_Util test;
 
-	// normal(4) + Stinger(6): minimum is 4+1=5
-	// Stinger contributes exactly 1
 	auto context = test.ParseFightContext(
 		"4:4 g6:6",
 		"5:5");
@@ -289,8 +273,6 @@ TEST(SkillTests, StingerSkillAttackAtMaximumRange)
 {
 	TEST_Util test;
 
-	// normal(4) + Stinger(6): maximum is 4+6=10
-	// Stinger contributes full value
 	auto context = test.ParseFightContext(
 		"4:4 g6:6",
 		"10:10");
@@ -303,8 +285,6 @@ TEST(SkillTests, StingerSkillAttackBelowRange)
 {
 	TEST_Util test;
 
-	// normal(4) + Stinger(6): minimum is 4+1=5, so target 4 cannot be hit
-	// by a 2-die skill attack (Stinger minimum contribution is 1)
 	auto context = test.ParseFightContext(
 		"4:4 g6:6",
 		"4:4");
@@ -317,8 +297,6 @@ TEST(SkillTests, TwoStingersSkillAttackRange)
 {
 	TEST_Util test;
 
-	// Per rules: "Two Stinger Dice showing 10 can Skill Attack any die between 2 and 20"
-	// Minimum: both Stingers contribute 1 each = 2
 	auto context = test.ParseFightContext(
 		"g10:10 g10:10",
 		"2:2");
@@ -331,7 +309,6 @@ TEST(SkillTests, TwoStingersCannotHitBelowMinimum)
 {
 	TEST_Util test;
 
-	// Two Stingers: minimum is 1+1=2, so target 1 cannot be hit
 	auto context = test.ParseFightContext(
 		"g10:10 g10:10",
 		"1:1");
@@ -340,16 +317,11 @@ TEST(SkillTests, TwoStingersCannotHitBelowMinimum)
 											IsAttack(BME_ATTACK_TYPE_N_1, "skill", { 0, 1 }, 0))));
 }
 
-// === Stinger + Konstant Combined Flexibility ===
-// No direct interaction documented. Each skill applies its own rules:
-// Stinger can use [1, current_value], Konstant can add or subtract.
 
 TEST(SkillTests, StingerAtValueOneHasNoFlexibility)
 {
 	TEST_Util test;
 
-	// Stinger showing 1: range is [1, 1], no flexibility (slack = 0)
-	// normal(4) + Stinger(showing 1): only total is 4+1=5
 	auto context = test.ParseFightContext(
 		"4:4 g6:1",
 		"5:5");
@@ -362,8 +334,6 @@ TEST(SkillTests, StingerAtValueOneCannotHitLowerTarget)
 {
 	TEST_Util test;
 
-	// Stinger showing 1 has no slack, so normal(4) + Stinger(1) = 5 only
-	// Target 4 is NOT reachable
 	auto context = test.ParseFightContext(
 		"4:4 g6:1",
 		"4:4");
@@ -376,8 +346,6 @@ TEST(SkillTests, NormalStingerKonstantThreeDieAttack)
 {
 	TEST_Util test;
 
-	// Target 5: 4+Stinger(4)+Konstant(-3) => 4+4-3=5
-	// Requires all three types working together
 	auto ctx = test.ParseFightContext(
 		"4:4 g6:6 Mk3:3",
 		"5:5");
@@ -390,7 +358,6 @@ TEST(SkillTests, KonstantWarriorCanAddInSkillAttack)
 {
 	TEST_Util test;
 
-	// Warrior Konstant(3) + normal(5): 5+3=8, Warrior Konstant can add
 	auto ctx = test.ParseFightContext(
 		"5:5 `k3:3",
 		"8:8");
@@ -399,14 +366,10 @@ TEST(SkillTests, KonstantWarriorCanAddInSkillAttack)
 										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "5", "`k3" }), ctx.t("8"))));
 }
 
-// Per rules: "A Warrior can't use the Stinger skill to add less than the
-// full value of the die, because the die isn't in play yet"
 TEST(SkillTests, StingerWarriorMustUseFullValue)
 {
 	TEST_Util test;
 
-	// Warrior Stinger must use full value 6, so only total is 4+6=10
-	// Target 7 would require Stinger to use 3, which Warrior forbids
 	auto ctx = test.ParseFightContext(
 		"4:4 `g6:6",
 		"7:7");
@@ -419,7 +382,6 @@ TEST(SkillTests, StingerWarriorAtFullValueIsValid)
 {
 	TEST_Util test;
 
-	// Warrior Stinger(6) + normal(4) at full value: 4+6=10
 	auto ctx = test.ParseFightContext(
 		"4:4 `g6:6",
 		"10:10");
@@ -432,9 +394,6 @@ TEST(SkillTests, StingerAndKonstantCombinedFlexibility)
 {
 	TEST_Util test;
 
-	// Stinger(8) + Konstant(5): Stinger can use [1..8], Konstant can +5 or -5
-	// Target 2: Stinger=7, Konstant=-5 => 7-5=2
-	// This requires BOTH Stinger flexibility AND Konstant subtraction together
 	auto context = test.ParseFightContext(
 		"g8:8 Mk5:5",
 		"2:2");
@@ -447,9 +406,6 @@ TEST(SkillTests, StingerKonstantOnSameDieWithSubtraction)
 {
 	TEST_Util test;
 
-	// 4:4 (normal) + gk5:5 (Stinger+Konstant on SAME die, showing 5)
-	// Target: d2:2 (Stealth, so only capturable by multi-die skill attack)
-	// Valid capture: Stinger lets gk use value 2, Konstant lets it subtract: 4 + (-2) = 2
 	auto context = test.ParseFightContext(
 		"4:4 gk5:5",
 		"d2:2");
@@ -462,7 +418,6 @@ TEST(SkillTests, StingerKonstantOnSameDieWithAddition)
 {
 	TEST_Util test;
 
-	// Stinger lets gk contribute 2, and Konstant adds it: 4 + 2 = 6.
 	auto ctx = test.ParseFightContext(
 		"4:4 gk5:5",
 		"d6:6");
@@ -475,7 +430,6 @@ TEST(SkillTests, StingerKonstantOnSameDieCannotHitGapBetweenSigns)
 {
 	TEST_Util test;
 
-	// 4 + gk5 reaches [-1, 3] by subtraction or [5, 9] by addition, but not 4.
 	auto ctx = test.ParseFightContext(
 		"4:4 gk5:5",
 		"d4:4");
@@ -488,12 +442,11 @@ TEST(SkillTests, StingerWithKonstantWarriorUsesStingerFlexibility)
 {
 	TEST_Util test;
 
-	// Warrior Konstant must add 3; Stinger can contribute 4: 4 + 3 = 7.
 	auto ctx = test.ParseFightContext(
 		"g6:6 `k3:3",
 		"d7:7");
 
-	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::ElementsAre(
 		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "g6", "`k3" }), ctx.t("d7"))));
 }
 
@@ -501,7 +454,6 @@ TEST(SkillTests, StingerWarriorWithKonstantUsesKonstantSubtraction)
 {
 	TEST_Util test;
 
-	// Warrior Stinger must contribute its full 6; Konstant can subtract 3.
 	auto ctx = test.ParseFightContext(
 		"`g6:6 Mk3:3",
 		"d3:3");
@@ -514,7 +466,6 @@ TEST(SkillTests, StingerKonstantWarriorUsesFullPositiveValue)
 {
 	TEST_Util test;
 
-	// Warrior disables Stinger flexibility and Konstant subtraction: 4 + 5 = 9.
 	auto ctx = test.ParseFightContext(
 		"4:4 `gk5:5",
 		"d9:9");
@@ -606,7 +557,7 @@ TEST(SkillTests, MaximumSkill) {
 TEST(SkillTests, RollRequiresNotSetState) {
     BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID);
 
-    // This invariant is enforced only in debug builds, where assert() is active.
+	// Death tests require active assertions.
 #ifdef NDEBUG
     GTEST_SKIP() << "assert() is compiled out in release builds";
 #else
@@ -621,7 +572,7 @@ TEST(SkillTests, RollRequiresNotSetState) {
 TEST(SkillTests, SwingSetRequiresNotSetState) {
     BMC_Die die = TEST_Util::createTestDie(6, BME_PROPERTY_VALID, BME_SWING_X);
 
-    // This invariant is enforced only in debug builds, where assert() is active.
+	// Death tests require active assertions.
 #ifdef NDEBUG
     GTEST_SKIP() << "assert() is compiled out in release builds";
 #else
@@ -642,7 +593,7 @@ TEST(SkillTests, KonstantRetainsValueWhenTripped) {
 		IsAttack(BME_ATTACK_TYPE_1_1, "trip", 0, 0)
 	));
 
-	// Fix the RNG seed so a broken reroll path cannot randomly land back on 7 and mask the bug.
+	// A fixed seed prevents a coincidental value match.
 	g_rng.SRand(1);
 
 	bool extra_turn = false;
@@ -667,7 +618,6 @@ TEST(SkillTests, TripTargetMightyTriggersOnce) {
 	bool extra_turn = false;
 	context.Game()->SimulateAttack(*trip_it, extra_turn);
 
-	// A Mighty d6 grows once to d8 when Trip causes it to reroll.
 	EXPECT_EQ(context.Game()->GetPlayer(1)->GetDie(0)->GetSidesMax(), 8);
 }
 
@@ -687,7 +637,6 @@ TEST(SkillTests, KonstantMightyTripTargetRetainsValueAndGrows) {
 
 	BMC_Die *target = context.Game()->GetPlayer(1)->GetDie(0);
 	EXPECT_EQ(target->GetValueTotal(), 5);
-	// Konstant preserves the value, but Mighty still responds to the Trip reroll.
 	EXPECT_EQ(target->GetSidesMax(), 8);
 }
 
@@ -738,13 +687,12 @@ TEST(SkillTests, KonstantRetainsValueWhenChanceRerolls) {
 	});
 	ASSERT_NE(chance_it, valid_chance.end());
 
-	// Fix the RNG seed so a broken reroll path cannot randomly land back on 7 and mask the bug.
+	// A fixed seed prevents a coincidental value match.
 	g_rng.SRand(1);
 
 	context.Game()->ApplyUseChance(*chance_it);
 
 	BMC_Player *chance_player = context.Game()->GetPlayer(0);
-	// Die should not have re-rolled
 	EXPECT_EQ(chance_player->GetDie(0)->GetValueTotal(), 7);
 }
 
@@ -862,6 +810,42 @@ TEST(SkillTests, KonstantOrneryWeakRetainsValueAndShrinks) {
 	EXPECT_EQ(ornery_die->GetSidesMax(), 4);
 }
 
+TEST(SkillTests, NonparticipatingOrneryDieRerolls) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("6:6 o100:100", "1:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [&context](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.a("6");
+	});
+	ASSERT_NE(attack_it, valid_attacks.end());
+
+	int original_index = context.a("o100");
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*attack_it, extra_turn);
+
+	BMC_Die *ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(ornery_die, nullptr);
+	EXPECT_NE(ornery_die->GetValueTotal(), 100);
+}
+
+TEST(SkillTests, ParticipatingOrneryMightyTriggersOnce) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("oH6:6", "1:1");
+	auto valid_attacks = context.ValidAttacks();
+	ASSERT_THAT(valid_attacks, ::testing::UnorderedElementsAre(
+		IsAttack(BME_ATTACK_TYPE_1_1, "power", 0, 0)
+	));
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(valid_attacks.front(), extra_turn);
+
+	EXPECT_EQ(context.Game()->GetPlayer(0)->GetDie(0)->GetSidesMax(), 8);
+}
+
 TEST(SkillTests, KonstantTimeAndSpaceTripDoesNotGrantExtraTurn) {
 	TEST_Util test;
 
@@ -895,6 +879,24 @@ TEST(SkillTests, KonstantTimeAndSpaceSkillAttackDoesNotGrantExtraTurn) {
 	EXPECT_FALSE(extra_turn);
 }
 
+TEST(SkillTests, TimeAndSpaceOddRerollGrantsExtraTurn) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("^6:1", "1:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_POWER;
+	});
+	ASSERT_NE(attack_it, valid_attacks.end());
+
+	g_rng.SRand(3);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*attack_it, extra_turn);
+
+	ASSERT_EQ(context.Game()->GetPlayer(0)->GetDie(0)->GetValueTotal()%2, 1);
+	EXPECT_TRUE(extra_turn);
+}
+
 TEST(SkillTests, KonstantAttackerRetainsValueAfterSkillAttack) {
 	TEST_Util test;
 
@@ -918,7 +920,6 @@ TEST(SkillTests, KonstantAttackerRetainsValueAfterSkillAttack) {
 	attacker = context.Game()->GetPlayer(0);
 	konstant_die = FindDieByOriginalIndex(attacker, original_index);
 	ASSERT_NE(konstant_die, nullptr);
-	// Die should not have re-rolled
 	EXPECT_EQ(konstant_die->GetValueTotal(), 13);
 }
 
@@ -946,7 +947,6 @@ TEST(SkillTests, KonstantWarriorRetainsValueWhenUsedInSkillAttack) {
 	attacker = context.Game()->GetPlayer(0);
 	warrior_die = FindDieByOriginalIndex(attacker, original_index);
 	ASSERT_NE(warrior_die, nullptr);
-	// Die should not have re-rolled
 	EXPECT_EQ(warrior_die->GetValueTotal(), 17);
 	EXPECT_FALSE(warrior_die->HasProperty(BME_PROPERTY_WARRIOR));
 }

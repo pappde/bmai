@@ -19,9 +19,7 @@ This file tracks BMAI behavior against the [Button Weavers skill rules](skill-ru
 | Trip value retention | Implemented | `KonstantRetainsValueWhenTripped` |
 | Trip with Mighty and Weak | Implemented | `KonstantMightyTripTargetRetainsValueAndGrows`, `KonstantWeakTripTargetRetainsValueAndShrinks` |
 | Chance value retention | Implemented | `KonstantRetainsValueWhenChanceRerolls` |
-| Chance with Mighty and Weak | Known bug | `KonstantChanceMightyRetainsValueAndGrows`, `KonstantChanceWeakRetainsValueAndShrinks` |
-| Ornery value retention | Implemented | Covered indirectly by attack reroll behavior |
-| Ornery with Mighty and Weak | Known bug | `KonstantOrneryMightyRetainsValueAndGrows`, `KonstantOrneryWeakRetainsValueAndShrinks` |
-| TimeAndSpace | Known bug | `KonstantTimeAndSpaceTripDoesNotGrantExtraTurn`, `KonstantTimeAndSpaceSkillAttackDoesNotGrantExtraTurn` |
-
-`Known bug` tests intentionally fail until their corresponding behavior is fixed.
+| Chance with Mighty and Weak | Implemented | `KonstantChanceMightyRetainsValueAndGrows`, `KonstantChanceWeakRetainsValueAndShrinks` |
+| Ornery value retention | Implemented | `KonstantOrneryMightyRetainsValueAndGrows`, `KonstantOrneryWeakRetainsValueAndShrinks` |
+| Ornery with Mighty and Weak | Implemented | `KonstantOrneryMightyRetainsValueAndGrows`, `KonstantOrneryWeakRetainsValueAndShrinks` |
+| TimeAndSpace | Implemented | `KonstantTimeAndSpaceTripDoesNotGrantExtraTurn`, `KonstantTimeAndSpaceSkillAttackDoesNotGrantExtraTurn` |

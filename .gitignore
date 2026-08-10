@@ -692,3 +692,7 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,perl,cmake,linux,macos,windows,clion+all,visualstudio,visualstudiocode
 # SPDX-SnippetEnd
+
+# Local upstream rules cache; redistribution terms are not established.
+/docs/skill-rules.local.md
+/rules/buttonweavers-skills.local.json
