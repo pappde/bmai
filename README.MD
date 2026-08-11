@@ -22,25 +22,6 @@ Homepage: https://github.com/pappde/bmai
 4. [BMAI SUMMARY](#4-bmai-summary)
 5. [POSSIBLE IMPROVEMENTS](#5-possible-improvements)
 
-## Rules reference
-
-The repository includes a generated [Button Weavers skill index](docs/skill-rules.md), its [machine-readable snapshot](rules/buttonweavers-skills.json), and a separately maintained [implementation-status matrix](docs/skill-status.md). Rule text remains at Button Weavers; the checked-in artifacts contain identifiers and links only.
-
-Refresh both generated rule files from Button Weavers with:
-
-```sh
-python3 scripts/update_buttonweavers_skills.py
-```
-
-The refresh also writes the complete upstream text to the gitignored
-`docs/skill-rules.local.md` and `rules/buttonweavers-skills.local.json` for local human and AI-assisted development.
-
-Validate the checked-in snapshot and generated Markdown without network access with:
-
-```sh
-python3 scripts/update_buttonweavers_skills.py --check
-```
-
 ## CONTENTS
 
 ### 1. FOREWORD AND HISTORY (UPDATE 2020)

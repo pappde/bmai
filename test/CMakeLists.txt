@@ -52,9 +52,3 @@ endif()
 
 include(GoogleTest)
 gtest_discover_tests(bmai_tests DISCOVERY_MODE PRE_TEST)
-
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
-add_test(
-    NAME rules_generator
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/RulesGeneratorTest.py
-)

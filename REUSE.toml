@@ -10,8 +10,3 @@ path = [
 ]
 SPDX-License-Identifier = "MIT"
 SPDX-FileCopyrightText = "Copyright © Denis Papp <denis@accessdenied.net>"
-
-[[annotations]]
-path = ["rules/*.json"]
-SPDX-License-Identifier = "MIT"
-SPDX-FileCopyrightText = "Copyright © 2026 Denis Papp <denis@accessdenied.net>"
