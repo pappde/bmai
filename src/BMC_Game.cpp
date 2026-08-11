@@ -25,9 +25,9 @@
 
 struct KonstantTerm
 {
-	INT min_value;  // 1 if Stinger, else full value
-	INT max_value;  // always full die value
-	bool allow_subtraction;  // false for Warrior+Konstant
+	INT min_value;
+	INT max_value;
+	bool allow_subtraction;
 };
 
 BMC_Game::BMC_Game(bool _simulation)
@@ -1078,7 +1078,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 				{
 					BMC_DieIndexStack	die_stack(attacker);
 					bool finished = false;
-					bool player_has_flexible_skill_die = false;
+					bool player_has_variable_skill_value = false;
 					for (INT i = 0; i < attacker->GetAvailableDice(); i++)
 					{
 						BMC_Die *die = attacker->GetDie(i);
@@ -1086,7 +1086,7 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 							&& (die->HasProperty(BME_PROPERTY_STINGER)
 								|| die->HasProperty(BME_PROPERTY_KONSTANT)))
 						{
-							player_has_flexible_skill_die = true;
+							player_has_variable_skill_value = true;
 							break;
 						}
 					}
@@ -1169,8 +1169,8 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// if full (using all target dice) and att value is <= tgt total value, give up since won't be able to do any other matches
 						// drp100224 - this check was wrong. We can abort if GetValueTotal() <= target->GetMinValue(), since that's the highest we can combine to,
 						//  but otherwise we should keep cycling since other combniations will have lower totals.
-						// Unused flexible dice can reduce later stack totals.
-						bool skip_cycle_pruning = player_has_flexible_skill_die;
+						// Rolled totals are not lower bounds for Stinger or Konstant stacks.
+						bool skip_cycle_pruning = player_has_variable_skill_value;
 						if (!skip_cycle_pruning && die_stack.ContainsAllDice() && die_stack.GetValueTotal() <= target->GetMinValue())
 							break;
 
@@ -1603,7 +1603,7 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 		}
 	}
 
-	for (i=0; i<attacker->GetAvailableDice(); i++)
+	for (i=0; _move.m_attack != BME_ATTACK_INVALID && i<attacker->GetAvailableDice(); i++)
 	{
 		att_die = attacker->GetDie(i);
 		if (!att_die->HasProperty(BME_PROPERTY_ORNERY))

@@ -11,7 +11,6 @@
 // drp030321 - partial split out to individual headers
 // dbl100524 - further split out of individual headers
 // dbl040626 - expose parser-owned game for parser-driven tests
-// dbl081026 - grant parser tests game access
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -25,7 +24,6 @@
 #include "BMC_Die.h"
 #include "BMC_QAI.h"
 
-class TEST_Parser;
 
 class BMC_Parser
 {
@@ -34,6 +32,7 @@ public:
 	void	ParseStdIn() { m_inputFile = stdin; Parse(); }
 	void	ParseFile(FILE *_fp) { m_inputFile = _fp; Parse(); }
 	void	ParseString(std::string  _data);
+	BMC_Game *Game() { return &m_game; }
 
 protected:
 	void			GetAction();
@@ -64,7 +63,6 @@ protected:
 	bool			DieIsOption(char _c) { return _c == '/'; }
 
 private:
-	friend class TEST_Parser;
 	void			Parse();
 
 	// parsing dice methods (uses 'line')

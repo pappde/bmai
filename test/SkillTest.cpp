@@ -217,7 +217,7 @@ TEST(SkillTests, KonstantSkillAttackWithUnusedStingerInPool)
 		"4:4");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
-										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "5", "Mk2", "Mk3" }), ctx.t("4"))));
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "5", "Mk2", "Mk3" }), ctx.TargetIndex("4"))));
 }
 
 TEST(SkillTests, StingerAndKonstantBothInAttack)
@@ -351,7 +351,7 @@ TEST(SkillTests, NormalStingerKonstantThreeDieAttack)
 		"5:5");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
-										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "g6", "Mk3" }), ctx.t("5"))));
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "g6", "Mk3" }), ctx.TargetIndex("5"))));
 }
 
 TEST(SkillTests, KonstantWarriorCanAddInSkillAttack)
@@ -363,7 +363,7 @@ TEST(SkillTests, KonstantWarriorCanAddInSkillAttack)
 		"8:8");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
-										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "5", "`k3" }), ctx.t("8"))));
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "5", "`k3" }), ctx.TargetIndex("8"))));
 }
 
 TEST(SkillTests, StingerWarriorMustUseFullValue)
@@ -375,7 +375,7 @@ TEST(SkillTests, StingerWarriorMustUseFullValue)
 		"7:7");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
-										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`g6" }), ctx.t("7")))));
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "`g6" }), ctx.TargetIndex("7")))));
 }
 
 TEST(SkillTests, StingerWarriorAtFullValueIsValid)
@@ -387,7 +387,7 @@ TEST(SkillTests, StingerWarriorAtFullValueIsValid)
 		"10:10");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
-										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`g6" }), ctx.t("10"))));
+										IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "`g6" }), ctx.TargetIndex("10"))));
 }
 
 TEST(SkillTests, StingerAndKonstantCombinedFlexibility)
@@ -423,7 +423,7 @@ TEST(SkillTests, StingerKonstantOnSameDieWithAddition)
 		"d6:6");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
-		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "gk5" }), ctx.t("d6"))));
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "gk5" }), ctx.TargetIndex("d6"))));
 }
 
 TEST(SkillTests, StingerKonstantOnSameDieCannotHitGapBetweenSigns)
@@ -435,7 +435,7 @@ TEST(SkillTests, StingerKonstantOnSameDieCannotHitGapBetweenSigns)
 		"d4:4");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
-		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "gk5" }), ctx.t("d4")))));
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "gk5" }), ctx.TargetIndex("d4")))));
 }
 
 TEST(SkillTests, StingerWithKonstantWarriorUsesStingerFlexibility)
@@ -447,7 +447,7 @@ TEST(SkillTests, StingerWithKonstantWarriorUsesStingerFlexibility)
 		"d7:7");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::ElementsAre(
-		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "g6", "`k3" }), ctx.t("d7"))));
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "g6", "`k3" }), ctx.TargetIndex("d7"))));
 }
 
 TEST(SkillTests, StingerWarriorWithKonstantUsesKonstantSubtraction)
@@ -459,7 +459,7 @@ TEST(SkillTests, StingerWarriorWithKonstantUsesKonstantSubtraction)
 		"d3:3");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
-		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "`g6", "Mk3" }), ctx.t("d3"))));
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "`g6", "Mk3" }), ctx.TargetIndex("d3"))));
 }
 
 TEST(SkillTests, StingerKonstantWarriorUsesFullPositiveValue)
@@ -471,7 +471,7 @@ TEST(SkillTests, StingerKonstantWarriorUsesFullPositiveValue)
 		"d9:9");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Contains(
-		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`gk5" }), ctx.t("d9"))));
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "`gk5" }), ctx.TargetIndex("d9"))));
 }
 
 TEST(SkillTests, StingerKonstantWarriorCannotUsePartialValue)
@@ -483,7 +483,7 @@ TEST(SkillTests, StingerKonstantWarriorCannotUsePartialValue)
 		"d6:6");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
-		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`gk5" }), ctx.t("d6")))));
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "`gk5" }), ctx.TargetIndex("d6")))));
 }
 
 TEST(SkillTests, StingerKonstantWarriorCannotSubtract)
@@ -495,7 +495,7 @@ TEST(SkillTests, StingerKonstantWarriorCannotSubtract)
 		"d2:2");
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
-		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.a({ "4", "`gk5" }), ctx.t("d2")))));
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "`gk5" }), ctx.TargetIndex("d2")))));
 }
 
 TEST(SkillTests, StealthSingleDieSkillAttack) {
@@ -770,11 +770,11 @@ TEST(SkillTests, KonstantOrneryMightyRetainsValueAndGrows) {
 	auto context = test.ParseFightContext("6:6 oHk6:3", "1:1");
 	auto valid_attacks = context.ValidAttacks();
 	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [&context](const BMC_Move &move) {
-		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.a("6");
+		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.AttackerIndex("6");
 	});
 	ASSERT_NE(attack_it, valid_attacks.end());
 
-	int original_index = context.a("oHk6");
+	int original_index = context.AttackerIndex("oHk6");
 	BMC_Die *ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
 	ASSERT_NE(ornery_die, nullptr);
 	g_rng.SRand(1);
@@ -793,11 +793,11 @@ TEST(SkillTests, KonstantOrneryWeakRetainsValueAndShrinks) {
 	auto context = test.ParseFightContext("6:6 ohk6:3", "1:1");
 	auto valid_attacks = context.ValidAttacks();
 	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [&context](const BMC_Move &move) {
-		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.a("6");
+		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.AttackerIndex("6");
 	});
 	ASSERT_NE(attack_it, valid_attacks.end());
 
-	int original_index = context.a("ohk6");
+	int original_index = context.AttackerIndex("ohk6");
 	BMC_Die *ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
 	ASSERT_NE(ornery_die, nullptr);
 	g_rng.SRand(1);
@@ -816,11 +816,11 @@ TEST(SkillTests, NonparticipatingOrneryDieRerolls) {
 	auto context = test.ParseFightContext("6:6 o100:100", "1:1");
 	auto valid_attacks = context.ValidAttacks();
 	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [&context](const BMC_Move &move) {
-		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.a("6");
+		return move.m_attack == BME_ATTACK_POWER && move.m_attacker == context.AttackerIndex("6");
 	});
 	ASSERT_NE(attack_it, valid_attacks.end());
 
-	int original_index = context.a("o100");
+	int original_index = context.AttackerIndex("o100");
 	g_rng.SRand(1);
 	bool extra_turn = false;
 	context.Game()->SimulateAttack(*attack_it, extra_turn);
@@ -844,6 +844,42 @@ TEST(SkillTests, ParticipatingOrneryMightyTriggersOnce) {
 	context.Game()->SimulateAttack(valid_attacks.front(), extra_turn);
 
 	EXPECT_EQ(context.Game()->GetPlayer(0)->GetDie(0)->GetSidesMax(), 8);
+}
+
+TEST(SkillTests, OrneryMoodDoesNotChangeOnPass) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("oX?-6:3", "20:20");
+	auto valid_attacks = context.ValidAttacks();
+	auto pass_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_action == BME_ACTION_PASS;
+	});
+	ASSERT_NE(pass_it, valid_attacks.end());
+
+	BMC_Die *ornery_die = context.Game()->GetPlayer(0)->GetDie(0);
+	ASSERT_NE(ornery_die, nullptr);
+	int sides = ornery_die->GetSidesMax();
+	int value = ornery_die->GetValueTotal();
+
+	g_rng.SRand(1);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*pass_it, extra_turn);
+
+	EXPECT_EQ(ornery_die->GetSidesMax(), sides);
+	EXPECT_EQ(ornery_die->GetValueTotal(), value);
+}
+
+TEST(SkillTests, OrdinarySideChangeInvalidatesValue) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("6:3", "20:20");
+	BMC_Player *player = context.Game()->GetPlayer(0);
+	BMC_Die *die = player->GetDie(0);
+	ASSERT_EQ(die->GetState(), BME_STATE_READY);
+
+	player->OnDieSidesChanging(die);
+
+	EXPECT_EQ(die->GetState(), BME_STATE_NOTSET);
 }
 
 TEST(SkillTests, KonstantTimeAndSpaceTripDoesNotGrantExtraTurn) {

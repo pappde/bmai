@@ -39,7 +39,6 @@ public:
 // lets us collect what is being sent to Send for inspection during tests
 class TEST_Parser : public BMC_Parser {
 public:
-	BMC_Game *Game() { return &m_game; }
 	std::string tm_third_to_last_fmt;
 	std::string tm_next_to_last_fmt;
 	std::string tm_last_fmt;
@@ -82,7 +81,7 @@ public:
 		std::vector<std::string> attacker_specs;
 		std::vector<std::string> target_specs;
 
-		int a(const std::string &_spec) const
+		int AttackerIndex(const std::string &_spec) const
 		{
 			for (int i = 0; i < (int)attacker_specs.size(); i++)
 				if (attacker_specs[i] == _spec)
@@ -90,15 +89,15 @@ public:
 			throw std::runtime_error("attacker die not found: " + _spec);
 		}
 
-		std::vector<int> a(std::initializer_list<std::string> _specs) const
+		std::vector<int> AttackerIndex(std::initializer_list<std::string> _specs) const
 		{
 			std::vector<int> result;
 			for (auto &s : _specs)
-				result.push_back(a(s));
+				result.push_back(AttackerIndex(s));
 			return result;
 		}
 
-		int t(const std::string &_spec) const
+		int TargetIndex(const std::string &_spec) const
 		{
 			for (int i = 0; i < (int)target_specs.size(); i++)
 				if (target_specs[i] == _spec)
@@ -106,11 +105,11 @@ public:
 			throw std::runtime_error("target die not found: " + _spec);
 		}
 
-		std::vector<int> t(std::initializer_list<std::string> _specs) const
+		std::vector<int> TargetIndex(std::initializer_list<std::string> _specs) const
 		{
 			std::vector<int> result;
 			for (auto &s : _specs)
-				result.push_back(t(s));
+				result.push_back(TargetIndex(s));
 			return result;
 		}
 
