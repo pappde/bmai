@@ -195,6 +195,19 @@ TEST(SkillTests, KonstantMultiDieSkillAttackWithoutSubtraction) {
 	));
 }
 
+TEST(SkillTests, TenKonstantDiceCanMakeSignedSkillAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext(
+		"k1:1 k2:2 k3:3 k4:4 k5:5 k6:6 k7:7 k8:8 k9:9 k10:10",
+		"53:53");
+
+	EXPECT_THAT(context.ValidAttacks(), ::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill",
+			context.AttackerIndex({ "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10" }),
+			context.TargetIndex("53"))));
+}
+
 TEST(SkillTests, KonstantGenerationFindsLaterTargetAfterOvershoot) {
 	TEST_Util test;
 
@@ -436,6 +449,18 @@ TEST(SkillTests, StingerKonstantOnSameDieCannotHitGapBetweenSigns)
 
 	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
 		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "4", "gk5" }), ctx.TargetIndex("d4")))));
+}
+
+TEST(SkillTests, TwoStingerKonstantDiceCannotHitGapBetweenSignedValues)
+{
+	TEST_Util test;
+
+	auto ctx = test.ParseFightContext(
+		"gk1:1 gk2:1",
+		"d1:1");
+
+	EXPECT_THAT(ctx.ValidAttacks(), ::testing::Not(::testing::Contains(
+		IsAttack(BME_ATTACK_TYPE_N_1, "skill", ctx.AttackerIndex({ "gk1", "gk2" }), ctx.TargetIndex("d1")))));
 }
 
 TEST(SkillTests, StingerWithKonstantWarriorUsesStingerFlexibility)
@@ -764,6 +789,22 @@ TEST(SkillTests, KonstantChanceWeakRetainsValueAndShrinks) {
 	EXPECT_EQ(chance_die->GetSidesMax(), 4);
 }
 
+TEST(SkillTests, KonstantMaximumRetainsValueWhenChanceRerolled) {
+	TEST_Util test;
+
+	auto context = test.ParseChanceContext("cMk6:3", "20:20");
+	auto valid_chance = context.ValidChance();
+	auto chance_it = std::find_if(valid_chance.begin(), valid_chance.end(), [](const BMC_Move &move) {
+		return move.m_action == BME_ACTION_USE_CHANCE;
+	});
+	ASSERT_NE(chance_it, valid_chance.end());
+
+	g_rng.SRand(1);
+	context.Game()->ApplyUseChance(*chance_it);
+
+	EXPECT_EQ(context.Game()->GetPlayer(0)->GetDie(0)->GetValueTotal(), 3);
+}
+
 TEST(SkillTests, KonstantOrneryMightyRetainsValueAndGrows) {
 	TEST_Util test;
 
@@ -869,6 +910,27 @@ TEST(SkillTests, OrneryMoodDoesNotChangeOnPass) {
 	EXPECT_EQ(ornery_die->GetValueTotal(), value);
 }
 
+TEST(SkillTests, KonstantOrneryMoodChangesSizeAndRetainsValueOnAttack) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("6:6 okX?-6:3", "1:1");
+	auto valid_attacks = context.ValidAttacks();
+	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_POWER;
+	});
+	ASSERT_NE(attack_it, valid_attacks.end());
+
+	int original_index = context.AttackerIndex("okX?-6");
+	g_rng.SRand(3);
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*attack_it, extra_turn);
+
+	BMC_Die *ornery_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(ornery_die, nullptr);
+	EXPECT_NE(ornery_die->GetSidesMax(), 6);
+	EXPECT_EQ(ornery_die->GetValueTotal(), 3);
+}
+
 TEST(SkillTests, OrdinarySideChangeInvalidatesValue) {
 	TEST_Util test;
 
@@ -957,6 +1019,47 @@ TEST(SkillTests, KonstantAttackerRetainsValueAfterSkillAttack) {
 	konstant_die = FindDieByOriginalIndex(attacker, original_index);
 	ASSERT_NE(konstant_die, nullptr);
 	EXPECT_EQ(konstant_die->GetValueTotal(), 13);
+}
+
+TEST(SkillTests, KonstantMorphingAttackerRetainsValueAfterChangingSize) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("mk9:6 1:1", "7:7");
+	auto valid_attacks = context.ValidAttacks();
+	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_SKILL;
+	});
+	ASSERT_NE(attack_it, valid_attacks.end());
+
+	int original_index = context.AttackerIndex("mk9");
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*attack_it, extra_turn);
+
+	BMC_Die *konstant_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(konstant_die, nullptr);
+	EXPECT_EQ(konstant_die->GetSidesMax(), 7);
+	EXPECT_EQ(konstant_die->GetValueTotal(), 6);
+}
+
+TEST(SkillTests, KonstantBerserkAttackerRetainsValueAfterHalvingSize) {
+	TEST_Util test;
+
+	auto context = test.ParseFightContext("Bk9:8", "3:3 5:5");
+	auto valid_attacks = context.ValidAttacks();
+	auto attack_it = std::find_if(valid_attacks.begin(), valid_attacks.end(), [](const BMC_Move &move) {
+		return move.m_attack == BME_ATTACK_BERSERK;
+	});
+	ASSERT_NE(attack_it, valid_attacks.end());
+
+	int original_index = context.AttackerIndex("Bk9");
+	bool extra_turn = false;
+	context.Game()->SimulateAttack(*attack_it, extra_turn);
+
+	BMC_Die *konstant_die = FindDieByOriginalIndex(context.Game()->GetPlayer(0), original_index);
+	ASSERT_NE(konstant_die, nullptr);
+	EXPECT_EQ(konstant_die->GetSidesMax(), 5);
+	EXPECT_EQ(konstant_die->GetValueTotal(), 8);
+	EXPECT_FALSE(konstant_die->HasProperty(BME_PROPERTY_BERSERK));
 }
 
 TEST(SkillTests, KonstantWarriorRetainsValueWhenUsedInSkillAttack) {
