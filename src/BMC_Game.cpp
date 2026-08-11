@@ -12,7 +12,7 @@
 // dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
 // dbl040626 - schedule Chance and Trip rerolls only for dice that should actually reroll
-// dbl081026 - add signed Konstant attacks and reroll interactions
+// dbl081026 - support signed Konstant skill attacks; preserve Konstant values through Chance, Trip, and Ornery effects
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Game.h"
