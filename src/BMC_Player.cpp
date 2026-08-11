@@ -9,6 +9,7 @@
 //
 // REVISION HISTORY:
 // dbl100524 - broke this logic out into its own class file
+// dbl040626 - add property-change bookkeeping for warrior Konstant transitions
 // dbl081026 - track score across die property changes
 ///////////////////////////////////////////////////////////////////////////////////////////
 

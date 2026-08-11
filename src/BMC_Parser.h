@@ -10,6 +10,7 @@
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
 // dbl100524 - further split out of individual headers
+// dbl040626 - expose parser-owned game for parser-driven tests
 // dbl081026 - grant parser tests game access
 ///////////////////////////////////////////////////////////////////////////////////////////
 

@@ -11,6 +11,7 @@
 // dbl100524 - broke this logic out into its own class file
 // dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
+// dbl040626 - schedule Chance and Trip rerolls only for dice that should actually reroll
 // dbl081026 - add signed Konstant attacks and reroll interactions
 ///////////////////////////////////////////////////////////////////////////////////////////
 

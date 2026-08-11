@@ -10,6 +10,7 @@
 // REVISION HISTORY:
 // drp030321 - partial split out to individual headers
 // dbl100524 - further split out of individual headers
+// dbl040626 - add property-change bookkeeping hooks for warrior Konstant transitions
 // dbl081026 - declare die property change events
 ///////////////////////////////////////////////////////////////////////////////////////////
 
