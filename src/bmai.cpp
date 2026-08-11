@@ -102,6 +102,7 @@
 // dbl102424	- Implemented Insult skill
 // dbl110424	- Parser can now parse passed in String
 //				- Implemented Value skill
+// dbl081026 - remove completed Konstant TODOs
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // TODO:
@@ -160,9 +161,6 @@
 // - unskilled
 
 // DICE REMAINING: (most worthwhile +FvGk) (+DC%GF@vk)
-// k KONSTANT: (partial support)
-//	  done: cannot power attack, cannot perform 1 die skill attack, does not reroll
-//	  todo: can add or subtract in a skill attack
 // + AUX: if both players have one and agree, they use them.  If one player doesn't and both
 //   players agree, then you get the same die as the opponent.
 // D DOPPLEGANGER: if doing a power attack, att_die becomes exact copy of tgt_die (still rerolls)
@@ -245,7 +243,6 @@
 // - MORPHING SPEED/BERSERK or TURBO works? (not allowing)
 // - MORPHING MIGHTY/WEAK order? (applying morphing after)
 // - WARRIOR: worth 0 when has skill, still worth 0 once loses? (assuming no)
-// - KONSTANT: reroll on trip?
 
 // LOW PRIORITY TODO:
 // - clean up logging system

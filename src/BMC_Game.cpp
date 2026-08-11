@@ -12,6 +12,7 @@
 // dbl021125 - adjust to new Die::CanDoAttack()/Die::CanBeAttacked() signatures
 // dbl032526 - allow single-die skill; enforce that Stealth overrides added attacks and only interacts via multi-die skill as attacker or target
 // dbl040626 - schedule Chance and Trip rerolls only for dice that should actually reroll
+// dbl081026 - support signed Konstant skill attacks; preserve Konstant values through Chance, Trip, and Ornery effects
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include "BMC_Game.h"
@@ -22,6 +23,12 @@
 #include "BMC_DieIndexStack.h"
 #include "BMC_Logger.h"
 
+struct KonstantTerm
+{
+	INT min_value;
+	INT max_value;
+	bool allow_subtraction;
+};
 
 BMC_Game::BMC_Game(bool _simulation)
 {
@@ -381,13 +388,6 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 
 	case BME_ATTACK_SKILL:	// N -> 1
 		{
-			// TODO: KONSTANT allow + or -
-				// 41 k2 k3
-				// 5+2+3 10
-				// 5+2-3 4
-				// 5-2+3 6
-				// 5-2-3 0
-
 			// WARRIOR: can only have one involved
 			INT warriors = 0;
 
@@ -401,10 +401,14 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 			INT	att_value_total = 0;
 			INT i;
 			INT dice = 0;
-			bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
+			bool att_has_stinger = false;
 			bool has_stealth = false;
 			INT stinger_att_value_minimum = 0;
+			INT stinger_slack = 0;
 			INT konstants = 0;
+			INT subtractable_konstants = 0;
+			INT non_konstant_total = 0;
+			KonstantTerm konstant_terms[BMD_MAX_DICE];
 			for (i=0; i<BMD_MAX_DICE; i++)
 			{
 				if (_move.m_attackers.IsSet(i))
@@ -415,10 +419,7 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 					if (!att_die->CanDoAttack(_move.m_attack))
 						return false;
 
-					// count value of att die, and check if gone past limit
 					att_value_total += att_die->GetValueTotal();
-					if (!has_stinger && att_value_total > tgt_die->GetValueTotal())
-						return false;
 
 					if (att_die->HasProperty(BME_PROPERTY_WARRIOR))
 					{
@@ -427,33 +428,99 @@ bool BMC_Game::ValidAttack(BMC_MoveAttack &_move)
 						warriors++;
 					}
 
-						if (att_die->HasProperty(BME_PROPERTY_KONSTANT))
-							konstants++;
+					bool is_konstant = att_die->HasProperty(BME_PROPERTY_KONSTANT);
+					bool is_stinger = att_die->HasProperty(BME_PROPERTY_STINGER)
+						&& !att_die->HasProperty(BME_PROPERTY_WARRIOR);
 
-						if (att_die->HasProperty(BME_PROPERTY_STEALTH))
-							has_stealth = true;
+					if (is_konstant)
+					{
+						konstant_terms[konstants] = {
+							is_stinger ? att_die->Dice() : att_die->GetValueTotal(),
+							att_die->GetValueTotal(),
+							!att_die->HasProperty(BME_PROPERTY_WARRIOR)
+						};
+						if (konstant_terms[konstants].allow_subtraction)
+							subtractable_konstants++;
+						konstants++;
+					}
+					else
+					{
+						non_konstant_total += att_die->GetValueTotal();
+					}
 
-						if (att_die->HasProperty(BME_PROPERTY_STINGER))
-							stinger_att_value_minimum += 1;
-						else
-							stinger_att_value_minimum += att_die->GetValueTotal();
+					if (att_die->HasProperty(BME_PROPERTY_STEALTH))
+						has_stealth = true;
+
+					if (is_stinger && !is_konstant)
+					{
+						att_has_stinger = true;
+						stinger_att_value_minimum += att_die->Dice();  // min is 1 per sub-die (2 for twins)
+						stinger_slack += att_die->GetValueTotal() - att_die->Dice();
+					}
+					else if (!is_konstant)
+					{
+						stinger_att_value_minimum += att_die->GetValueTotal();
 					}
 				}
-	
-				// Stealth dice can only participate in, or be captured by, multi-die skill attacks.
-				if (dice<2 && (has_stealth || target_has_stealth))
-					return false;
-	
-				// KONSTANT: cannot do with just one die
-				if (dice<2 && konstants>0)
+			}
+
+			bool att_has_konstant = (konstants > 0);
+
+			if (dice < 2 && (has_stealth || target_has_stealth))
 				return false;
+
+			if (dice < 2 && konstants > 0)
+				return false;
+
+			// Try each assignment of signs to subtractable Konstant dice. Stinger
+			// flexibility makes the reachable values for one sign assignment a
+			// continuous interval, so individual die values do not need enumeration.
+			if (konstants > 0)
+			{
+				INT tgt = tgt_die->GetValueTotal();
+				INT sign_combinations = 1 << subtractable_konstants;
+				for (INT signs = 0; signs < sign_combinations; signs++)
+				{
+					INT minimum = non_konstant_total - stinger_slack;
+					INT maximum = non_konstant_total;
+					INT sign_bit = 0;
+					for (INT k = 0; k < konstants; k++)
+					{
+						const KonstantTerm &term = konstant_terms[k];
+						bool subtract = term.allow_subtraction && (signs & (1 << sign_bit));
+						if (term.allow_subtraction)
+							sign_bit++;
+
+						if (subtract)
+						{
+							minimum -= term.max_value;
+							maximum -= term.min_value;
+						}
+						else
+						{
+							minimum += term.min_value;
+							maximum += term.max_value;
+						}
+					}
+
+					if (tgt >= minimum && tgt <= maximum)
+						return true;
+				}
+			}
+
+			if (att_value_total > tgt_die->GetValueTotal()
+				&& !att_has_stinger
+				&& !att_has_konstant)
+			{
+				return false;
+			}
 
 			// if match - success
 			if (att_value_total == tgt_die->GetValueTotal())
 				return true;
 
 			// stinger - if within range - success
-			if (has_stinger && tgt_die->GetValueTotal() >= stinger_att_value_minimum && tgt_die->GetValueTotal() <= att_value_total)
+			if (att_has_stinger && tgt_die->GetValueTotal() >= stinger_att_value_minimum && tgt_die->GetValueTotal() <= att_value_total)
 				return true;
 
 			return false;
@@ -1009,14 +1076,20 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 
 			case BME_ATTACK_TYPE_N_1:
 				{
-					// TODO: KONSTANT: consider all combinations, don't break early due to total
-					// OPTIMIZATION: KONSTANT optimization - add one negative version of each constant die to the front
-					//  of the stack.
-
 					BMC_DieIndexStack	die_stack(attacker);
 					bool finished = false;
-					bool has_stinger = attacker->HasDieWithProperty(BME_PROPERTY_STINGER);
-					bool has_konstant = attacker->HasDieWithProperty(BME_PROPERTY_KONSTANT);
+					bool player_has_variable_skill_value = false;
+					for (INT i = 0; i < attacker->GetAvailableDice(); i++)
+					{
+						BMC_Die *die = attacker->GetDie(i);
+						if (!die->HasProperty(BME_PROPERTY_WARRIOR)
+							&& (die->HasProperty(BME_PROPERTY_STINGER)
+								|| die->HasProperty(BME_PROPERTY_KONSTANT)))
+						{
+							player_has_variable_skill_value = true;
+							break;
+						}
+					}
 
 					// add the first die (this one)
 					die_stack.Push(move.m_attacker);
@@ -1025,9 +1098,21 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 					{
 						//die_stack.Debug(BME_DEBUG_ALWAYS);
 
-						// STINGER: if there are any stinger dice in the stack it gives us flexibility.
-						// The range is [non_stinger_total+stinger_dice, total]
-						if (has_stinger && die_stack.GetStackSize()>1)
+						bool stack_has_stinger = false;
+						bool stack_has_konstant = false;
+						for (INT si = 0; si < die_stack.GetStackSize(); si++)
+						{
+							BMC_Die *sd = die_stack.GetDie(si);
+							if (!sd->HasProperty(BME_PROPERTY_WARRIOR)
+								&& sd->HasProperty(BME_PROPERTY_STINGER))
+								stack_has_stinger = true;
+							if (!sd->HasProperty(BME_PROPERTY_WARRIOR)
+								&& sd->HasProperty(BME_PROPERTY_KONSTANT))
+								stack_has_konstant = true;
+						}
+
+						// Konstant subtraction invalidates the Stinger range shortcut.
+						if (stack_has_stinger && !stack_has_konstant && die_stack.GetStackSize() > 1)
 						{
 							INT i;
 							INT minimum_value = 0;
@@ -1068,12 +1153,10 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 							{
 								tgt_die = target->GetDie(move.m_target);
 
-								// if past our value, give up
-								if (tgt_die->GetValueTotal() < die_stack.GetValueTotal())
+								if (!stack_has_konstant && tgt_die->GetValueTotal() < die_stack.GetValueTotal())
 									break;
 
-								// if match our value, check move
-								if (tgt_die->GetValueTotal() == die_stack.GetValueTotal())
+								if (stack_has_konstant || tgt_die->GetValueTotal() == die_stack.GetValueTotal())
 								{
 									// build m_attackers to check move validity
 									die_stack.SetBits(move.m_attackers);
@@ -1086,11 +1169,13 @@ void BMC_Game::GenerateValidAttacks(BMC_MoveList & _movelist)
 						// if full (using all target dice) and att value is <= tgt total value, give up since won't be able to do any other matches
 						// drp100224 - this check was wrong. We can abort if GetValueTotal() <= target->GetMinValue(), since that's the highest we can combine to,
 						//  but otherwise we should keep cycling since other combniations will have lower totals.
-						if (die_stack.ContainsAllDice() && die_stack.GetValueTotal()<=target->GetMinValue())
+						// Rolled totals are not lower bounds for Stinger or Konstant stacks.
+						bool skip_cycle_pruning = player_has_variable_skill_value;
+						if (!skip_cycle_pruning && die_stack.ContainsAllDice() && die_stack.GetValueTotal() <= target->GetMinValue())
 							break;
 
 						// if att_total matches or exceeds tgt_total, don't add a die
-						if (die_stack.GetValueTotal() >= target->GetMaxValue())
+						if (!skip_cycle_pruning && die_stack.GetValueTotal() >= target->GetMaxValue())
 							finished = die_stack.Cycle(false);
 						else // otherwise standard cycle
 							finished = die_stack.Cycle();
@@ -1281,7 +1366,7 @@ void BMC_Game::ApplyUseChance(BMC_Move &_move)
 			continue;
 		die = player->GetDie(i);
 
-		// CHANCE rerolls preserve Konstant values, so only schedule a reroll for dice that should change.
+		die->OnBeforeRollInGame(player);
 		if (!die->HasProperty(BME_PROPERTY_KONSTANT))
 			die->SetState(BME_STATE_NOTSET);
 		if (die->GetState()==BME_STATE_NOTSET)
@@ -1455,7 +1540,7 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 		}
 	}
 
-	// for TRIP, mark non-Konstant targets as needing a reroll
+	// Konstant suppresses randomness, not reroll-triggered effects.
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
@@ -1465,23 +1550,23 @@ void BMC_Game::ApplyAttackPlayer(BMC_Move &_move)
 
 		tgt_die = target->GetDie(_move.m_target);
 		if (!tgt_die->HasProperty(BME_PROPERTY_KONSTANT))
-		{
 			tgt_die->SetState(BME_STATE_NOTSET);
-			tgt_die->OnBeforeRollInGame(target);
-		}
+		tgt_die->OnBeforeRollInGame(target);
 	}
 
-	// ORNERY: all ornery dice on attacker must reroll (whether attacked)
-    // unless the player passed (there must be SOME attack involved)
-    if (_move.m_attack != BME_ATTACK_INVALID)
-    {
-        for (i=0; i<attacker->GetAvailableDice(); i++)
-        {
-            att_die = attacker->GetDie(i);
-            if (att_die->HasProperty(BME_PROPERTY_ORNERY))
-                att_die->OnApplyAttackPlayer(_move,attacker,false);	// false means not _actually_attacking
-        }
-    }
+	if (_move.m_attack != BME_ATTACK_INVALID)
+	{
+		for (i=0; i<attacker->GetAvailableDice(); i++)
+		{
+			att_die = attacker->GetDie(i);
+			if (!att_die->HasProperty(BME_PROPERTY_ORNERY)
+				|| att_die->GetState()==BME_STATE_NOTSET)
+				continue;
+			if (!att_die->HasProperty(BME_PROPERTY_KONSTANT))
+				att_die->SetState(BME_STATE_NOTSET);
+			att_die->OnBeforeRollInGame(attacker);
+		}
+	}
 }
 
 // DESC: simulate all random steps - reroll attackers, targets, MOOD
@@ -1518,18 +1603,25 @@ void BMC_Game::ApplyAttackNatureRoll(BMC_Move &_move)
 		}
 	}
 
+	for (i=0; _move.m_attack != BME_ATTACK_INVALID && i<attacker->GetAvailableDice(); i++)
+	{
+		att_die = attacker->GetDie(i);
+		if (!att_die->HasProperty(BME_PROPERTY_ORNERY))
+			continue;
+
+		bool participated = c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_N_1
+			? _move.m_attackers.IsSet(i)
+			: i==_move.m_attacker;
+		if (!participated)
+			att_die->OnApplyAttackNatureRollAttacker(_move,attacker);
+	}
+
 	// TRIP attack
 	if (_move.m_attack == BME_ATTACK_TRIP)
 	{
-		// reroll target if the attack scheduled one
 		BM_ASSERT(c_attack_type[_move.m_attack]==BME_ATTACK_TYPE_1_1);
 
 		tgt_die = target->GetDie(_move.m_target);
-		if (!tgt_die->HasProperty(BME_PROPERTY_KONSTANT))
-		{
-			tgt_die->SetState(BME_STATE_NOTSET);
-			tgt_die->OnBeforeRollInGame(target);
-		}
 		tgt_die->OnApplyAttackNatureRollTripped();
 	}
 }
@@ -1563,8 +1655,9 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 			null_attacker = att_die->HasProperty(BME_PROPERTY_NULL);
 			value_attacker = att_die->HasProperty(BME_PROPERTY_VALUE);
 
-			// TIME AND SPACE
-			if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
+			if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE)
+				&& !att_die->HasProperty(BME_PROPERTY_KONSTANT)
+				&& att_die->GetValueTotal()%2==1)
 				_extra_turn = true;
 			break;
 		}
@@ -1578,8 +1671,9 @@ void BMC_Game::ApplyAttackNaturePost(BMC_Move &_move, bool &_extra_turn)
 				null_attacker = null_attacker || att_die->HasProperty(BME_PROPERTY_NULL);
 				value_attacker = value_attacker || att_die->HasProperty(BME_PROPERTY_VALUE);
 
-				// TIME AND SPACE
-				if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE) && att_die->GetValueTotal()%2==1)
+				if (att_die->HasProperty(BME_PROPERTY_TIME_AND_SPACE)
+					&& !att_die->HasProperty(BME_PROPERTY_KONSTANT)
+					&& att_die->GetValueTotal()%2==1)
 					_extra_turn = true;
 			}
 			break;

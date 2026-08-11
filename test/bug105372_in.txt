@@ -1,0 +1,15 @@
+game 3
+fight
+player 0 3 0
+Mk1:1
+Mk1:1
+Mk3:3
+player 1 1 0
+3:3
+ply 2
+max_sims 100
+min_sims 5
+maxbranch 400
+surrender off
+getaction
+quit

@@ -78,6 +78,40 @@ public:
 		std::unique_ptr<TEST_Parser> parser;
 		BMC_Game *game = nullptr;
 		BMC_Move chosen_move;
+		std::vector<std::string> attacker_specs;
+		std::vector<std::string> target_specs;
+
+		int AttackerIndex(const std::string &_spec) const
+		{
+			for (int i = 0; i < (int)attacker_specs.size(); i++)
+				if (attacker_specs[i] == _spec)
+					return i;
+			throw std::runtime_error("attacker die not found: " + _spec);
+		}
+
+		std::vector<int> AttackerIndex(std::initializer_list<std::string> _specs) const
+		{
+			std::vector<int> result;
+			for (auto &s : _specs)
+				result.push_back(AttackerIndex(s));
+			return result;
+		}
+
+		int TargetIndex(const std::string &_spec) const
+		{
+			for (int i = 0; i < (int)target_specs.size(); i++)
+				if (target_specs[i] == _spec)
+					return i;
+			throw std::runtime_error("target die not found: " + _spec);
+		}
+
+		std::vector<int> TargetIndex(std::initializer_list<std::string> _specs) const
+		{
+			std::vector<int> result;
+			for (auto &s : _specs)
+				result.push_back(TargetIndex(s));
+			return result;
+		}
 
 		BMC_Game* Game() const
 		{
@@ -147,6 +181,12 @@ public:
 		context.parser->ParseString(ss.str());
 		context.game = context.parser->Game();
 		context.chosen_move = context.parser->last_attack;
+
+		for (auto &d : dice0)
+			context.attacker_specs.push_back(d.substr(0, d.find(':')));
+		for (auto &d : dice1)
+			context.target_specs.push_back(d.substr(0, d.find(':')));
+
 		return context;
 	}
 

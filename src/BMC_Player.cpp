@@ -10,6 +10,7 @@
 // REVISION HISTORY:
 // dbl100524 - broke this logic out into its own class file
 // dbl040626 - add property-change bookkeeping for warrior Konstant transitions
+// dbl081026 - preserve Konstant values during side changes
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // includes
@@ -236,8 +237,8 @@ void BMC_Player::OnDiePropertiesChanged(BMC_Die *_die)
 
 void BMC_Player::OnDieSidesChanging(BMC_Die *_die)
 {
-	// Side changes invalidate the current value, even for dice that otherwise preserve it between attacks.
-	if (_die->GetState()!=BME_STATE_NOTSET)
+	if (!_die->HasProperty(BME_PROPERTY_KONSTANT)
+		&& _die->GetState()!=BME_STATE_NOTSET)
 		_die->SetState(BME_STATE_NOTSET);
 	m_score -= _die->GetScore(true);
 }
